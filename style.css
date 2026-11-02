@@ -1,0 +1,21 @@
+/*
+Theme Name: Kataskevi
+Theme URI: https://kataskevi.com
+Author: Kataskevi Engineering & Safety Support Services
+Author URI: https://kataskevi.com
+Description: High-performance, bespoke WordPress theme for Kataskevi - Engineering, Safety, Information Technology, and Telecommunications support services. Includes turnkey support for Fire Suppression, Electronic Security, IT/Telecoms Site Prep, Access Control, and Industrial PPE.
+Version: 2.0.0
+Requires at least: 5.8
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU 
+ Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: kataskevi
+Tags: engineering, safety, telecommunications, corporate, responsive-layout, modern, grid-layout, accessibility-ready
+*/
+
+/*
+ * Note: Core styling is compiled and organized within assets/css/main.css
+ * to ensure optimal loading performance, modularity, and maintainability.
+ */

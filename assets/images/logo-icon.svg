@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="6" y1="4" x2="38" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2c5e8a"/>
+      <stop offset="100%" stop-color="#18344f"/>
+    </linearGradient>
+    <linearGradient id="emberGrad" x1="22" y1="13" x2="22" y2="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="60%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="12" y1="10" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Structural Shield -->
+  <path d="M22 3.5 L38.5 9.5 V22.5 C38.5 31.8 31.2 38.2 22 41 C12.8 38.2 5.5 31.8 5.5 22.5 V9.5 L22 3.5 Z" 
+        stroke="url(#shieldGrad)" stroke-width="2.5" stroke-linejoin="round" fill="#f8fafc"/>
+  
+  <!-- Inner Architectural Facet -->
+  <path d="M22 7.5 L34.5 12 V22 C34.5 28.8 29.2 34 22 36.5 C14.8 34 9.5 28.8 9.5 22 V12 L22 7.5 Z" 
+        stroke="url(#shieldGrad)" stroke-width="1.2" stroke-opacity="0.3" fill="none"/>
+
+  <!-- Left Facet Shading -->
+  <path d="M22 4 L5.5 10 V22.5 C5.5 31.8 12.8 38.2 22 41 V4 Z" 
+        fill="url(#shieldGrad)" fill-opacity="0.04"/>
+
+  <!-- Ember Flame & Precision Shield Core -->
+  <path d="M22 13 C20 16.5 16.5 19.5 16.5 23.5 C16.5 27.5 19 30.5 22 31 C25 30.5 27.5 27.5 27.5 23.5 C27.5 19.5 24 16.5 22 13 Z" 
+        fill="url(#emberGrad)"/>
+
+  <!-- Dynamic Inner Spark / Safety Diamond -->
+  <path d="M22 18.5 L24 22.5 L22 26.5 L20 22.5 Z" fill="#ffffff" fill-opacity="0.95"/>
+
+  <!-- Technical Corner Accents -->
+  <circle cx="22" cy="7.5" r="1.2" fill="#2c5e8a"/>
+  <circle cx="9.5" cy="12" r="1.2" fill="#2c5e8a"/>
+  <circle cx="34.5" cy="12" r="1.2" fill="#2c5e8a"/>
+</svg>
+

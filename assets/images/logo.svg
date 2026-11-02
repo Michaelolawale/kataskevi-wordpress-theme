@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175 44" width="175" height="44" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="4" y1="4" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2c5e8a"/>
+      <stop offset="100%" stop-color="#18344f"/>
+    </linearGradient>
+    <linearGradient id="emberGrad" x1="21" y1="14" x2="21" y2="33" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="60%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Emblem Icon -->
+  <g transform="translate(0, 0)">
+    <path d="M21 4.5 L36.5 10 V22 C36.5 30.5 29.8 36.5 21 39 C12.2 36.5 5.5 30.5 5.5 22 V10 L21 4.5 Z" 
+          stroke="url(#shieldGrad)" stroke-width="2.2" stroke-linejoin="round" fill="#f8fafc"/>
+    <path d="M21 8 L32.5 12 V21.5 C32.5 27.8 27.8 32.5 21 34.8 C14.2 32.5 9.5 27.8 9.5 21.5 V12 L21 8 Z" 
+          stroke="url(#shieldGrad)" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+    <path d="M21 5 L5.5 10.5 V22 C5.5 30.5 12.2 36.5 21 39 V5 Z" 
+          fill="url(#shieldGrad)" fill-opacity="0.05"/>
+    <path d="M21 14 C19.2 17.2 16 19.8 16 23.5 C16 27.2 18.2 29.8 21 30.5 C23.8 29.8 26 27.2 26 23.5 C26 19.8 22.8 17.2 21 14 Z" 
+          fill="url(#emberGrad)"/>
+    <path d="M21 19 L22.8 22.8 L21 26.5 L19.2 22.8 Z" fill="#ffffff" fill-opacity="0.95"/>
+    <circle cx="21" cy="8" r="1" fill="#2c5e8a"/>
+  </g>
+
+  <!-- Brand Typography (Without Engineering & Safety) -->
+  <g transform="translate(48, 0)">
+    <text x="0" y="30" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-size="30" font-style="normal" font-weight="500" fill="#171f27" letter-spacing="-0.02em">Kataskevi</text>
+  </g>
+</svg>
