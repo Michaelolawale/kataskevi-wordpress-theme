@@ -2,6 +2,8 @@
 /**
  * The template for displaying archive pages
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -42,8 +44,8 @@ get_header();
 				the_posts_pagination(
 					array(
 						'mid_size'  => 2,
-						'prev_text' => '&larr; Previous',
-						'next_text' => 'Next &rarr;',
+						'prev_text' => '&larr; ' . esc_html__( 'Previous', 'kataskevi' ),
+						'next_text' => esc_html__( 'Next', 'kataskevi' ) . ' &rarr;',
 					)
 				);
 				?>

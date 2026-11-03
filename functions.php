@@ -223,7 +223,7 @@ function kataskevi_setup_default_pages() {
 		} else {
 			// Ensure template is explicitly assigned
 			$current_tpl = get_post_meta( $page->ID, '_wp_page_template', true );
-			if ( empty( $current_tpl ) || $current_tpl === 'default' ) {
+			if ( empty( $current_tpl ) || 'default' === $current_tpl ) {
 				update_post_meta( $page->ID, '_wp_page_template', $data['template'] );
 			}
 			$created_pages[ $slug ] = $page->ID;
@@ -341,63 +341,9 @@ function kataskevi_scripts_styles() {
 add_action( 'wp_enqueue_scripts', 'kataskevi_scripts_styles' );
 
 /**
- * Customizer settings for Kataskevi company contacts and details
+ * Load Theme Customizer settings and controls.
  */
-function kataskevi_customize_register( $wp_customize ) {
-	$wp_customize->add_section(
-		'kataskevi_company_info',
-		array(
-			'title'       => esc_html__( 'Kataskevi Contact & Info', 'kataskevi' ),
-			'priority'    => 30,
-			'description' => esc_html__( 'Configure corporate phone numbers, email, physical address, and emergency engineering lines.', 'kataskevi' ),
-		)
-	);
-
-	// Phone Number
-	$wp_customize->add_setting( 'kataskevi_phone', array( 'default' => '+234 800 KATASKEVI', 'sanitize_callback' => 'sanitize_text_field' ) );
-	$wp_customize->add_control( 'kataskevi_phone', array( 'label' => esc_html__( 'Primary Phone / Hotline', 'kataskevi' ), 'section' => 'kataskevi_company_info', 'type' => 'text' ) );
-
-	// Emergency Support Line
-	$wp_customize->add_setting( 'kataskevi_emergency_phone', array( 'default' => '+234 802 345 6789', 'sanitize_callback' => 'sanitize_text_field' ) );
-	$wp_customize->add_control( 'kataskevi_emergency_phone', array( 'label' => esc_html__( '24/7 Emergency Line', 'kataskevi' ), 'section' => 'kataskevi_company_info', 'type' => 'text' ) );
-
-	// Email
-	$wp_customize->add_setting( 'kataskevi_email', array( 'default' => 'info@kataskevi.com', 'sanitize_callback' => 'sanitize_email' ) );
-	$wp_customize->add_control( 'kataskevi_email', array( 'label' => esc_html__( 'Contact Email', 'kataskevi' ), 'section' => 'kataskevi_company_info', 'type' => 'email' ) );
-
-	// Physical Address
-	$wp_customize->add_setting( 'kataskevi_address', array( 'default' => 'Engineering Hub, Commercial District, Victoria Island, Lagos', 'sanitize_callback' => 'sanitize_textarea_field' ) );
-	$wp_customize->add_control( 'kataskevi_address', array( 'label' => esc_html__( 'Physical Office Address', 'kataskevi' ), 'section' => 'kataskevi_company_info', 'type' => 'textarea' ) );
-
-	// Business Hours
-	$wp_customize->add_setting( 'kataskevi_hours', array( 'default' => 'Mon - Fri: 8:00 AM - 6:00 PM | 24/7 Emergency Response', 'sanitize_callback' => 'sanitize_text_field' ) );
-	$wp_customize->add_control( 'kataskevi_hours', array( 'label' => esc_html__( 'Working Hours', 'kataskevi' ), 'section' => 'kataskevi_company_info', 'type' => 'text' ) );
-
-	// Social Links Section
-	$wp_customize->add_section(
-		'kataskevi_social_links',
-		array(
-			'title'       => esc_html__( 'Kataskevi Social Channels', 'kataskevi' ),
-			'priority'    => 35,
-			'description' => esc_html__( 'Configure official social profiles displayed in the footer and contact sections.', 'kataskevi' ),
-		)
-	);
-
-	$socials = array(
-		'linkedin'  => array( 'label' => 'LinkedIn Profile URL',  'default' => 'https://linkedin.com/company/kataskevi' ),
-		'twitter'   => array( 'label' => 'X (Twitter) URL',       'default' => 'https://x.com/kataskevi' ),
-		'facebook'  => array( 'label' => 'Facebook Page URL',     'default' => 'https://facebook.com/kataskevi' ),
-		'instagram' => array( 'label' => 'Instagram Profile URL', 'default' => 'https://instagram.com/kataskevi' ),
-		'youtube'   => array( 'label' => 'YouTube Channel URL',   'default' => 'https://youtube.com/@kataskevi' ),
-		'whatsapp'  => array( 'label' => 'WhatsApp Chat Link',    'default' => 'https://wa.me/2348005282753' ),
-	);
-
-	foreach ( $socials as $key => $s_data ) {
-		$wp_customize->add_setting( 'kataskevi_' . $key, array( 'default' => $s_data['default'], 'sanitize_callback' => 'esc_url_raw' ) );
-		$wp_customize->add_control( 'kataskevi_' . $key, array( 'label' => esc_html__( $s_data['label'], 'kataskevi' ), 'section' => 'kataskevi_social_links', 'type' => 'url' ) );
-	}
-}
-add_action( 'customize_register', 'kataskevi_customize_register' );
+require_once KATASKEVI_DIR . '/inc/customizer.php';
 
 /**
  * Data provider: Active Social Links
@@ -869,7 +815,7 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 		);
 	}
 
-	if ( ! empty( $sector_slug ) && $sector_slug !== 'all' ) {
+	if ( ! empty( $sector_slug ) && 'all' !== $sector_slug ) {
 		$args['tax_query'] = array(
 			array(
 				'taxonomy' => 'project_sector',
@@ -937,7 +883,7 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 			if ( $featured_only && empty( $item['featured'] ) ) {
 				continue;
 			}
-			if ( ! empty( $sector_slug ) && $sector_slug !== 'all' && $item['sector_slug'] !== $sector_slug ) {
+			if ( ! empty( $sector_slug ) && 'all' !== $sector_slug && $item['sector_slug'] !== $sector_slug ) {
 				continue;
 			}
 			$item['permalink'] = home_url( '/works/' . $item['slug'] . '/' );

@@ -2,6 +2,8 @@
 /**
  * The template for displaying all single posts
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -21,7 +23,7 @@ get_header();
 		<article id="post-<?php the_ID(); ?>" <?php post_class( 'single-post-article' ); ?>>
 			<section class="section-page-hero">
 				<div class="container-editorial">
-					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> · <?php the_author(); ?></p>
+					<p class="eyebrow"><?php echo esc_html( get_the_date() ); ?> &middot; <?php the_author(); ?></p>
 					<h1 class="page-hero-title"><?php the_title(); ?></h1>
 				</div>
 			</section>

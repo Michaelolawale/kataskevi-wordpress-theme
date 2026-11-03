@@ -2,6 +2,8 @@
 /**
  * The template for displaying search results pages
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -18,7 +20,7 @@ get_header();
 		<div class="container-editorial">
 			<p class="eyebrow"><?php esc_html_e( 'Search Results', 'kataskevi' ); ?></p>
 			<h1 class="page-hero-title">
-				Results for: <em class="text-primary italic">&ldquo;<?php echo esc_html( get_search_query() ); ?>&rdquo;</em>
+				<?php esc_html_e( 'Results for:', 'kataskevi' ); ?> <em class="text-primary italic">&ldquo;<?php echo esc_html( get_search_query() ); ?>&rdquo;</em>
 			</h1>
 		</div>
 	</section>
@@ -29,7 +31,7 @@ get_header();
 				<?php
 				while ( have_posts() ) :
 					the_post();
-					get_template_part( 'template-parts/content', 'search' );
+					get_template_part( 'template-parts/content', get_post_format() );
 				endwhile;
 				?>
 			</div>
@@ -46,13 +48,13 @@ get_header();
 			</div>
 		<?php else : ?>
 			<div class="no-results" style="max-width: 36rem;">
-				<h2 class="text-2xl mb-4" style="font-family: var(--font-display);">No results found</h2>
+				<h2 class="text-2xl mb-4" style="font-family: var(--font-display);"><?php esc_html_e( 'No results found', 'kataskevi' ); ?></h2>
 				<p class="text-muted-foreground mb-6" style="color: var(--muted-foreground);">
-					We could not find any matching articles or documentation. Try searching with different keywords.
+					<?php esc_html_e( 'We could not find any matching articles or documentation. Try searching with different keywords.', 'kataskevi' ); ?>
 				</p>
 				<form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" style="display: flex; gap: 0.5rem;">
-					<input type="search" class="input-editorial" placeholder="Search Kataskevi..." value="<?php echo esc_attr( get_search_query() ); ?>" name="s" required>
-					<button type="submit" class="btn-pill btn-pill-primary">Search</button>
+					<input type="search" class="input-editorial" placeholder="<?php esc_attr_e( 'Search Kataskevi...', 'kataskevi' ); ?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s" required>
+					<button type="submit" class="btn-pill btn-pill-primary"><?php esc_html_e( 'Search', 'kataskevi' ); ?></button>
 				</form>
 			</div>
 		<?php endif; ?>
@@ -61,4 +63,3 @@ get_header();
 
 <?php
 get_footer();
-

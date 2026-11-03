@@ -3,6 +3,8 @@
  * The header for Kataskevi theme
  * Redesigned UI matching ember-shield-systems.lovable.app
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -11,15 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$phone      = get_theme_mod( 'kataskevi_phone', '+234 800 KATASKEVI' );
-$emergency  = get_theme_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
-$email      = get_theme_mod( 'kataskevi_email', 'info@kataskevi.com' );
+$phone     = kataskevi_get_mod( 'kataskevi_phone', '+234 800 KATASKEVI' );
+$emergency = kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
+$email     = kataskevi_get_mod( 'kataskevi_email', 'info@kataskevi.com' );
 
-// Resilient page links
+// Resilient page links.
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $works_url    = kataskevi_get_page_url( 'works', 'Our Works' );
 $about_url    = kataskevi_get_page_url( 'about', 'About' );
 $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
+
+$header_cta_text = kataskevi_get_mod( 'kataskevi_header_cta_text', 'Get a Quote' );
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -46,7 +50,7 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 				<?php if ( has_custom_logo() ) : ?>
 					<?php the_custom_logo(); ?>
 				<?php else : ?>
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-link" rel="home" aria-label="Kataskevi Home">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-link" rel="home" aria-label="<?php esc_attr_e( 'Kataskevi Home', 'kataskevi' ); ?>">
 						<span class="brand-emblem-wrap">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="32" height="32" fill="none" class="brand-emblem-svg">
 								<defs>
@@ -67,7 +71,7 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 								<path d="M22 18.5 L24 22.5 L22 26.5 L20 22.5 Z" fill="#ffffff" fill-opacity="0.95"/>
 							</svg>
 						</span>
-						<span class="brand-title">Kataskevi</span>
+						<span class="brand-title"><?php bloginfo( 'name' ); ?></span>
 					</a>
 				<?php endif; ?>
 			</div>
@@ -87,16 +91,18 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 				} else {
 					?>
 					<ul id="primary-menu" class="nav-links">
-						<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>" <?php echo is_front_page() ? 'class="active"' : ''; ?>>Home</a></li>
-						<li><a href="<?php echo esc_url( $services_url ); ?>" <?php echo is_page( 'services' ) ? 'class="active"' : ''; ?>>Services</a></li>
-						<li><a href="<?php echo esc_url( $works_url ); ?>" <?php echo is_page( 'works' ) || is_singular( 'project' ) || is_post_type_archive( 'project' ) ? 'class="active"' : ''; ?>>Our Works</a></li>
-						<li><a href="<?php echo esc_url( $about_url ); ?>" <?php echo is_page( 'about' ) ? 'class="active"' : ''; ?>>About</a></li>
-						<li><a href="<?php echo esc_url( $contact_url ); ?>" <?php echo is_page( 'contact' ) ? 'class="active"' : ''; ?>>Contact</a></li>
+						<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>" <?php echo is_front_page() ? 'class="active"' : ''; ?>><?php esc_html_e( 'Home', 'kataskevi' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $services_url ); ?>" <?php echo is_page( 'services' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Services', 'kataskevi' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $works_url ); ?>" <?php echo is_page( 'works' ) || is_singular( 'project' ) || is_post_type_archive( 'project' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Our Works', 'kataskevi' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $about_url ); ?>" <?php echo is_page( 'about' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'About', 'kataskevi' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $contact_url ); ?>" <?php echo is_page( 'contact' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Contact', 'kataskevi' ); ?></a></li>
 					</ul>
 					<?php
 				}
 				?>
-				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary nav-cta">Get a Quote</a>
+				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary nav-cta">
+					<?php echo esc_html( $header_cta_text ); ?>
+				</a>
 			</nav>
 
 			<!-- Mobile Hamburger Toggle -->
@@ -109,12 +115,14 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 		<!-- Mobile Navigation Dropdown -->
 		<div id="mobile-navigation" class="mobile-nav-drawer" aria-hidden="true">
 			<nav class="mobile-nav-inner">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" <?php echo is_front_page() ? 'class="active"' : ''; ?>>Home</a>
-				<a href="<?php echo esc_url( $services_url ); ?>" <?php echo is_page( 'services' ) ? 'class="active"' : ''; ?>>Services</a>
-				<a href="<?php echo esc_url( $works_url ); ?>" <?php echo is_page( 'works' ) || is_singular( 'project' ) || is_post_type_archive( 'project' ) ? 'class="active"' : ''; ?>>Our Works</a>
-				<a href="<?php echo esc_url( $about_url ); ?>" <?php echo is_page( 'about' ) ? 'class="active"' : ''; ?>>About</a>
-				<a href="<?php echo esc_url( $contact_url ); ?>" <?php echo is_page( 'contact' ) ? 'class="active"' : ''; ?>>Contact</a>
-				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary mobile-cta">Get a Quote</a>
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" <?php echo is_front_page() ? 'class="active"' : ''; ?>><?php esc_html_e( 'Home', 'kataskevi' ); ?></a>
+				<a href="<?php echo esc_url( $services_url ); ?>" <?php echo is_page( 'services' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Services', 'kataskevi' ); ?></a>
+				<a href="<?php echo esc_url( $works_url ); ?>" <?php echo is_page( 'works' ) || is_singular( 'project' ) || is_post_type_archive( 'project' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Our Works', 'kataskevi' ); ?></a>
+				<a href="<?php echo esc_url( $about_url ); ?>" <?php echo is_page( 'about' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'About', 'kataskevi' ); ?></a>
+				<a href="<?php echo esc_url( $contact_url ); ?>" <?php echo is_page( 'contact' ) ? 'class="active"' : ''; ?>><?php esc_html_e( 'Contact', 'kataskevi' ); ?></a>
+				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary mobile-cta">
+					<?php echo esc_html( $header_cta_text ); ?>
+				</a>
 			</nav>
 		</div>
 	</header>

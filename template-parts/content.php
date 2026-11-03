@@ -2,8 +2,10 @@
 /**
  * Template part for displaying posts in post loops
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="post-card__body">
 		<div class="post-card__meta">
-			<span class="meta-date"><?php echo get_the_date(); ?></span>
+			<span class="meta-date"><?php echo esc_html( get_the_date() ); ?></span>
 			<?php if ( has_category() ) : ?>
-				<span class="meta-dot">•</span>
+				<span class="meta-dot">&bull;</span>
 				<span class="meta-cat"><?php the_category( ', ' ); ?></span>
 			<?php endif; ?>
 		</div>
@@ -39,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="post-card__footer">
 			<a href="<?php the_permalink(); ?>" class="read-more-link">
-				<span>Read Case Study</span>
+				<span><?php esc_html_e( 'Read More', 'kataskevi' ); ?></span>
 				<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 			</a>
 		</div>

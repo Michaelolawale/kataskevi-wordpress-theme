@@ -2,6 +2,8 @@
 /**
  * The main template file
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -16,7 +18,7 @@ get_header();
 <main id="primary" class="site-main">
 	<section class="section-page-hero">
 		<div class="container-editorial">
-			<p class="eyebrow">Updates &amp; Insights</p>
+			<p class="eyebrow"><?php esc_html_e( 'Updates & Insights', 'kataskevi' ); ?></p>
 			<h1 class="page-hero-title">
 				<?php
 				if ( is_home() && ! is_front_page() ) {
@@ -27,7 +29,7 @@ get_header();
 				?>
 			</h1>
 			<p class="page-hero-desc">
-				Industry standards, fire safety protocols, and mission-critical infrastructure insights from Kataskevi.
+				<?php esc_html_e( 'Industry standards, fire safety protocols, and mission-critical infrastructure insights from Kataskevi.', 'kataskevi' ); ?>
 			</p>
 		</div>
 	</section>

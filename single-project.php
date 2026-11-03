@@ -2,6 +2,8 @@
 /**
  * The template for displaying single Project case studies
  *
+ * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
+ *
  * @package Kataskevi
  * @version 2.0.0
  */
@@ -16,7 +18,7 @@ $works_url    = kataskevi_get_page_url( 'works', 'Our Works' );
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 
-// Retrieve project data
+// Retrieve project data.
 $project_slug = get_post_field( 'post_name', get_the_ID() );
 if ( empty( $project_slug ) && isset( $_GET['project'] ) ) {
 	$project_slug = sanitize_text_field( wp_unslash( $_GET['project'] ) );
@@ -24,13 +26,13 @@ if ( empty( $project_slug ) && isset( $_GET['project'] ) ) {
 
 $proj = kataskevi_get_project_by_slug( $project_slug );
 if ( ! $proj ) {
-	// Fallback to first project if not matched
+	// Fallback to first project if not matched.
 	$all_projects = kataskevi_get_default_projects();
-	$proj = reset( $all_projects );
+	$proj         = reset( $all_projects );
 }
 
 $all_projects = kataskevi_get_projects( 3 );
-$related = array();
+$related      = array();
 foreach ( $all_projects as $k => $item ) {
 	if ( $item['slug'] !== $proj['slug'] ) {
 		$related[] = $item;
@@ -47,9 +49,9 @@ foreach ( $all_projects as $k => $item ) {
 	<header class="section-case-header">
 		<div class="container-editorial">
 			<nav class="case-breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb navigation', 'kataskevi' ); ?>">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'kataskevi' ); ?></a>
 				<span class="breadcrumb-sep">/</span>
-				<a href="<?php echo esc_url( $works_url ); ?>">Our Works</a>
+				<a href="<?php echo esc_url( $works_url ); ?>"><?php esc_html_e( 'Our Works', 'kataskevi' ); ?></a>
 				<span class="breadcrumb-sep">/</span>
 				<span class="breadcrumb-current"><?php echo esc_html( $proj['title'] ); ?></span>
 			</nav>
@@ -105,8 +107,8 @@ foreach ( $all_projects as $k => $item ) {
 					</div>
 				<?php endif; ?>
 				<div class="case-metric-card">
-					<div class="metric-num">Turnkey</div>
-					<div class="metric-txt">EPC Handover Standard</div>
+					<div class="metric-num"><?php esc_html_e( 'Turnkey', 'kataskevi' ); ?></div>
+					<div class="metric-txt"><?php esc_html_e( 'EPC Handover Standard', 'kataskevi' ); ?></div>
 				</div>
 			</div>
 		</div>
@@ -122,7 +124,7 @@ foreach ( $all_projects as $k => $item ) {
 					
 					<?php if ( ! empty( $proj['challenge'] ) ) : ?>
 						<div class="case-block">
-							<h2 class="case-subheading">The Operational Challenge</h2>
+							<h2 class="case-subheading"><?php esc_html_e( 'The Operational Challenge', 'kataskevi' ); ?></h2>
 							<p class="case-paragraph">
 								<?php echo esc_html( $proj['challenge'] ); ?>
 							</p>
@@ -131,7 +133,7 @@ foreach ( $all_projects as $k => $item ) {
 
 					<?php if ( ! empty( $proj['solution'] ) ) : ?>
 						<div class="case-block">
-							<h2 class="case-subheading">The Engineered Solution</h2>
+							<h2 class="case-subheading"><?php esc_html_e( 'The Engineered Solution', 'kataskevi' ); ?></h2>
 							<p class="case-paragraph">
 								<?php echo esc_html( $proj['solution'] ); ?>
 							</p>
@@ -140,11 +142,11 @@ foreach ( $all_projects as $k => $item ) {
 
 					<?php if ( ! empty( $proj['deliverables'] ) ) : ?>
 						<div class="case-block">
-							<h2 class="case-subheading">Systems Delivered &amp; Commissioned</h2>
+							<h2 class="case-subheading"><?php esc_html_e( 'Systems Delivered &amp; Commissioned', 'kataskevi' ); ?></h2>
 							<ul class="case-deliverables-checklist">
 								<?php foreach ( $proj['deliverables'] as $item ) : ?>
 									<li>
-										<span class="check-icon-wrap">
+										<span class="check-icon-wrap" aria-hidden="true">
 											<?php echo kataskevi_render_icon( 'check', 'icon icon-xs text-primary' ); ?>
 										</span>
 										<span><?php echo esc_html( $item ); ?></span>
@@ -156,9 +158,9 @@ foreach ( $all_projects as $k => $item ) {
 
 					<!-- Handover & Lifecycle Note -->
 					<div class="case-block case-lifecycle-note">
-						<h3 class="note-title">Commissioning &amp; Handover Protocol</h3>
+						<h3 class="note-title"><?php esc_html_e( 'Commissioning & Handover Protocol', 'kataskevi' ); ?></h3>
 						<p class="note-text">
-							Following final pressure integrity testing, NFPA audit verifications, and integrated BMS simulation runs, Kataskevi provided full as-built documentation, facility manager certifications, and active 24/7 on-call SLA maintenance coverage.
+							<?php esc_html_e( 'Following final pressure integrity testing, NFPA audit verifications, and integrated BMS simulation runs, Kataskevi provided full as-built documentation, facility manager certifications, and active 24/7 on-call SLA maintenance coverage.', 'kataskevi' ); ?>
 						</p>
 					</div>
 
@@ -170,49 +172,49 @@ foreach ( $all_projects as $k => $item ) {
 						
 						<!-- Project Specifications Table -->
 						<div class="specs-card">
-							<h3 class="specs-heading">Project Metadata</h3>
+							<h3 class="specs-heading"><?php esc_html_e( 'Project Metadata', 'kataskevi' ); ?></h3>
 							<dl class="specs-list">
 								<div class="spec-row">
-									<dt>Client</dt>
+									<dt><?php esc_html_e( 'Client', 'kataskevi' ); ?></dt>
 									<dd><?php echo esc_html( $proj['client'] ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt>Sector</dt>
+									<dt><?php esc_html_e( 'Sector', 'kataskevi' ); ?></dt>
 									<dd><?php echo esc_html( $proj['sector'] ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt>Location</dt>
+									<dt><?php esc_html_e( 'Location', 'kataskevi' ); ?></dt>
 									<dd><?php echo esc_html( $proj['location'] ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt>Completion</dt>
+									<dt><?php esc_html_e( 'Completion', 'kataskevi' ); ?></dt>
 									<dd><?php echo esc_html( $proj['year'] ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt>Accountability</dt>
-									<dd>Survey, Design, Supply, Install, Maintain</dd>
+									<dt><?php esc_html_e( 'Accountability', 'kataskevi' ); ?></dt>
+									<dd><?php esc_html_e( 'Survey, Design, Supply, Install, Maintain', 'kataskevi' ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt>Compliance</dt>
-									<dd>NFPA, ISO &amp; EN Standards</dd>
+									<dt><?php esc_html_e( 'Compliance', 'kataskevi' ); ?></dt>
+									<dd><?php esc_html_e( 'NFPA, ISO & EN Standards', 'kataskevi' ); ?></dd>
 								</div>
 							</dl>
 						</div>
 
 						<!-- Action Card -->
 						<div class="sidebar-quote-card">
-							<div class="quote-card-badge">Site Consultation</div>
-							<h4 class="quote-card-title">Need a similar protection system?</h4>
+							<div class="quote-card-badge"><?php esc_html_e( 'Site Consultation', 'kataskevi' ); ?></div>
+							<h4 class="quote-card-title"><?php esc_html_e( 'Need a similar protection system?', 'kataskevi' ); ?></h4>
 							<p class="quote-card-text">
-								Speak directly with a Kataskevi systems engineer. We assess your facility floorplans and develop an end-to-end design.
+								<?php esc_html_e( 'Speak directly with a Kataskevi systems engineer. We assess your facility floorplans and develop an end-to-end design.', 'kataskevi' ); ?>
 							</p>
 							<a href="<?php echo esc_url( add_query_arg( array( 'project' => $proj['slug'] ), $contact_url ) ); ?>" class="btn-pill btn-pill-primary btn-block">
-								<span>Request a Site Survey</span>
+								<span><?php esc_html_e( 'Request a Site Survey', 'kataskevi' ); ?></span>
 								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 							</a>
 							<div class="quote-card-direct">
-								<span>Or call 24/7 support:</span>
-								<strong><?php echo esc_html( get_theme_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' ) ); ?></strong>
+								<span><?php esc_html_e( 'Or call 24/7 support:', 'kataskevi' ); ?></span>
+								<strong><?php echo esc_html( kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' ) ); ?></strong>
 							</div>
 						</div>
 
@@ -229,11 +231,11 @@ foreach ( $all_projects as $k => $item ) {
 			<div class="container-editorial">
 				<div class="section-header-split">
 					<div>
-						<p class="eyebrow">Case Studies</p>
-						<h2 class="section-title">Explore more works</h2>
+						<p class="eyebrow"><?php esc_html_e( 'Case Studies', 'kataskevi' ); ?></p>
+						<h2 class="section-title"><?php esc_html_e( 'Explore more works', 'kataskevi' ); ?></h2>
 					</div>
 					<a href="<?php echo esc_url( $works_url ); ?>" class="btn-pill btn-pill-outline btn-sm">
-						<span>All Projects</span>
+						<span><?php esc_html_e( 'All Projects', 'kataskevi' ); ?></span>
 						<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 					</a>
 				</div>
@@ -264,7 +266,7 @@ foreach ( $all_projects as $k => $item ) {
 								</h3>
 								<div class="featured-work-action">
 									<a href="<?php echo esc_url( $rel['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm">
-										<span>Read More</span>
+										<span><?php esc_html_e( 'Read More', 'kataskevi' ); ?></span>
 										<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 									</a>
 								</div>
@@ -280,4 +282,3 @@ foreach ( $all_projects as $k => $item ) {
 
 <?php
 get_footer();
-
