@@ -1396,6 +1396,99 @@ function kataskevi_customize_register( $wp_customize ) {
 			'type'    => 'textarea',
 		)
 	);
+
+	/*
+	 * =========================================================================
+	 * SECTION 12: THEME UPDATES & BITBUCKET REPOSITORY
+	 * =========================================================================
+	 */
+	$wp_customize->add_section(
+		'kataskevi_sec_theme_updates',
+		array(
+			'title'       => esc_html__( '12. Theme Updates (Bitbucket)', 'kataskevi' ),
+			'panel'       => 'kataskevi_options_panel',
+			'priority'    => 120,
+			'description' => esc_html__( 'Configure your Bitbucket repository and private access token to receive automated one-click theme updates.', 'kataskevi' ),
+		)
+	);
+
+	// Bitbucket Repo URL.
+	$wp_customize->add_setting(
+		'kataskevi_bitbucket_repo',
+		array(
+			'default'           => 'https://bitbucket.org/unionolivia/kataskevi',
+			'type'              => 'option',
+			'sanitize_callback' => 'esc_url_raw',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_bitbucket_repo',
+		array(
+			'label'   => esc_html__( 'Bitbucket Repository URL', 'kataskevi' ),
+			'section' => 'kataskevi_sec_theme_updates',
+			'type'    => 'url',
+		)
+	);
+
+	// Bitbucket Branch.
+	$wp_customize->add_setting(
+		'kataskevi_bitbucket_branch',
+		array(
+			'default'           => 'main',
+			'type'              => 'option',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_bitbucket_branch',
+		array(
+			'label'   => esc_html__( 'Target Branch', 'kataskevi' ),
+			'section' => 'kataskevi_sec_theme_updates',
+			'type'    => 'text',
+		)
+	);
+
+	// Bitbucket Username.
+	$wp_customize->add_setting(
+		'kataskevi_bitbucket_user',
+		array(
+			'default'           => '',
+			'type'              => 'option',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_bitbucket_user',
+		array(
+			'label'       => esc_html__( 'Bitbucket Username', 'kataskevi' ),
+			'description' => esc_html__( 'Your Bitbucket account username.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_theme_updates',
+			'type'        => 'text',
+		)
+	);
+
+	// Bitbucket App Password / Token.
+	$wp_customize->add_setting(
+		'kataskevi_bitbucket_token',
+		array(
+			'default'           => '',
+			'type'              => 'option',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_bitbucket_token',
+		array(
+			'label'       => esc_html__( 'Bitbucket App Password / Token', 'kataskevi' ),
+			'description' => esc_html__( 'Generate in Bitbucket Settings -> App passwords with "Repositories: Read" permission.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_theme_updates',
+			'type'        => 'password',
+		)
+	);
 }
 add_action( 'customize_register', 'kataskevi_customize_register' );
 

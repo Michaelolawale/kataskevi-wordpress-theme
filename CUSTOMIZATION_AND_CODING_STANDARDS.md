@@ -63,7 +63,8 @@ Kataskevi Theme Settings
 ├── 8. Page: Services Overview
 ├── 9. Page: About Kataskevi
 ├── 10. Page: Our Works & Commitments
-└── 11. Page: Contact & Consultation
+├── 11. Page: Contact & Consultation
+└── 12. Theme Updates (Bitbucket Repository)
 ```
 
 ---
@@ -187,6 +188,17 @@ Kataskevi Theme Settings
 | `kataskevi_contact_urgent_title` | Text | `Need urgent support?` |
 | `kataskevi_contact_urgent_desc` | Textarea | `For active alarm faults, critical camera outages, or urgent life-safety requirements, contact our 24/7 technical desk directly:` |
 
+### Section 12: Theme Updates (Bitbucket Repository)
+| Setting ID | Control Type | Default Value | Description |
+|---|---|---|---|
+| `kataskevi_bitbucket_repo` | URL | `https://bitbucket.org/unionolivia/kataskevi` | Bitbucket Repository HTTPS URL |
+| `kataskevi_bitbucket_branch` | Text | `main` | Release branch to track |
+| `kataskevi_bitbucket_user` | Text | *(empty)* | Bitbucket account username |
+| `kataskevi_bitbucket_token` | Password | *(empty)* | Bitbucket App Password (`read:repository:bitbucket`) |
+
+> [!NOTE]
+> These credentials can also be managed directly in the dedicated admin interface under **Appearance &rarr; Theme Updates**, complete with an instant "Check for Updates" trigger and step-by-step instructions.
+
 ---
 
 ## 4. Helper Function: `kataskevi_get_mod()`
@@ -219,6 +231,7 @@ This guarantees that even before an administrator modifies any setting in the Cu
 | File Path | Description | WPCS Status | Customizer Integrated |
 |---|---|:---:|:---:|
 | `inc/customizer.php` | Customizer settings, controls, and image uploaders | ✅ Passed | Core Engine |
+| `inc/updater.php` | Plugin Update Checker (PUC) Bitbucket updater | ✅ Passed | Auto-updates |
 | `functions.php` | Theme setup, CPT registration, navigation, icons, AJAX | ✅ Passed | Loads `inc/customizer.php` |
 | `header.php` | Responsive header, SVG shield emblem, navigation, CTA | ✅ Passed | Header CTA & phone |
 | `footer.php` | 4-column footer, social strip, copyright, tagline | ✅ Passed | Brand desc, social, tagline |

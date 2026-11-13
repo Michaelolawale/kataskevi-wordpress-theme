@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '1.0.0' );
+define( 'KATASKEVI_VERSION', '2.0.0' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -344,6 +344,11 @@ add_action( 'wp_enqueue_scripts', 'kataskevi_scripts_styles' );
  * Load Theme Customizer settings and controls.
  */
 require_once KATASKEVI_DIR . '/inc/customizer.php';
+
+/**
+ * Load Plugin Update Checker (PUC) for automatic theme updates from Bitbucket.
+ */
+require_once KATASKEVI_DIR . '/inc/updater.php';
 
 /**
  * Data provider: Active Social Links

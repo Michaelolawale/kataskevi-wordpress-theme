@@ -13,6 +13,7 @@ Crafted with an editorial aesthetic inspired by modern architectural publication
 
 ## Key Features
 
+- **Automatic Updates via Bitbucket (PUC v6.0)**: Bundled with YahnisElsts Plugin Update Checker library to provide seamless one-click theme updates directly from `bitbucket.org/unionolivia/kataskevi` inside the WordPress admin dashboard (`Dashboard -> Updates`).
 - **100% Editable via WordPress Customizer**: Every single text headline, eyebrow label, lead paragraph, button text, live statistic number, and media asset is editable directly in **Appearance &rarr; Customize** without touching any code.
 - **Dedicated Media Uploaders**: Uses `WP_Customize_Image_Control` to allow site administrators to upload or select custom images for the Homepage Hero, the Whole-of-Life Support Banner, and the About page showcase directly from the WordPress Media Library.
 - **Custom Post Type: Projects (`project`)**: Dedicated portfolio architecture with custom slug `/works/`, sector taxonomy (`project_sector`), project metadata (Client, Year, Location, Accountability, Compliance), and dynamic metric highlights.
@@ -51,7 +52,9 @@ kataskevi/
 │       ├── logo.svg             # Primary Kataskevi logo
 │       └── projects/            # Seeded case study photography
 ├── inc/
-│   └── customizer.php           # Theme Customizer settings, controls, and image uploaders
+│   ├── customizer.php           # Theme Customizer settings, controls, and image uploaders
+│   ├── updater.php              # Plugin Update Checker (PUC) Bitbucket integration
+│   └── plugin-update-checker/   # YahnisElsts Plugin Update Checker library v6.0
 ├── page-templates/
 │   ├── page-about.php           # Template: About Us
 │   ├── page-contact.php         # Template: Contact & Site Survey
@@ -134,6 +137,47 @@ This theme strictly follows the **WordPress PHP Coding Standards**:
 - **Input Sanitization**: Superglobals and form inputs are thoroughly sanitized with `sanitize_text_field()`, `sanitize_email()`, `sanitize_textarea_field()`, `esc_url_raw()`, and `absint()`.
 - **Security & Nonce Verification**: AJAX inquiry submissions require a valid nonce verified with `check_ajax_referer()`.
 - **Pure PHP Files**: `functions.php` and `inc/customizer.php` omit the closing `?>` tag.
+
+---
+
+## Automatic Theme Updates (PUC Integration)
+
+Kataskevi includes native support for automatic updates via the **[YahnisElsts Plugin Update Checker (PUC)](https://github.com/YahnisElsts/plugin-update-checker)** library (v6.0), configured to track the `main` branch of the Bitbucket repository:
+
+- **Repository**: `https://bitbucket.org/unionolivia/kataskevi`
+- **Branch**: `main`
+
+### How It Works:
+1. When a new version tag or commit is pushed to the `main` branch on Bitbucket with a bumped `Version:` header in `style.css`, WordPress automatically detects the new release under **Dashboard &rarr; Updates** and **Appearance &rarr; Themes**.
+2. Administrators can update the theme with a single click, just like an official repository theme.
+
+### Private Repository Authentication (Backend UI)
+
+You can configure private repository credentials directly in the WordPress dashboard:
+
+1. **Dedicated Admin Page**: Navigate to **Appearance &rarr; Theme Updates** (`themes.php?page=kataskevi-updates`).
+   - Enter your **Bitbucket Repository URL**, **Branch**, **Bitbucket Username**, and **Bitbucket App Password**.
+   - Includes real-time status indicators, masked credential storage, and an instant **"Check for Updates Now"** button.
+   - Includes step-by-step instructions on generating an App Password with `read:repository:bitbucket` permissions.
+2. **WordPress Customizer**: Navigate to **Appearance &rarr; Customize &rarr; Kataskevi Theme Settings &rarr; 12. Theme Updates (Bitbucket)**.
+3. **Optional wp-config.php Constants**: You can also define constants in `wp-config.php`:
+
+```php
+// Optional: In wp-config.php
+define( 'KATASKEVI_BITBUCKET_USER', 'your_bitbucket_username' );
+define( 'KATASKEVI_BITBUCKET_TOKEN', 'your_bitbucket_app_password' );
+```
+
+Alternatively, use the filter hook in custom code or an mu-plugin:
+
+```php
+add_filter( 'kataskevi_bitbucket_credentials', function( $creds ) {
+    return array(
+        'username'  => 'your_bitbucket_username',
+        'api_token' => 'your_app_password',
+    );
+} );
+```
 
 ---
 
