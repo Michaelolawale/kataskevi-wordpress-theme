@@ -63,7 +63,7 @@ $clients_desc    = kataskevi_get_mod(
 						<?php foreach ( $clients['row_1'] as $client ) : ?>
 							<div class="client-logo-card">
 								<div class="client-logo-mark" aria-hidden="true">
-									<?php echo kataskevi_render_icon( $client['icon'], 'icon icon-sm text-primary' ); ?>
+									<?php echo kataskevi_render_client_logo( $client ); ?>
 								</div>
 								<div class="client-logo-meta">
 									<h3 class="client-name"><?php echo esc_html( $client['name'] ); ?></h3>
@@ -78,7 +78,7 @@ $clients_desc    = kataskevi_get_mod(
 						<?php foreach ( $clients['row_1'] as $client ) : ?>
 							<div class="client-logo-card">
 								<div class="client-logo-mark" aria-hidden="true">
-									<?php echo kataskevi_render_icon( $client['icon'], 'icon icon-sm text-primary' ); ?>
+									<?php echo kataskevi_render_client_logo( $client ); ?>
 								</div>
 								<div class="client-logo-meta">
 									<span class="client-name"><?php echo esc_html( $client['name'] ); ?></span>
@@ -100,7 +100,7 @@ $clients_desc    = kataskevi_get_mod(
 						<?php foreach ( $clients['row_2'] as $client ) : ?>
 							<div class="client-logo-card">
 								<div class="client-logo-mark" aria-hidden="true">
-									<?php echo kataskevi_render_icon( $client['icon'], 'icon icon-sm text-primary' ); ?>
+									<?php echo kataskevi_render_client_logo( $client ); ?>
 								</div>
 								<div class="client-logo-meta">
 									<h3 class="client-name"><?php echo esc_html( $client['name'] ); ?></h3>
@@ -115,7 +115,7 @@ $clients_desc    = kataskevi_get_mod(
 						<?php foreach ( $clients['row_2'] as $client ) : ?>
 							<div class="client-logo-card">
 								<div class="client-logo-mark" aria-hidden="true">
-									<?php echo kataskevi_render_icon( $client['icon'], 'icon icon-sm text-primary' ); ?>
+									<?php echo kataskevi_render_client_logo( $client ); ?>
 								</div>
 								<div class="client-logo-meta">
 									<span class="client-name"><?php echo esc_html( $client['name'] ); ?></span>

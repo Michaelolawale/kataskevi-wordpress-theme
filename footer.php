@@ -37,6 +37,22 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 				<!-- Col 1: Brand & Bio -->
 				<div class="footer-col-brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand-link" rel="home">
+						<?php
+						$header_logo = kataskevi_get_mod( 'kataskevi_header_logo', '' );
+						if ( ! empty( $header_logo ) ) :
+							?>
+							<img src="<?php echo esc_url( $header_logo ); ?>" alt="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>" class="footer-custom-logo" />
+							<?php
+						elseif ( has_custom_logo() ) :
+							$custom_logo_id = get_theme_mod( 'custom_logo' );
+							$logo_src       = wp_get_attachment_image_src( $custom_logo_id, 'full' );
+							if ( ! empty( $logo_src[0] ) ) :
+								?>
+								<img src="<?php echo esc_url( $logo_src[0] ); ?>" alt="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>" class="footer-custom-logo" />
+								<?php
+							endif;
+						endif;
+						?>
 						<span class="footer-brand-title"><?php echo esc_html( kataskevi_get_brand_name() ); ?></span>
 					</a>
 					<?php if ( ! empty( $footer_desc ) ) : ?>

@@ -72,6 +72,28 @@ function kataskevi_customize_register( $wp_customize ) {
 		)
 	);
 
+	// Custom Header Logo / Brand Mark (Alternative / Direct Uploader).
+	$wp_customize->add_setting(
+		'kataskevi_header_logo',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'kataskevi_header_logo',
+			array(
+				'label'       => esc_html__( 'Header Logo / Icon', 'kataskevi' ),
+				'description' => esc_html__( 'Upload a custom logo or icon (PNG, SVG, JPG, WebP). Also supports standard WordPress Site Identity Logo. Never breaks navbar layout.', 'kataskevi' ),
+				'section'     => 'kataskevi_sec_company',
+				'priority'    => 15,
+			)
+		)
+	);
+
 	// Primary Phone.
 	$wp_customize->add_setting(
 		'kataskevi_phone',

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.0' );
+define( 'KATASKEVI_VERSION', '2.1.1' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -61,14 +61,15 @@ function kataskevi_theme_setup() {
 	// Add theme support for selective refresh for widgets.
 	add_theme_support( 'customize-selective-refresh-widgets' );
 
-	// Custom logo support.
+	// Custom logo support (Standard WordPress Custom Logo).
 	add_theme_support(
 		'custom-logo',
 		array(
-			'height'      => 80,
-			'width'       => 280,
-			'flex-width'  => true,
-			'flex-height' => true,
+			'height'               => 80,
+			'width'                => 280,
+			'flex-width'           => true,
+			'flex-height'          => true,
+			'unlink-homepage-logo' => false,
 		)
 	);
 
@@ -742,10 +743,95 @@ function kataskevi_get_clients() {
 }
 
 /**
+ * Safely render a client logo mark, handling image URLs, attachment IDs, SVGs, or icon names.
+ * Adheres strictly to standard WordPress theme architecture and never breaks if an
+ * invalid, custom, or newly uploaded icon/image is passed.
+ *
+ * @param array  $client Client data array.
+ * @param string $class  Optional CSS class for icon/image.
+ * @return string Safe HTML for logo mark.
+ */
+function kataskevi_render_client_logo( $client, $class = 'client-logo-img' ) {
+	$icon_or_logo = '';
+	if ( ! empty( $client['logo'] ) ) {
+		$icon_or_logo = $client['logo'];
+	} elseif ( ! empty( $client['image'] ) ) {
+		$icon_or_logo = $client['image'];
+	} elseif ( ! empty( $client['icon'] ) ) {
+		$icon_or_logo = $client['icon'];
+	}
+
+	$client_name = ! empty( $client['name'] ) ? $client['name'] : esc_html__( 'Client', 'kataskevi' );
+
+	// 1. If it's a numeric attachment ID from WordPress media library.
+	if ( is_numeric( $icon_or_logo ) ) {
+		$img_html = wp_get_attachment_image(
+			(int) $icon_or_logo,
+			'medium',
+			false,
+			array(
+				'class'   => esc_attr( $class ),
+				'alt'     => esc_attr( $client_name ),
+				'loading' => 'lazy',
+			)
+		);
+		if ( ! empty( $img_html ) ) {
+			return $img_html;
+		}
+	}
+
+	// 2. If it's an image URL (http, https, relative path, or common image extensions).
+	if ( is_string( $icon_or_logo ) && ( preg_match( '/\.(svg|png|jpg|jpeg|webp|gif)(\?.*)?$/i', $icon_or_logo ) || preg_match( '#^https?://#i', $icon_or_logo ) || strpos( $icon_or_logo, '/wp-content/' ) !== false ) ) {
+		return sprintf(
+			'<img src="%s" alt="%s" class="%s" loading="lazy" />',
+			esc_url( $icon_or_logo ),
+			esc_attr( $client_name ),
+			esc_attr( $class )
+		);
+	}
+
+	// 3. If it's raw SVG markup.
+	if ( is_string( $icon_or_logo ) && strpos( $icon_or_logo, '<svg' ) !== false ) {
+		return $icon_or_logo;
+	}
+
+	// 4. If it's a named icon in kataskevi_render_icon().
+	if ( is_string( $icon_or_logo ) && ! empty( $icon_or_logo ) ) {
+		$rendered_svg = kataskevi_render_icon( $icon_or_logo, 'icon icon-sm text-primary' );
+		if ( ! empty( $rendered_svg ) ) {
+			return $rendered_svg;
+		}
+	}
+
+	// 5. Safe Monogram fallback: Never breaks, always renders a clean 2-letter badge.
+	$mark = ! empty( $client['mark'] ) ? $client['mark'] : '';
+	if ( empty( $mark ) && ! empty( $client_name ) ) {
+		$words = preg_split( '/\s+/', trim( $client_name ) );
+		if ( count( $words ) >= 2 ) {
+			$mark = mb_strtoupper( mb_substr( $words[0], 0, 1 ) . mb_substr( $words[1], 0, 1 ) );
+		} else {
+			$mark = mb_strtoupper( mb_substr( $client_name, 0, 2 ) );
+		}
+	}
+
+	return sprintf( '<span class="client-monogram-mark">%s</span>', esc_html( $mark ) );
+}
+
+/**
  * Helper to render SVG icons inline
  */
 function kataskevi_render_icon( $name, $class = 'icon' ) {
 	$icons = array(
+		'shield' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>',
+		'building' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>',
+		'building-2' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>',
+		'cogs' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+		'briefcase' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>',
+		'globe' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>',
+		'network' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg>',
+		'truck' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10"></path><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>',
+		'lock' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
+		'wifi' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 20h.01"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><path d="M5 12.859a10 10 0 0 1 14 0"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path></svg>',
 		'flame' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"></path></svg>',
 		'hotel' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 22v-6.57"></path><path d="M12 11h.01"></path><path d="M12 7h.01"></path><path d="M14 15.43V22"></path><path d="M15 16a5 5 0 0 0-6 0"></path><path d="M16 11h.01"></path><path d="M16 7h.01"></path><path d="M8 11h.01"></path><path d="M8 7h.01"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg>',
 		'landmark' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 18v-7"></path><path d="M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z"></path><path d="M14 18v-7"></path><path d="M18 18v-7"></path><path d="M3 22h18"></path><path d="M6 18v-7"></path></svg>',

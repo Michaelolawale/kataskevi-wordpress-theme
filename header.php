@@ -47,8 +47,17 @@ $header_cta_text = kataskevi_get_mod( 'kataskevi_header_cta_text', 'Get a Quote'
 		<div class="site-header__inner">
 			<!-- Brand Logo -->
 			<div class="site-branding">
-				<?php if ( has_custom_logo() ) : ?>
-					<?php the_custom_logo(); ?>
+				<?php 
+				$header_logo = kataskevi_get_mod( 'kataskevi_header_logo', '' );
+				if ( ! empty( $header_logo ) ) : 
+				?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="custom-logo-link" rel="home" aria-label="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>">
+						<img src="<?php echo esc_url( $header_logo ); ?>" alt="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>" class="custom-logo" />
+					</a>
+				<?php elseif ( has_custom_logo() ) : ?>
+					<div class="site-logo">
+						<?php the_custom_logo(); ?>
+					</div>
 				<?php else : ?>
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-link" rel="home" aria-label="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>">
 						<span class="brand-emblem-wrap">
@@ -71,8 +80,15 @@ $header_cta_text = kataskevi_get_mod( 'kataskevi_header_cta_text', 'Get a Quote'
 								<path d="M22 18.5 L24 22.5 L22 26.5 L20 22.5 Z" fill="#ffffff" fill-opacity="0.95"/>
 							</svg>
 						</span>
-						<span class="brand-title"><?php echo esc_html( kataskevi_get_brand_name() ); ?></span>
 					</a>
+				<?php endif; ?>
+
+				<?php if ( display_header_text() ) : ?>
+					<div class="site-branding-text">
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-title-link" rel="home">
+							<span class="brand-title"><?php echo esc_html( kataskevi_get_brand_name() ); ?></span>
+						</a>
+					</div>
 				<?php endif; ?>
 			</div>
 
