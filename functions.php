@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.1' );
+define( 'KATASKEVI_VERSION', '2.1.2' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -127,6 +127,42 @@ function kataskevi_register_project_cpt() {
 	);
 
 	register_post_type( 'project', $args );
+
+	// Register Custom Post Type: Service
+	$service_labels = array(
+		'name'               => _x( 'Services', 'post type general name', 'kataskevi' ),
+		'singular_name'      => _x( 'Service', 'post type singular name', 'kataskevi' ),
+		'menu_name'          => _x( 'Services', 'admin menu', 'kataskevi' ),
+		'name_admin_bar'     => _x( 'Service', 'add new on admin bar', 'kataskevi' ),
+		'add_new'            => _x( 'Add New', 'service', 'kataskevi' ),
+		'add_new_item'       => __( 'Add New Service', 'kataskevi' ),
+		'new_item'           => __( 'New Service', 'kataskevi' ),
+		'edit_item'          => __( 'Edit Service', 'kataskevi' ),
+		'view_item'          => __( 'View Service', 'kataskevi' ),
+		'all_items'          => __( 'All Services', 'kataskevi' ),
+		'search_items'       => __( 'Search Services', 'kataskevi' ),
+		'not_found'          => __( 'No services found.', 'kataskevi' ),
+		'not_found_in_trash' => __( 'No services found in Trash.', 'kataskevi' ),
+	);
+
+	$service_args = array(
+		'labels'             => $service_labels,
+		'public'             => true,
+		'publicly_queryable' => true,
+		'show_ui'            => true,
+		'show_in_menu'       => true,
+		'query_var'          => true,
+		'rewrite'            => array( 'slug' => 'service', 'with_front' => false ),
+		'capability_type'    => 'post',
+		'has_archive'        => false,
+		'hierarchical'       => false,
+		'menu_position'      => 21,
+		'menu_icon'          => 'dashicons-hammer',
+		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
+		'show_in_rest'       => true,
+	);
+
+	register_post_type( 'service', $service_args );
 
 	// Register Taxonomy: Project Sector
 	$tax_labels = array(
@@ -452,6 +488,8 @@ function kataskevi_get_social_links() {
  * Returns curated services matching the company scope
  */
 function kataskevi_get_services() {
+	$img_base = get_template_directory_uri() . '/assets/images/';
+
 	return array(
 		'fire-suppression' => array(
 			'id'          => 'fire-suppression',
@@ -461,6 +499,7 @@ function kataskevi_get_services() {
 			'description' => 'Complete design, supply, installation and maintenance of clean-agent fire suppression systems that protect high-value equipment without damaging it.',
 			'points'      => array( 'FM 200 systems', 'CO2 systems', 'NOVEC 1230 systems', 'Detection & release panels' ),
 			'icon'        => 'flame',
+			'image'       => $img_base . 'projects/datacenter.jpg',
 		),
 		'fire-alarm-safety' => array(
 			'id'          => 'fire-alarm-safety',
@@ -470,6 +509,7 @@ function kataskevi_get_services() {
 			'description' => 'Conventional and addressable fire detection plus the hydrant and hose reel infrastructure and safety equipment your site needs to respond fast.',
 			'points'      => array( 'Fire alarm systems', 'Fire hydrants', 'Hose reels', 'Safety equipment' ),
 			'icon'        => 'bell-alert',
+			'image'       => $img_base . 'band.jpg',
 		),
 		'security-cctv' => array(
 			'id'          => 'security-cctv',
@@ -479,6 +519,7 @@ function kataskevi_get_services() {
 			'description' => 'End-to-end electronic security: camera systems designed around your site, recording and monitoring infrastructure, and ongoing support.',
 			'points'      => array( 'CCTV design & installation', 'IP & analog camera systems', 'Recording & monitoring', 'Perimeter security' ),
 			'icon'        => 'video-camera',
+			'image'       => $img_base . 'projects/logistics.jpg',
 		),
 		'it-site-preparation' => array(
 			'id'          => 'it-site-preparation',
@@ -488,6 +529,7 @@ function kataskevi_get_services() {
 			'description' => 'Turnkey preparation of IT and telecoms facilities — from the floor beneath your racks to the ceiling and walls that protect them.',
 			'points'      => array( 'Raised access floors', 'Fire-rated ceilings', 'Wall cladding', 'Site fit-out' ),
 			'icon'        => 'server',
+			'image'       => $img_base . 'hero.jpg',
 		),
 		'access-control' => array(
 			'id'          => 'access-control',
@@ -497,6 +539,7 @@ function kataskevi_get_services() {
 			'description' => 'Integrated access control and time attendance systems that secure your premises while giving you accurate, auditable workforce data.',
 			'points'      => array( 'Card, fob & biometric access', 'Time attendance terminals', 'Visitor management', 'Central reporting' ),
 			'icon'        => 'finger-print',
+			'image'       => $img_base . 'projects/commercial.jpg',
 		),
 		'hotel-locks' => array(
 			'id'          => 'hotel-locks',
@@ -506,6 +549,7 @@ function kataskevi_get_services() {
 			'description' => 'Hospitality-grade electronic locking systems — supply, installation and integration with your front-office and energy management systems.',
 			'points'      => array( 'RFID & smart card locks', 'Front-desk integration', 'Master key planning', 'Maintenance & support' ),
 			'icon'        => 'key',
+			'image'       => $img_base . 'projects/hospitality.jpg',
 		),
 		'ppe' => array(
 			'id'          => 'ppe',
@@ -515,12 +559,13 @@ function kataskevi_get_services() {
 			'description' => 'Quality personal protective equipment for energy, industrial and construction environments — specified correctly and delivered reliably.',
 			'points'      => array( 'Head-to-toe protection', 'Site-specific specifications', 'Bulk supply', 'Replacement programmes' ),
 			'icon'        => 'shield-check',
+			'image'       => $img_base . 'projects/industrial.jpg',
 		),
 	);
 }
 
 /**
- * Data provider: Core Lifecycle Capabilities
+ * Data provider: Core Lifecycle Capabilities / Main Services
  */
 function kataskevi_get_capabilities() {
 	return array(
@@ -550,6 +595,404 @@ function kataskevi_get_capabilities() {
 		),
 	);
 }
+
+/**
+ * Data provider: The 4 Core Main Services
+ * 1. Site Surveys
+ * 2. System Design & Specification
+ * 3. Project Commissioning
+ * 4. Sales & Installation
+ *
+ * @return array
+ */
+function kataskevi_get_main_services() {
+	$img_base = get_template_directory_uri() . '/assets/images/';
+
+	return array(
+		'site-surveys' => array(
+			'id'          => 'site-surveys',
+			'slug'        => 'site-surveys',
+			'title'       => 'Site Surveys',
+			'badge'       => 'Assessment & Risk Audit',
+			'short_desc'  => 'Comprehensive on-site evaluation of facility hazards, space constraints, and technical safety requirements.',
+			'description' => 'In-depth assessment of your premises to establish exactly what your site requires before specifying equipment, avoiding costly redesigns and compliance gaps.',
+			'lead'        => 'Before any equipment is procured or pipework installed, our certified survey engineers conduct exhaustive on-site audits to assess physical risks, structural constraints, and regulatory safety demands.',
+			'points'      => array(
+				'Facility hazard assessment & fire load analysis',
+				'Spatial, ceiling void & sub-floor infrastructure audits',
+				'Airflow dynamics, ventilation & ambient risk modeling',
+				'Preliminary feasibility reports & comprehensive BOQ',
+			),
+			'metrics'     => array(
+				array( 'num' => '100%', 'label' => 'Spatial & Risk Audit' ),
+				array( 'num' => 'Zero', 'label' => 'Unplanned Variations' ),
+				array( 'num' => 'NFPA & ISO', 'label' => 'Compliance Verification' ),
+				array( 'num' => 'Turnkey', 'label' => 'Engineering Standard' ),
+			),
+			'overview'    => 'A successful engineering deployment begins with knowing every constraint of the built environment. Our site survey methodology assesses facility geometry, ventilation, fire loads, electrical distribution, and cable tray routing to ensure systems are engineered specifically for your facility without costly redesigns. By discovering building characteristics in advance, we eliminate project delay and guarantee seamless authority approvals.',
+			'methodology' => array(
+				array(
+					'step'  => '01',
+					'title' => 'Preliminary Consultation & Blueprint Review',
+					'desc'  => 'Analyzing architectural plans, structural blueprints, and operational risk priorities in collaboration with your facilities and security leadership.',
+				),
+				array(
+					'step'  => '02',
+					'title' => 'On-Site Physical & Environmental Audit',
+					'desc'  => 'Measuring ceiling heights, sub-floor voids, airflow dynamics, ambient temperatures, and structural fire ratings on location.',
+				),
+				array(
+					'step'  => '03',
+					'title' => 'Threat Modeling & Code Compliance Verification',
+					'desc'  => 'Evaluating occupancy hazards, electrical switchgear rooms, IT server density, and mandatory statutory fire safety codes.',
+				),
+				array(
+					'step'  => '04',
+					'title' => 'Technical Survey Dossier & BOQ Handover',
+					'desc'  => 'Delivering a comprehensive audit document including risk assessments, bill of quantities (BOQ), and turnkey engineering recommendations.',
+				),
+			),
+			'deliverables' => array(
+				'Comprehensive Facility Hazard & Fire Load Report',
+				'Spatial Blueprint & Sub-floor Void Assessment',
+				'Ventilation, Airflow & Thermal Environmental Profile',
+				'Preliminary Bill of Quantities (BOQ) & Feasibility Summary',
+				'Statutory Safety & Local Authority Code Review',
+			),
+			'compliance'  => 'NFPA 72, NFPA 2001, BS 5839, ISO 9001:2015, Statutory Fire Service Regulations',
+			'icon'        => 'compass',
+			'image'       => $img_base . 'about.jpg',
+		),
+		'system-design' => array(
+			'id'          => 'system-design',
+			'slug'        => 'system-design',
+			'title'       => 'System Design & Specification',
+			'badge'       => 'Engineering & Architecture',
+			'short_desc'  => 'Precision engineered designs, technical specifications, and hydraulic/electrical schematics.',
+			'description' => 'Engineered system designs, precise equipment specifications, and schematic layouts tailored directly to facility layout and NFPA/ISO compliance standards.',
+			'lead'        => 'Precision engineered designs, technical specifications, and schematic layouts tailored directly to facility architecture and international life-safety codes.',
+			'points'      => array(
+				'NFPA & EN compliance design standards',
+				'Certified clean-gas & hydraulic flow calculations',
+				'BMS integration & alarm interlocking blueprints',
+				'Detailed equipment procurement specifications & BIM',
+			),
+			'metrics'     => array(
+				array( 'num' => 'CAD & BIM', 'label' => 'Precision Modeling' ),
+				array( 'num' => 'ISO 9001', 'label' => 'Engineering Standard' ),
+				array( 'num' => 'Sub-Second', 'label' => 'Detection Sensitivity' ),
+				array( 'num' => '100%', 'label' => 'Custom Tailored' ),
+			),
+			'overview'    => 'Great engineering leaves nothing to chance. Kataskevi delivers precise AutoCAD and Revit BIM designs, gaseous clean-agent hydraulic flow calculations, electrical conduit pathways, and Building Management System (BMS) integration schematics. We design around your facility layout, equipment density, and mission-critical uptime requirements to ensure seamless installation.',
+			'methodology' => array(
+				array(
+					'step'  => '01',
+					'title' => 'Hydraulic & Clean-Agent Volume Calculations',
+					'desc'  => 'Computing exact agent concentrations (FM-200, Novec 1230, CO2) according to room volumes, leakage rates, and nozzle discharge pressures.',
+				),
+				array(
+					'step'  => '02',
+					'title' => 'Aspirating & Sensor Density Mapping',
+					'desc'  => 'Engineering high-sensitivity smoke detection (VESDA) and addressable sensor layouts to eliminate dead zones and prevent false alarms.',
+				),
+				array(
+					'step'  => '03',
+					'title' => 'Access Control & Surveillance Topology',
+					'desc'  => 'Designing high-security ingress points, biometric readers, fail-safe magnetic locks, and complete CCTV camera field-of-view matrices.',
+				),
+				array(
+					'step'  => '04',
+					'title' => 'Full Construction Schematics & Tender Specs',
+					'desc'  => 'Producing verified single-line electrical diagrams, isometric piping blueprints, and tender specifications ready for procurement.',
+				),
+			),
+			'deliverables' => array(
+				'Certified Clean-Agent Hydraulic Flow Calculations',
+				'AutoCAD / BIM Isometric Piping & Conduit Schematics',
+				'BMS Integration & Alarm Interlocking Matrix',
+				'Complete Equipment Procurement Bill of Materials (BOM)',
+				'Authority Having Jurisdiction (AHJ) Submittal Package',
+			),
+			'compliance'  => 'NFPA 13, NFPA 72, NFPA 2001, EN 54, ISO 14001, BS 7671',
+			'icon'        => 'pencil-square',
+			'image'       => $img_base . 'projects/commercial.jpg',
+		),
+		'project-commissioning' => array(
+			'id'          => 'project-commissioning',
+			'slug'        => 'project-commissioning',
+			'title'       => 'Project Commissioning',
+			'badge'       => 'Quality Assurance & Handover',
+			'short_desc'  => 'Structured commissioning, pressure-testing, acoustic verification, and certified sign-off.',
+			'description' => 'Rigorous testing and structured commissioning ensuring every detector, cylinder, camera, and access barrier performs under real-world emergency conditions.',
+			'lead'        => 'Rigorous multi-stage testing and structured commissioning ensuring every detector, cylinder array, camera, and access barrier performs under real-world emergency conditions.',
+			'points'      => array(
+				'Enclosure room integrity & door-fan testing',
+				'Integrated alarm, voice & acoustic verification',
+				'Automated failsafe release & HVAC trip audits',
+				'Statutory compliance sign-off & operator training',
+			),
+			'metrics'     => array(
+				array( 'num' => '100%', 'label' => 'Functional Verification' ),
+				array( 'num' => '10s', 'label' => 'Clean-Agent Release Test' ),
+				array( 'num' => 'Certified', 'label' => 'Handover Sign-off' ),
+				array( 'num' => 'Zero Defect', 'label' => 'Quality Handover' ),
+			),
+			'overview'    => 'Commissioning is the bridge between construction and life-safety operation. Our certified commissioning engineers subject every safety system, suppression cylinder bank, smoke damper, and access turnstile to rigorous stress testing, room integrity enclosure tests, and simulated power-fail failovers before handing over the keys to your operational team.',
+			'methodology' => array(
+				array(
+					'step'  => '01',
+					'title' => 'Enclosure Room Integrity Fan Testing',
+					'desc'  => 'Verifying room leakage and gas retention times using calibrated door-fan testing to ensure gaseous agent hold times satisfy NFPA 2001.',
+				),
+				array(
+					'step'  => '02',
+					'title' => 'Loop Checking & Sensory Calibration',
+					'desc'  => 'Individually testing addressable smoke heads, flame detectors, break-glass units, and siren sounders for calibrated sensitivity.',
+				),
+				array(
+					'step'  => '03',
+					'title' => 'Simulated Emergency Discharge Runs',
+					'desc'  => 'Performing dry solenoid actuations, automated damper drop tests, HVAC shutdown sequences, and generator interlock tests.',
+				),
+				array(
+					'step'  => '04',
+					'title' => 'Operator Training & Compliance Certification',
+					'desc'  => 'Training facility personnel, delivering as-built manuals, and issuing statutory certificates of commissioning compliance.',
+				),
+			),
+			'deliverables' => array(
+				'Certified Room Integrity Enclosure Test Certificate',
+				'Full Loop Verification & Sensor Calibration Log',
+				'Integrated HVAC Damper & Power-Trip Verification',
+				'Comprehensive As-Built Operations & Maintenance (O&M) Manual',
+				'Operator & Facility Security Staff Training Sign-off',
+			),
+			'compliance'  => 'NFPA 2001 Room Integrity Protocol, EN 12094, ISO 9001, NFPA 72 Inspection Guidelines',
+			'icon'        => 'circle-check',
+			'image'       => $img_base . 'projects/datacenter.jpg',
+		),
+		'sales-installation' => array(
+			'id'          => 'sales-installation',
+			'slug'        => 'sales-installation',
+			'title'       => 'Sales & Installation',
+			'badge'       => 'Turnkey Delivery & Maintenance',
+			'short_desc'  => 'Certified equipment supply, professional deployment, and ongoing preventative SLA maintenance.',
+			'description' => 'Turnkey supply and certified professional installation backed by preventative maintenance SLAs, warranty coverage, and emergency response dispatch.',
+			'lead'        => 'Turnkey supply and certified professional installation backed by preventative maintenance SLAs, warranty coverage, and emergency response dispatch.',
+			'points'      => array(
+				'Certified hardware procurement & OEM warranties',
+				'Professional mechanical & electrical installation',
+				'Quarterly preventative servicing & inspections',
+				'24/7 technical dispatch support & spare parts',
+			),
+			'metrics'     => array(
+				array( 'num' => 'Turnkey', 'label' => 'Supply & Deployment' ),
+				array( 'num' => '24/7', 'label' => 'Emergency Dispatch' ),
+				array( 'num' => 'OEM Certified', 'label' => 'Direct Procurement' ),
+				array( 'num' => 'SLA Backed', 'label' => 'Quarterly Servicing' ),
+			),
+			'overview'    => 'From certified hardware procurement to heavy mechanical and electrical installation, Kataskevi manages turnkey deployment with single-source accountability. We supply genuine, OEM-warranted equipment and maintain certified field installation crews. Following installation, we back every client with quarterly maintenance SLAs, emergency callouts, and lifecycle parts support.',
+			'methodology' => array(
+				array(
+					'step'  => '01',
+					'title' => 'Direct OEM Procurement & Staging',
+					'desc'  => 'Sourcing certified cylinders, valves, control panels, biometric terminals, and heavy-duty raised flooring directly from top-tier manufacturers.',
+				),
+				array(
+					'step'  => '02',
+					'title' => 'Rigorous Mechanical & Electrical Deployment',
+					'desc'  => 'Routing high-pressure seamless steel pipework, fire-rated cabling, and precision flooring supports adhering to international installation codes.',
+				),
+				array(
+					'step'  => '03',
+					'title' => 'Quality Control & Pre-Commissioning Punchlists',
+					'desc'  => 'Conducting daily site inspections, pressure hydrostatic testing, and zero-defect checks before handover.',
+				),
+				array(
+					'step'  => '04',
+					'title' => 'Preventative Maintenance SLA Enactment',
+					'desc'  => 'Enrolling your facility into scheduled quarterly inspections, 24/7 on-call technical response, and guaranteed spare parts replenishment.',
+				),
+			),
+			'deliverables' => array(
+				'OEM Factory Test Certificates & Hardware Warranties',
+				'Professional Mechanical & Electrical Installation Sign-off',
+				'24/7 Emergency Support Contact Protocols',
+				'Quarterly Preventative Maintenance SLA Schedule',
+				'Emergency Refill & Spare Cylinder Availability Guarantee',
+			),
+			'compliance'  => 'ISO 9001:2015, NFPA Installation Codes, IEEE Electrical Standards, Factory Mutual (FM)',
+			'icon'        => 'shield-check',
+			'image'       => $img_base . 'band.jpg',
+		),
+	);
+}
+
+/**
+ * Helper to get a resilient URL for a service detail page.
+ *
+ * @param string $slug Service slug.
+ * @return string
+ */
+function kataskevi_get_service_url( $slug ) {
+	$slug = sanitize_title( $slug );
+	$post = get_page_by_path( $slug, OBJECT, 'service' );
+	if ( $post ) {
+		return get_permalink( $post->ID );
+	}
+	if ( get_option( 'permalink_structure' ) ) {
+		return home_url( '/service/' . $slug . '/' );
+	}
+	return add_query_arg( 'service_slug', $slug, kataskevi_get_page_url( 'services', 'Services' ) );
+}
+
+/**
+ * Retrieve a single service by its slug.
+ * Resolves from WordPress CPT 'service' or falls back to main services array.
+ *
+ * @param string $slug
+ * @return array|null
+ */
+function kataskevi_get_service_by_slug( $slug ) {
+	$slug     = sanitize_title( $slug );
+	$defaults = kataskevi_get_main_services();
+	$default  = isset( $defaults[ $slug ] ) ? $defaults[ $slug ] : null;
+
+	$post = get_page_by_path( $slug, OBJECT, 'service' );
+	if ( $post ) {
+		$img = get_the_post_thumbnail_url( $post->ID, 'full' );
+		if ( empty( $img ) && $default ) {
+			$img = $default['image'];
+		}
+
+		$content = get_post_field( 'post_content', $post->ID );
+		$excerpt = get_post_field( 'post_excerpt', $post->ID );
+
+		return array(
+			'id'           => $slug,
+			'slug'         => $slug,
+			'title'        => get_the_title( $post->ID ),
+			'badge'        => get_post_meta( $post->ID, '_kataskevi_badge', true ) ?: ( $default ? $default['badge'] : 'Core Engineering Service' ),
+			'short_desc'   => ! empty( $excerpt ) ? $excerpt : ( $default ? $default['short_desc'] : wp_trim_words( $content, 25 ) ),
+			'description'  => ! empty( $content ) ? $content : ( $default ? $default['description'] : '' ),
+			'lead'         => get_post_meta( $post->ID, '_kataskevi_lead', true ) ?: ( $default ? $default['lead'] : '' ),
+			'points'       => $default ? $default['points'] : array(),
+			'metrics'      => $default ? $default['metrics'] : array(),
+			'overview'     => get_post_meta( $post->ID, '_kataskevi_overview', true ) ?: ( $default ? $default['overview'] : $content ),
+			'methodology'  => $default ? $default['methodology'] : array(),
+			'deliverables' => $default ? $default['deliverables'] : array(),
+			'compliance'   => get_post_meta( $post->ID, '_kataskevi_compliance', true ) ?: ( $default ? $default['compliance'] : 'NFPA, ISO & EN Standards' ),
+			'icon'         => $default ? $default['icon'] : 'compass',
+			'image'        => $img ?: ( $default ? $default['image'] : get_template_directory_uri() . '/assets/images/hero.jpg' ),
+			'permalink'    => get_permalink( $post->ID ),
+		);
+	}
+
+	if ( $default ) {
+		$default['permalink'] = kataskevi_get_service_url( $slug );
+		return $default;
+	}
+
+	return null;
+}
+
+/**
+ * Register custom rewrite rules for services
+ */
+function kataskevi_service_rewrite_rules() {
+	add_rewrite_rule(
+		'^service/([^/]+)/?$',
+		'index.php?service_slug=$matches[1]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^services/([^/]+)/?$',
+		'index.php?service_slug=$matches[1]',
+		'top'
+	);
+}
+add_action( 'init', 'kataskevi_service_rewrite_rules' );
+
+/**
+ * Register service_slug query variable
+ */
+function kataskevi_service_query_vars( $vars ) {
+	$vars[] = 'service_slug';
+	return $vars;
+}
+add_filter( 'query_vars', 'kataskevi_service_query_vars' );
+
+/**
+ * Template include filter to ensure single-service.php is served reliably
+ */
+function kataskevi_service_template_include( $template ) {
+	if ( is_singular( 'service' ) ) {
+		$new_template = locate_template( array( 'single-service.php' ) );
+		if ( ! empty( $new_template ) ) {
+			return $new_template;
+		}
+	}
+
+	$service_slug = get_query_var( 'service_slug' );
+	if ( empty( $service_slug ) && isset( $_GET['service_slug'] ) ) {
+		$service_slug = sanitize_text_field( wp_unslash( $_GET['service_slug'] ) );
+	}
+
+	if ( empty( $service_slug ) ) {
+		$req = trim( (string) parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+		$parts = explode( '/', $req );
+		if ( count( $parts ) >= 2 && ( 'service' === $parts[0] || 'services' === $parts[0] ) && in_array( $parts[1], array( 'site-surveys', 'system-design', 'project-commissioning', 'sales-installation' ), true ) ) {
+			$service_slug = $parts[1];
+		}
+	}
+
+	if ( ! empty( $service_slug ) ) {
+		$service_tpl = locate_template( array( 'single-service.php' ) );
+		if ( ! empty( $service_tpl ) ) {
+			return $service_tpl;
+		}
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'kataskevi_service_template_include' );
+
+/**
+ * Auto-seed default services into WordPress CPT if none exist
+ */
+function kataskevi_seed_default_services() {
+	if ( get_option( 'kataskevi_services_seeded_v1' ) ) {
+		return;
+	}
+
+	$defaults = kataskevi_get_main_services();
+	foreach ( $defaults as $slug => $data ) {
+		$existing = get_page_by_path( $slug, OBJECT, 'service' );
+		if ( ! $existing ) {
+			$post_id = wp_insert_post(
+				array(
+					'post_title'     => $data['title'],
+					'post_name'      => $slug,
+					'post_content'   => $data['overview'],
+					'post_excerpt'   => $data['short_desc'],
+					'post_status'    => 'publish',
+					'post_type'      => 'service',
+					'comment_status' => 'closed',
+				)
+			);
+
+			if ( $post_id && ! is_wp_error( $post_id ) ) {
+				update_post_meta( $post_id, '_kataskevi_badge', $data['badge'] );
+				update_post_meta( $post_id, '_kataskevi_lead', $data['lead'] );
+				update_post_meta( $post_id, '_kataskevi_overview', $data['overview'] );
+				update_post_meta( $post_id, '_kataskevi_compliance', $data['compliance'] );
+			}
+		}
+	}
+
+	update_option( 'kataskevi_services_seeded_v1', 1 );
+}
+add_action( 'init', 'kataskevi_seed_default_services', 20 );
 
 /**
  * Data provider: Philosophy Pillars
@@ -845,7 +1288,10 @@ function kataskevi_render_icon( $name, $class = 'icon' ) {
 		'finger-print' => '<svg class="' . esc_attr( $class ) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0a8 8 0 00.126 1.405m2.775 5.76A18.9 18.9 0 016 11"></path></svg>',
 		'key' => '<svg class="' . esc_attr( $class ) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>',
 		'shield-check' => '<svg class="' . esc_attr( $class ) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>',
+		'arrow-left' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>',
 		'arrow-right' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>',
+		'chevron-left' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>',
+		'chevron-right' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>',
 		'menu' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>',
 		'close' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>',
 		'phone' => '<svg class="' . esc_attr( $class ) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>',
@@ -861,6 +1307,9 @@ function kataskevi_render_icon( $name, $class = 'icon' ) {
 		'layers' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0l8.57-3.9a1 1 0 0 0 0-1.84Z"></path><path d="m2 12 10 4.5 10-4.5"></path><path d="m2 17 10 4.5 10-4.5"></path></svg>',
 		'cpu' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path></svg>',
 		'sparkles' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>',
+		'clipboard-document-check' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="m9 14 2 2 4-4"></path></svg>',
+		'pencil-square' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>',
+		'wrench-screwdriver' => '<svg class="' . esc_attr( $class ) . '" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>',
 		'linkedin' => '<svg class="' . esc_attr( $class ) . '" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>',
 		'twitter' => '<svg class="' . esc_attr( $class ) . '" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
 		'facebook' => '<svg class="' . esc_attr( $class ) . '" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>',
@@ -973,7 +1422,7 @@ function kataskevi_get_default_projects() {
 			'year'         => '2024',
 			'sector'       => 'Industrial & Energy',
 			'sector_slug'  => 'industrial',
-			'featured'     => false,
+			'featured'     => true,
 			'metric'       => 'ATEX Zone 1',
 			'metric_label' => 'Explosion-Proof Certified',
 			'stat_2'       => '48 Hydrants',
@@ -1001,7 +1450,7 @@ function kataskevi_get_default_projects() {
 			'year'         => '2025',
 			'sector'       => 'Hospitality & Leisure',
 			'sector_slug'  => 'hospitality',
-			'featured'     => false,
+			'featured'     => true,
 			'metric'       => '450 Rooms',
 			'metric_label' => 'RFID Smart Locks',
 			'stat_2'       => 'PMS Sync',
@@ -1029,7 +1478,7 @@ function kataskevi_get_default_projects() {
 			'year'         => '2024',
 			'sector'       => 'Healthcare',
 			'sector_slug'  => 'healthcare',
-			'featured'     => false,
+			'featured'     => true,
 			'metric'       => '6 Theatres',
 			'metric_label' => 'Novec 1230 Clean Gas',
 			'stat_2'       => '12 Wards',
@@ -1103,6 +1552,30 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 			$deliverables_raw = get_post_meta( $post_id, '_kataskevi_deliverables', true );
 			$deliverables = is_array( $deliverables_raw ) ? $deliverables_raw : array_filter( array_map( 'trim', explode( "\n", (string) $deliverables_raw ) ) );
 
+			$scope = get_post_meta( $post_id, '_kataskevi_scope', true ) ?: get_the_title();
+			$short_desc = get_the_excerpt( $post_id );
+			if ( empty( $short_desc ) ) {
+				$content = get_post_field( 'post_content', $post_id );
+				if ( ! empty( $content ) ) {
+					$short_desc = wp_trim_words( $content, 22 );
+				}
+			}
+			if ( empty( $short_desc ) ) {
+				$sol = get_post_meta( $post_id, '_kataskevi_solution', true );
+				if ( ! empty( $sol ) ) {
+					$short_desc = wp_trim_words( $sol, 22 );
+				}
+			}
+			if ( empty( $short_desc ) ) {
+				$defaults = kataskevi_get_default_projects();
+				if ( isset( $defaults[ $slug ]['short_desc'] ) ) {
+					$short_desc = $defaults[ $slug ]['short_desc'];
+				}
+			}
+			if ( empty( $short_desc ) ) {
+				$short_desc = $scope;
+			}
+
 			$projects[ $slug ] = array(
 				'id'           => $post_id,
 				'slug'         => $slug,
@@ -1121,8 +1594,8 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 				'stat_3'       => get_post_meta( $post_id, '_kataskevi_stat_3', true ) ?: '',
 				'stat_3_label' => get_post_meta( $post_id, '_kataskevi_stat_3_label', true ) ?: '',
 				'image'        => $img,
-				'short_desc'   => get_the_excerpt() ?: wp_trim_words( get_the_content(), 25 ),
-				'scope'        => get_post_meta( $post_id, '_kataskevi_scope', true ) ?: get_the_title(),
+				'short_desc'   => $short_desc,
+				'scope'        => $scope,
 				'challenge'    => get_post_meta( $post_id, '_kataskevi_challenge', true ) ?: '',
 				'solution'     => get_post_meta( $post_id, '_kataskevi_solution', true ) ?: get_the_content(),
 				'deliverables' => $deliverables,

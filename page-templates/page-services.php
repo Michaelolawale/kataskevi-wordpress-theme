@@ -7,7 +7,7 @@
  * All text is fully customizable via Appearance -> Customize.
  *
  * @package Kataskevi
- * @version 2.0.0
+ * @version 2.1.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -16,20 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$contact_url = kataskevi_get_page_url( 'contact', 'Contact' );
-
-$services     = kataskevi_get_services();
-$capabilities = kataskevi_get_capabilities();
+$contact_url   = kataskevi_get_page_url( 'contact', 'Contact' );
+$main_services = kataskevi_get_main_services();
 
 // Customizer Theme Options.
 $page_eyebrow = kataskevi_get_mod( 'kataskevi_page_services_eyebrow', 'Services' );
-$page_title   = kataskevi_get_mod( 'kataskevi_page_services_title', 'Seven service lines, <em class="text-primary italic">one accountable partner.</em>' );
-$page_desc    = kataskevi_get_mod( 'kataskevi_page_services_desc', 'Complete service in the design, supply, installation and maintenance of every system below — one partner, one accountable team, from survey to handover.' );
+$page_title   = kataskevi_get_mod( 'kataskevi_page_services_title', 'Engineering services, <em class="text-primary italic">one accountable partner.</em>' );
+$page_desc    = kataskevi_get_mod( 'kataskevi_page_services_desc', 'Complete lifecycle support across our four core engineering service pillars — from preliminary site survey to structured commissioning and ongoing preventative maintenance.' );
 
-$how_eyebrow = kataskevi_get_mod( 'kataskevi_services_how_eyebrow', 'How we work' );
-$how_title   = kataskevi_get_mod( 'kataskevi_services_how_title', 'From survey to support' );
-$how_desc    = kataskevi_get_mod( 'kataskevi_services_how_desc', 'A structured path from first visit to long-term support, so every system performs from day one and keeps performing.' );
-$how_btn     = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Start with a site survey' );
+$cta_eyebrow  = kataskevi_get_mod( 'kataskevi_services_how_eyebrow', 'One Accountable Partner' );
+$cta_title    = kataskevi_get_mod( 'kataskevi_services_how_title', 'Engineered for complete protection from survey to handover.' );
+$cta_desc     = kataskevi_get_mod( 'kataskevi_services_how_desc', 'Speak with our engineering team to audit your facility risks or design an integrated protection system tailored to your building.' );
+$cta_btn_text = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Request a Site Survey' );
 ?>
 
 <main id="primary" class="site-main">
@@ -53,90 +51,91 @@ $how_btn     = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Start with a si
 		</div>
 	</section>
 
-	<!-- 7 SERVICE LINES (3-COLUMN ARTICLE GRID) -->
-	<section class="section-services-list">
+	<!-- FOUR MAIN CORE SERVICES -->
+	<section id="main-services" class="section-services-list border-b border-border">
 		<div class="container-editorial pb-20">
 			<div class="border-t border-border">
 				<?php 
-				$idx = 1;
-				foreach ( $services as $key => $service ) : 
-					$formatted_num = str_pad( (string) $idx, 2, '0', STR_PAD_LEFT );
+				$m_idx = 1;
+				foreach ( $main_services as $m_key => $m_service ) : 
+					$formatted_num = str_pad( (string) $m_idx, 2, '0', STR_PAD_LEFT );
+					$inquire_url   = esc_url( add_query_arg( 'service', urlencode( $m_service['title'] ), $contact_url ) );
+					$detail_url    = esc_url( kataskevi_get_service_url( $m_service['slug'] ) );
 				?>
-					<article id="<?php echo esc_attr( $service['id'] ); ?>" class="service-article-row">
-						<!-- Col 1: Number -->
-						<span class="service-article-num"><?php echo esc_html( $formatted_num ); ?></span>
+					<article id="<?php echo esc_attr( $m_service['id'] ); ?>" class="service-article-row">
+						<!-- Col 1: Attached Service Image (Clean frame without overlay tags) -->
+						<?php if ( ! empty( $m_service['image'] ) ) : ?>
+							<div class="service-article-media">
+								<a href="<?php echo $detail_url; ?>" class="service-article-media-link" aria-label="<?php echo esc_attr( $m_service['title'] ); ?>">
+									<img 
+										src="<?php echo esc_url( $m_service['image'] ); ?>" 
+										alt="<?php echo esc_attr( $m_service['title'] ); ?>" 
+										width="640" 
+										height="400" 
+										loading="lazy" 
+										class="service-article-img"
+									>
+								</a>
+							</div>
+						<?php endif; ?>
 
 						<!-- Col 2: Info & Details -->
 						<div class="service-article-info">
-							<div class="service-article-icon">
-								<?php echo kataskevi_render_icon( $service['icon'], 'icon icon-md text-primary' ); ?>
+							<div class="service-article-top-meta">
+								<span class="service-article-num"><?php echo esc_html( $formatted_num ); ?></span>
 							</div>
-							<h2 class="service-article-title"><?php echo esc_html( $service['title'] ); ?></h2>
-							<p class="service-article-desc"><?php echo esc_html( $service['description'] ); ?></p>
-						</div>
 
-						<!-- Col 3: Points List -->
-						<ul class="service-points-list">
-							<?php foreach ( $service['points'] as $point ) : ?>
-								<li class="service-point-item">
-									<span class="check-icon-wrap" aria-hidden="true">
-										<?php echo kataskevi_render_icon( 'check', 'icon icon-xs text-primary' ); ?>
-									</span>
-									<span><?php echo esc_html( $point ); ?></span>
-								</li>
-							<?php endforeach; ?>
-						</ul>
+							<h2 class="service-article-title">
+								<a href="<?php echo $detail_url; ?>">
+									<?php echo esc_html( $m_service['title'] ); ?>
+								</a>
+							</h2>
+							<p class="service-article-desc"><?php echo esc_html( $m_service['description'] ); ?></p>
+
+							<div class="service-article-actions">
+								<a href="<?php echo $detail_url; ?>" class="btn-pill btn-pill-primary">
+									<span><?php esc_html_e( 'Service Details', 'kataskevi' ); ?></span>
+									<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+								</a>
+							</div>
+						</div>
 					</article>
 				<?php 
-					$idx++;
+					$m_idx++;
 				endforeach; 
 				?>
 			</div>
 		</div>
 	</section>
 
-	<!-- HOW WE WORK / FROM SURVEY TO SUPPORT -->
-	<section class="section-how-we-work border-y border-border">
-		<div class="container-editorial py-20">
-			<?php if ( ! empty( $how_eyebrow ) ) : ?>
-				<p class="eyebrow"><?php echo esc_html( $how_eyebrow ); ?></p>
-			<?php endif; ?>
-			<?php if ( ! empty( $how_title ) ) : ?>
-				<h2 class="section-title"><?php echo esc_html( $how_title ); ?></h2>
-			<?php endif; ?>
-			<?php if ( ! empty( $how_desc ) ) : ?>
-				<p class="section-lead-muted" style="max-width: 36rem;">
-					<?php echo esc_html( $how_desc ); ?>
-				</p>
-			<?php endif; ?>
-
-			<div class="lifecycle-cards-grid mt-12">
-				<?php 
-				$step_idx = 1;
-				foreach ( $capabilities as $cap ) : 
-					$cap_num = str_pad( (string) $step_idx, 2, '0', STR_PAD_LEFT );
-				?>
-					<div class="lifecycle-card">
-						<span class="lifecycle-card-step"><?php echo esc_html( $cap_num ); ?></span>
-						<h3 class="lifecycle-card-title"><?php echo esc_html( $cap['title'] ); ?></h3>
-						<p class="lifecycle-card-desc"><?php echo esc_html( $cap['desc'] ); ?></p>
+	<!-- BOTTOM CTA SECTION -->
+	<?php if ( ! empty( $cta_title ) || ! empty( $cta_desc ) || ! empty( $cta_btn_text ) ) : ?>
+		<section class="section-services-cta py-20 bg-muted border-t border-border">
+			<div class="container-editorial text-center" style="max-width: 56rem; margin: 0 auto;">
+				<?php if ( ! empty( $cta_eyebrow ) ) : ?>
+					<p class="eyebrow"><?php echo esc_html( $cta_eyebrow ); ?></p>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_title ) ) : ?>
+					<h2 class="section-title mb-4" style="text-wrap: balance; hyphens: none; word-break: normal;">
+						<?php echo esc_html( $cta_title ); ?>
+					</h2>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_desc ) ) : ?>
+					<p class="section-lead-muted mb-8" style="max-width: 44rem; margin-left: auto; margin-right: auto;">
+						<?php echo esc_html( $cta_desc ); ?>
+					</p>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_btn_text ) ) : ?>
+					<div class="services-cta-actions">
+						<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
+							<span><?php echo esc_html( $cta_btn_text ); ?></span>
+							<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+						</a>
 					</div>
-				<?php 
-					$step_idx++;
-				endforeach; 
-				?>
+				<?php endif; ?>
 			</div>
-
-			<?php if ( ! empty( $how_btn ) ) : ?>
-				<div class="how-we-work-action mt-12">
-					<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
-						<span><?php echo esc_html( $how_btn ); ?></span>
-						<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-					</a>
-				</div>
-			<?php endif; ?>
-		</div>
-	</section>
+		</section>
+	<?php endif; ?>
 
 </main>
 

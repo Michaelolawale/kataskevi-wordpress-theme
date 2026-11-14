@@ -16,14 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 $phone     = kataskevi_get_mod( 'kataskevi_phone', '+234 800 123 4567' );
 $emergency = kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
 $email     = kataskevi_get_mod( 'kataskevi_email', get_option( 'admin_email', 'info@example.com' ) );
+$hours     = kataskevi_get_mod( 'kataskevi_hours', 'Mon - Fri: 8:00 AM - 6:00 PM | 24/7 Emergency Response' );
 
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $works_url    = kataskevi_get_page_url( 'works', 'Our Works' );
 $about_url    = kataskevi_get_page_url( 'about', 'About' );
 $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 
-$services = kataskevi_get_services();
-$socials  = kataskevi_get_social_links();
+$main_services = kataskevi_get_main_services();
+$socials       = kataskevi_get_social_links();
 
 $footer_desc    = kataskevi_get_mod( 'kataskevi_footer_brand_desc', 'Engineering, Safety, Information Technology and Telecommunications support services — design, supply, installation and maintenance, end to end.' );
 $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supply · Install · Maintain' );
@@ -96,7 +97,7 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 				<div class="footer-col-nav">
 					<h3 class="footer-heading"><?php esc_html_e( 'Services', 'kataskevi' ); ?></h3>
 					<ul class="footer-links-list">
-						<?php foreach ( $services as $s ) : ?>
+						<?php foreach ( $main_services as $s_key => $s ) : ?>
 							<li>
 								<a href="<?php echo esc_url( $services_url . '#' . $s['id'] ); ?>">
 									<?php echo esc_html( $s['title'] ); ?>
@@ -106,10 +107,10 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 					</ul>
 				</div>
 
-				<!-- Col 4: Get in Touch -->
+				<!-- Col 4: Get in Touch & Business Hours -->
 				<div class="footer-col-contact">
 					<h3 class="footer-heading"><?php esc_html_e( 'Get in Touch', 'kataskevi' ); ?></h3>
-					<?php if ( ! empty( $email ) || ! empty( $phone ) ) : ?>
+					<?php if ( ! empty( $email ) || ! empty( $phone ) || ! empty( $hours ) ) : ?>
 						<ul class="footer-links-list footer-contact-direct-list">
 							<?php if ( ! empty( $email ) ) : ?>
 								<li>
@@ -125,6 +126,15 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 										<?php echo kataskevi_render_icon( 'phone', 'icon icon-xs' ); ?>
 										<span><?php echo esc_html( $phone ); ?></span>
 									</a>
+								</li>
+							<?php endif; ?>
+							<?php if ( ! empty( $hours ) ) : ?>
+								<li class="footer-hours-item">
+									<div class="footer-hours-label">
+										<?php echo kataskevi_render_icon( 'calendar', 'icon icon-xs' ); ?>
+										<span><?php esc_html_e( 'Business Hours:', 'kataskevi' ); ?></span>
+									</div>
+									<span class="footer-hours-val"><?php echo esc_html( $hours ); ?></span>
 								</li>
 							<?php endif; ?>
 						</ul>

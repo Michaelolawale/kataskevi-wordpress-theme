@@ -107,16 +107,16 @@ Kataskevi Theme Settings
 | `kataskevi_hero_btn1_text` | Text | `Explore Services` | Primary button text |
 | `kataskevi_hero_btn2_text` | Text | `Request a Quote` | Secondary button text |
 | **`kataskevi_hero_image`** | **Image Upload** (`WP_Customize_Image_Control`) | `assets/images/hero.jpg` | Full-width modern facility feature image |
+| `kataskevi_hero_feat1_title` / `_desc` | Text / Textarea | `Data Preparation` / `Turnkey preparation of IT and telecoms facilities, clean data halls...` | Core Specialty 1 (Under Hero Image) |
+| `kataskevi_hero_feat2_title` / `_desc` | Text / Textarea | `Raised Floor` / `Heavy-duty anti-static raised access flooring engineered for airflow...` | Core Specialty 2 (Under Hero Image) |
+| `kataskevi_hero_feat3_title` / `_desc` | Text / Textarea | `Access Control` / `Multi-factor biometric access, smart card terminals, optical turnstiles...` | Core Specialty 3 (Under Hero Image) |
 
-### Section 5: Homepage Services & Featured Works
-| Setting ID | Control Type | Default Value |
-|---|---|---|
-| `kataskevi_home_services_eyebrow` | Text | `Services` |
-| `kataskevi_home_services_title` | Text | `What we deliver` |
-| `kataskevi_home_services_desc` | Textarea | `Seven specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.` |
-| `kataskevi_home_works_eyebrow` | Text | `Proven in the field` |
-| `kataskevi_home_works_title` | Text | `Featured works` |
-| `kataskevi_home_works_desc` | Textarea | `A cross-section of recent installations where life safety, mission-critical uptime, and rigorous engineering were non-negotiable.` |
+### Section 5: Homepage Featured Works (Carousel Slider)
+| Setting ID | Control Type | Default Value | Description |
+|---|---|---|---|
+| `kataskevi_home_works_eyebrow` | Text | `Proven in the field` | Featured projects eyebrow |
+| `kataskevi_home_works_title` | Text | `Featured works` | Featured projects headline |
+| `kataskevi_home_works_desc` | Textarea | `A cross-section of recent installations where life safety, mission-critical uptime, and rigorous engineering were non-negotiable.` | Carousel lead description |
 
 ### Section 6: Homepage Lifecycle Banner & Steps
 | Setting ID | Control Type | Default Value |
@@ -149,8 +149,8 @@ Kataskevi Theme Settings
 | Setting ID | Control Type | Default Value |
 |---|---|---|
 | `kataskevi_page_services_eyebrow` | Text | `Services` |
-| `kataskevi_page_services_title` | Textarea (HTML) | `Seven service lines, <em class="text-primary italic">one accountable partner.</em>` |
-| `kataskevi_page_services_desc` | Textarea | `Complete service in the design, supply, installation and maintenance of every system below — one partner, one accountable team, from survey to handover.` |
+| `kataskevi_page_services_title` | Textarea (HTML) | `Engineering services, <em class="text-primary italic">one accountable partner.</em>` |
+| `kataskevi_page_services_desc` | Textarea | `Complete lifecycle support across our four core engineering service pillars — from preliminary site survey to structured commissioning and ongoing preventative maintenance.` |
 | `kataskevi_services_how_eyebrow` | Text | `How we work` |
 | `kataskevi_services_how_title` | Text | `From survey to support` |
 | `kataskevi_services_how_desc` | Textarea | `A structured path from first visit to long-term support, so every system performs from day one and keeps performing.` |
@@ -247,11 +247,12 @@ This guarantees that:
 | `header.php` | Responsive header, SVG shield emblem, navigation, CTA | ✅ Passed | Header CTA & phone |
 | `footer.php` | 4-column footer, social strip, copyright, tagline | ✅ Passed | Brand desc, social, tagline |
 | `front-page.php` | Homepage hero, stats, services, works, lifecycle, CTA | ✅ Passed | Hero, stats, lifecycle, CTA |
-| `page-templates/page-services.php` | 7 service rows, specs cards, how we work lifecycle | ✅ Passed | Headings, lifecycle, CTA |
+| `page-templates/page-services.php` | Service rows, specs cards, how we work lifecycle | ✅ Passed | Headings, lifecycle, CTA |
 | `page-templates/page-about.php` | About hero, full-width media, story, pillars, sectors | ✅ Passed | Headings, media image, story |
 | `page-templates/page-works.php` | Works filterable portfolio, 4 commitments matrix | ✅ Passed | Headings, 4 commitments |
 | `page-templates/page-contact.php` | 2-column contact channels, urgent card, AJAX form | ✅ Passed | Headings, urgent card, info |
 | `single-project.php` | Individual case study template with technical specs | ✅ Passed | Case metadata, quote card |
+| `single-service.php` | Individual service detail template with methodology & specs | ✅ Passed | Service metadata, CPT, CTA |
 | `search.php` | Search results template with editorial pagination | ✅ Passed | Localized UI strings |
 | `404.php` | 404 error template with quick return navigation | ✅ Passed | Localized UI strings |
 | `archive.php` | Category and archive listing template | ✅ Passed | Localized UI strings |

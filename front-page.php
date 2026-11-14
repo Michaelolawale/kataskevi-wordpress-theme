@@ -22,8 +22,21 @@ $about_url    = kataskevi_get_page_url( 'about', 'About' );
 $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 
 $services          = kataskevi_get_services();
+$main_services     = array_slice( $services, 0, 3 );
 $sectors           = kataskevi_get_sectors();
-$featured_projects = kataskevi_get_projects( 3, true );
+$all_projects      = kataskevi_get_projects( -1, false );
+$featured_projects = kataskevi_get_projects( -1, true );
+if ( empty( $featured_projects ) || count( $featured_projects ) < 4 ) {
+	$featured_projects = $all_projects;
+} else {
+	$merged = $featured_projects;
+	foreach ( $all_projects as $slug => $proj ) {
+		if ( ! isset( $merged[ $slug ] ) ) {
+			$merged[ $slug ] = $proj;
+		}
+	}
+	$featured_projects = $merged;
+}
 
 $brand_name = kataskevi_get_brand_name();
 
@@ -44,16 +57,16 @@ $hero_image   = kataskevi_get_mod( 'kataskevi_hero_image', get_template_director
 
 $services_eyebrow = kataskevi_get_mod( 'kataskevi_home_services_eyebrow', 'Services' );
 $services_title   = kataskevi_get_mod( 'kataskevi_home_services_title', 'What we deliver' );
-$services_desc    = kataskevi_get_mod( 'kataskevi_home_services_desc', 'Seven specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.' );
+$services_desc    = kataskevi_get_mod( 'kataskevi_home_services_desc', 'Specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.' );
 
 $works_eyebrow = kataskevi_get_mod( 'kataskevi_home_works_eyebrow', 'Proven in the field' );
 $works_title   = kataskevi_get_mod( 'kataskevi_home_works_title', 'Featured works' );
 $works_desc    = kataskevi_get_mod( 'kataskevi_home_works_desc', 'A cross-section of recent installations where life safety, mission-critical uptime, and rigorous engineering were non-negotiable.' );
 
 $lifecycle_image   = kataskevi_get_mod( 'kataskevi_lifecycle_image', get_template_directory_uri() . '/assets/images/band.jpg' );
-$lifecycle_eyebrow = kataskevi_get_mod( 'kataskevi_lifecycle_eyebrow', 'Whole-of-life support' );
+$lifecycle_eyebrow = kataskevi_get_mod( 'kataskevi_lifecycle_eyebrow', 'Core Services' );
 $lifecycle_title   = kataskevi_get_mod( 'kataskevi_lifecycle_title', 'Beyond installation' );
-$lifecycle_desc    = kataskevi_get_mod( 'kataskevi_lifecycle_desc', 'In an ever-changing industry, we support our clientele towards maximising profit with a variety of services across the whole project lifecycle.' );
+$lifecycle_desc    = kataskevi_get_mod( 'kataskevi_lifecycle_desc', 'From preliminary risk assessment to turnkey deployment and lifetime preventative maintenance, our team delivers complete protection across every project stage.' );
 
 $sectors_eyebrow = kataskevi_get_mod( 'kataskevi_home_sectors_eyebrow', 'Sectors' );
 $sectors_title   = kataskevi_get_mod( 'kataskevi_home_sectors_title', 'Sectors we serve' );
@@ -119,53 +132,61 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 		</section>
 	<?php endif; ?>
 
-	<!-- SERVICES OVERVIEW -->
-	<section id="services" class="section-services">
-		<div class="container-editorial">
-			<?php if ( ! empty( $services_eyebrow ) || ! empty( $services_title ) || ! empty( $services_desc ) ) : ?>
-				<div class="section-header-split">
-					<div>
-						<?php if ( ! empty( $services_eyebrow ) ) : ?>
-							<p class="eyebrow"><?php echo esc_html( $services_eyebrow ); ?></p>
-						<?php endif; ?>
-						<?php if ( ! empty( $services_title ) ) : ?>
-							<h2 class="section-title"><?php echo esc_html( $services_title ); ?></h2>
-						<?php endif; ?>
-					</div>
-					<?php if ( ! empty( $services_desc ) ) : ?>
-						<p class="section-lead-muted">
-							<?php echo esc_html( $services_desc ); ?>
-						</p>
+	<!-- THREE CORE SPECIALTIES STRIP (UNDER HERO IMAGE) -->
+	<?php
+	$feat1_title = kataskevi_get_mod( 'kataskevi_hero_feat1_title', 'Data Preparation' );
+	$feat1_desc  = kataskevi_get_mod( 'kataskevi_hero_feat1_desc', 'Turnkey preparation of IT and telecoms facilities, clean data halls, and mission-critical server environments.' );
+
+	$feat2_title = kataskevi_get_mod( 'kataskevi_hero_feat2_title', 'Raised Floor' );
+	$feat2_desc  = kataskevi_get_mod( 'kataskevi_hero_feat2_desc', 'Heavy-duty anti-static raised access flooring engineered for airflow, cable management, and load-bearing stability.' );
+
+	$feat3_title = kataskevi_get_mod( 'kataskevi_hero_feat3_title', 'Access Control' );
+	$feat3_desc  = kataskevi_get_mod( 'kataskevi_hero_feat3_desc', 'Multi-factor biometric access, smart card terminals, optical turnstiles, and auditable physical security systems.' );
+
+	$has_features = ( ! empty( $feat1_title ) || ! empty( $feat1_desc ) || ! empty( $feat2_title ) || ! empty( $feat2_desc ) || ! empty( $feat3_title ) || ! empty( $feat3_desc ) );
+	?>
+	<?php if ( $has_features ) : ?>
+		<section class="section-hero-features">
+			<div class="container-editorial">
+				<div class="hero-features-grid">
+					<?php if ( ! empty( $feat1_title ) || ! empty( $feat1_desc ) ) : ?>
+						<div class="hero-feature-card">
+							<?php if ( ! empty( $feat1_title ) ) : ?>
+								<h3 class="hero-feature-title"><?php echo esc_html( $feat1_title ); ?></h3>
+							<?php endif; ?>
+							<?php if ( ! empty( $feat1_desc ) ) : ?>
+								<p class="hero-feature-desc"><?php echo esc_html( $feat1_desc ); ?></p>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $feat2_title ) || ! empty( $feat2_desc ) ) : ?>
+						<div class="hero-feature-card">
+							<?php if ( ! empty( $feat2_title ) ) : ?>
+								<h3 class="hero-feature-title"><?php echo esc_html( $feat2_title ); ?></h3>
+							<?php endif; ?>
+							<?php if ( ! empty( $feat2_desc ) ) : ?>
+								<p class="hero-feature-desc"><?php echo esc_html( $feat2_desc ); ?></p>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $feat3_title ) || ! empty( $feat3_desc ) ) : ?>
+						<div class="hero-feature-card">
+							<?php if ( ! empty( $feat3_title ) ) : ?>
+								<h3 class="hero-feature-title"><?php echo esc_html( $feat3_title ); ?></h3>
+							<?php endif; ?>
+							<?php if ( ! empty( $feat3_desc ) ) : ?>
+								<p class="hero-feature-desc"><?php echo esc_html( $feat3_desc ); ?></p>
+							<?php endif; ?>
+						</div>
 					<?php endif; ?>
 				</div>
-			<?php endif; ?>
-
-			<div class="services-row-list">
-				<?php 
-				$service_index = 1;
-				foreach ( $services as $service_key => $service ) : 
-					$formatted_num = str_pad( (string) $service_index, 2, '0', STR_PAD_LEFT );
-					$target_link   = esc_url( $services_url . '#' . $service['id'] );
-				?>
-					<a href="<?php echo $target_link; ?>" class="service-row-item group">
-						<span class="service-row-num"><?php echo esc_html( $formatted_num ); ?></span>
-						<div class="service-row-content">
-							<h3 class="service-row-title"><?php echo esc_html( $service['title'] ); ?></h3>
-							<p class="service-row-desc"><?php echo esc_html( $service['short_desc'] ); ?></p>
-						</div>
-						<span class="service-row-arrow" aria-hidden="true">
-							<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-sm' ); ?>
-						</span>
-					</a>
-				<?php 
-					$service_index++;
-				endforeach; 
-				?>
 			</div>
-		</div>
-	</section>
+		</section>
+	<?php endif; ?>
 
-	<!-- FEATURED WORKS -->
+	<!-- FEATURED WORKS (CAROUSEL SLIDER) -->
 	<section id="works" class="section-featured-works">
 		<div class="container-editorial">
 			<div class="featured-works-header">
@@ -181,6 +202,14 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 					<?php endif; ?>
 				</div>
 				<div class="featured-works-header-right">
+					<div class="works-carousel-nav" aria-label="<?php esc_attr_e( 'Project carousel controls', 'kataskevi' ); ?>">
+						<button type="button" class="works-carousel-btn" id="works-carousel-prev" aria-label="<?php esc_attr_e( 'Previous projects', 'kataskevi' ); ?>">
+							<?php echo kataskevi_render_icon( 'arrow-left', 'icon icon-xs' ); ?>
+						</button>
+						<button type="button" class="works-carousel-btn" id="works-carousel-next" aria-label="<?php esc_attr_e( 'Next projects', 'kataskevi' ); ?>">
+							<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+						</button>
+					</div>
 					<a href="<?php echo esc_url( $works_url ); ?>" class="btn-pill btn-pill-outline btn-sm desktop-only-inline">
 						<span><?php esc_html_e( 'Explore All Projects', 'kataskevi' ); ?></span>
 						<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
@@ -188,66 +217,55 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 				</div>
 			</div>
 
-			<div class="featured-works-grid">
-				<?php foreach ( $featured_projects as $proj ) : ?>
-					<article class="featured-work-card group">
-						<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="featured-work-media-link" aria-label="<?php echo esc_attr( $proj['title'] ); ?>">
-							<div class="featured-work-media">
-								<img 
-									src="<?php echo esc_url( $proj['image'] ); ?>" 
-									alt="<?php echo esc_attr( $proj['title'] ); ?>" 
-									width="800" 
-									height="500" 
-									loading="lazy" 
-									class="featured-work-img"
-								>
-								<div class="featured-work-badge-strip">
-									<span class="sector-pill"><?php echo esc_html( $proj['sector'] ); ?></span>
-									<?php if ( ! empty( $proj['year'] ) ) : ?>
-										<span class="year-pill"><?php echo esc_html( $proj['year'] ); ?></span>
-									<?php endif; ?>
+			<div class="works-carousel-wrapper">
+				<div class="works-carousel-track" id="works-carousel-track" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Featured projects carousel', 'kataskevi' ); ?>">
+					<?php foreach ( $featured_projects as $proj ) : ?>
+						<article class="featured-work-card works-carousel-slide group">
+							<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="featured-work-media-link" aria-label="<?php echo esc_attr( $proj['title'] ); ?>">
+								<div class="featured-work-media">
+									<img 
+										src="<?php echo esc_url( $proj['image'] ); ?>" 
+										alt="<?php echo esc_attr( $proj['title'] ); ?>" 
+										width="800" 
+										height="500" 
+										loading="lazy" 
+										class="featured-work-img"
+									>
+									<div class="featured-work-badge-strip">
+										<span class="sector-pill"><?php echo esc_html( $proj['sector'] ); ?></span>
+									</div>
 								</div>
-							</div>
-						</a>
+							</a>
 
-						<div class="featured-work-body">
-							<div class="featured-work-meta">
-								<span class="work-meta-client"><?php echo esc_html( $proj['client'] ); ?></span>
-								<?php if ( ! empty( $proj['location'] ) ) : ?>
-									<span class="work-meta-sep" aria-hidden="true">·</span>
-									<span class="work-meta-loc"><?php echo esc_html( $proj['location'] ); ?></span>
+							<div class="featured-work-body">
+								<h3 class="featured-work-title">
+									<a href="<?php echo esc_url( $proj['permalink'] ); ?>">
+										<?php echo esc_html( $proj['title'] ); ?>
+									</a>
+								</h3>
+
+								<?php
+								$card_desc = ! empty( $proj['short_desc'] ) ? $proj['short_desc'] : ( ! empty( $proj['scope'] ) ? $proj['scope'] : '' );
+								if ( ! empty( $card_desc ) ) :
+								?>
+									<p class="featured-work-desc">
+										<?php echo esc_html( wp_trim_words( $card_desc, 18 ) ); ?>
+									</p>
 								<?php endif; ?>
-							</div>
 
-							<h3 class="featured-work-title">
-								<a href="<?php echo esc_url( $proj['permalink'] ); ?>">
-									<?php echo esc_html( $proj['title'] ); ?>
-								</a>
-							</h3>
-
-							<?php if ( ! empty( $proj['short_desc'] ) ) : ?>
-								<p class="featured-work-desc">
-									<?php echo esc_html( wp_trim_words( $proj['short_desc'], 16 ) ); ?>
-								</p>
-							<?php endif; ?>
-
-							<?php if ( ! empty( $proj['metric'] ) ) : ?>
-								<div class="featured-work-metric-strip">
-									<span class="metric-accent-val"><?php echo esc_html( $proj['metric'] ); ?></span>
-									<span class="metric-accent-lbl"><?php echo esc_html( $proj['metric_label'] ); ?></span>
+								<div class="featured-work-action mt-auto">
+									<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm">
+										<span><?php esc_html_e( 'Read More', 'kataskevi' ); ?></span>
+										<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+									</a>
 								</div>
-							<?php endif; ?>
-
-							<div class="featured-work-action">
-								<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="featured-work-link">
-									<span><?php esc_html_e( 'Explore Case Study', 'kataskevi' ); ?></span>
-									<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-								</a>
 							</div>
-						</div>
-					</article>
-				<?php endforeach; ?>
+						</article>
+					<?php endforeach; ?>
+				</div>
 			</div>
+
+			<div class="works-carousel-dots" id="works-carousel-dots" aria-label="<?php esc_attr_e( 'Carousel pagination', 'kataskevi' ); ?>"></div>
 
 			<div class="mobile-only-center mt-8">
 				<a href="<?php echo esc_url( $works_url ); ?>" class="btn-pill btn-pill-outline">

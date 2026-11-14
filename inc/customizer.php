@@ -427,6 +427,61 @@ function kataskevi_customize_register( $wp_customize ) {
 		)
 	);
 
+	// Three Core Specialties Strip (Under Hero Image).
+	$features = array(
+		1 => array(
+			'title_default' => 'Data Preparation',
+			'desc_default'  => 'Turnkey preparation of IT and telecoms facilities, clean data halls, and mission-critical server environments.',
+			'label'         => 'Specialty 1',
+		),
+		2 => array(
+			'title_default' => 'Raised Floor',
+			'desc_default'  => 'Heavy-duty anti-static raised access flooring engineered for airflow, cable management, and load-bearing stability.',
+			'label'         => 'Specialty 2',
+		),
+		3 => array(
+			'title_default' => 'Access Control',
+			'desc_default'  => 'Multi-factor biometric access, smart card terminals, optical turnstiles, and auditable physical security systems.',
+			'label'         => 'Specialty 3',
+		),
+	);
+
+	foreach ( $features as $f_idx => $f_data ) {
+		$wp_customize->add_setting(
+			'kataskevi_hero_feat' . $f_idx . '_title',
+			array(
+				'default'           => $f_data['title_default'],
+				'sanitize_callback' => 'sanitize_text_field',
+				'transport'         => 'refresh',
+			)
+		);
+		$wp_customize->add_control(
+			'kataskevi_hero_feat' . $f_idx . '_title',
+			array(
+				'label'   => sprintf( esc_html__( '%s: Title', 'kataskevi' ), $f_data['label'] ),
+				'section' => 'kataskevi_sec_home_hero',
+				'type'    => 'text',
+			)
+		);
+
+		$wp_customize->add_setting(
+			'kataskevi_hero_feat' . $f_idx . '_desc',
+			array(
+				'default'           => $f_data['desc_default'],
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'transport'         => 'refresh',
+			)
+		);
+		$wp_customize->add_control(
+			'kataskevi_hero_feat' . $f_idx . '_desc',
+			array(
+				'label'   => sprintf( esc_html__( '%s: Description', 'kataskevi' ), $f_data['label'] ),
+				'section' => 'kataskevi_sec_home_hero',
+				'type'    => 'textarea',
+			)
+		);
+	}
+
 	/*
 	 * =========================================================================
 	 * SECTION 5: HOMEPAGE SERVICES & FEATURED WORKS
@@ -482,7 +537,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_home_services_desc',
 		array(
-			'default'           => 'Seven specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.',
+			'default'           => 'Specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.',
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -590,7 +645,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_lifecycle_eyebrow',
 		array(
-			'default'           => 'Whole-of-life support',
+			'default'           => 'Core Services',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -626,7 +681,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_lifecycle_desc',
 		array(
-			'default'           => 'In an ever-changing industry, we support our clientele towards maximising profit with a variety of services across the whole project lifecycle.',
+			'default'           => 'From preliminary risk assessment to turnkey deployment and lifetime preventative maintenance, our team delivers complete protection across every project stage.',
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -940,7 +995,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_page_services_title',
 		array(
-			'default'           => 'Seven service lines, <em class="text-primary italic">one accountable partner.</em>',
+			'default'           => 'Engineering services, <em class="text-primary italic">one accountable partner.</em>',
 			'sanitize_callback' => 'wp_kses_post',
 			'transport'         => 'refresh',
 		)
@@ -958,7 +1013,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_page_services_desc',
 		array(
-			'default'           => 'Complete service in the design, supply, installation and maintenance of every system below — one partner, one accountable team, from survey to handover.',
+			'default'           => 'Complete lifecycle support across our four core engineering service pillars — from preliminary site survey to structured commissioning and ongoing preventative maintenance.',
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -972,11 +1027,11 @@ function kataskevi_customize_register( $wp_customize ) {
 		)
 	);
 
-	// How We Work Eyebrow.
+	// Bottom CTA Eyebrow.
 	$wp_customize->add_setting(
 		'kataskevi_services_how_eyebrow',
 		array(
-			'default'           => 'How we work',
+			'default'           => 'One Accountable Partner',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -984,17 +1039,17 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'kataskevi_services_how_eyebrow',
 		array(
-			'label'   => esc_html__( 'How We Work Eyebrow', 'kataskevi' ),
+			'label'   => esc_html__( 'Bottom CTA Eyebrow', 'kataskevi' ),
 			'section' => 'kataskevi_sec_page_services',
 			'type'    => 'text',
 		)
 	);
 
-	// How We Work Title.
+	// Bottom CTA Title.
 	$wp_customize->add_setting(
 		'kataskevi_services_how_title',
 		array(
-			'default'           => 'From survey to support',
+			'default'           => 'Engineered for complete protection from survey to handover.',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -1002,17 +1057,17 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'kataskevi_services_how_title',
 		array(
-			'label'   => esc_html__( 'How We Work Headline', 'kataskevi' ),
+			'label'   => esc_html__( 'Bottom CTA Headline', 'kataskevi' ),
 			'section' => 'kataskevi_sec_page_services',
 			'type'    => 'text',
 		)
 	);
 
-	// How We Work Desc.
+	// Bottom CTA Desc.
 	$wp_customize->add_setting(
 		'kataskevi_services_how_desc',
 		array(
-			'default'           => 'A structured path from first visit to long-term support, so every system performs from day one and keeps performing.',
+			'default'           => 'Speak with our engineering team to audit your facility risks or design an integrated protection system tailored to your building.',
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -1020,17 +1075,17 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'kataskevi_services_how_desc',
 		array(
-			'label'   => esc_html__( 'How We Work Lead', 'kataskevi' ),
+			'label'   => esc_html__( 'Bottom CTA Description', 'kataskevi' ),
 			'section' => 'kataskevi_sec_page_services',
 			'type'    => 'textarea',
 		)
 	);
 
-	// How We Work Button.
+	// Bottom CTA Button.
 	$wp_customize->add_setting(
 		'kataskevi_services_how_btn',
 		array(
-			'default'           => 'Start with a site survey',
+			'default'           => 'Request a Site Survey',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -1038,7 +1093,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'kataskevi_services_how_btn',
 		array(
-			'label'   => esc_html__( 'How We Work Action Button', 'kataskevi' ),
+			'label'   => esc_html__( 'Bottom CTA Button Text', 'kataskevi' ),
 			'section' => 'kataskevi_sec_page_services',
 			'type'    => 'text',
 		)
