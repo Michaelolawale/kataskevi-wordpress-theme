@@ -552,10 +552,17 @@ function kataskevi_render_updater_page() {
 				</div>
 
 				<?php if ( ! $diag_results['api_accessible'] ) : ?>
-					<div style="margin-top: 12px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
-						<strong><?php esc_html_e( 'Attention:', 'kataskevi' ); ?></strong>
-						<?php esc_html_e( 'Bitbucket returned HTTP 404/401. Because the repository is private, you must provide your Bitbucket Username and an App Password with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
-					</div>
+					<?php if ( false !== stripos( $diag_results['error_message'], 'registered email' ) ) : ?>
+						<div style="margin-top: 12px; padding: 12px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; color: #92400e; font-size: 0.92rem;">
+							<strong style="display: block; margin-bottom: 4px; font-size: 1rem;">💡 Immediate Action Required:</strong>
+							<span><?php esc_html_e( 'Your token is an Atlassian API Token. In the "Bitbucket Username or Atlassian Email" field below, enter your Atlassian registered email address (the email you log into Bitbucket with) instead of "unionolivia", then click "Save Repository Settings".', 'kataskevi' ); ?></span>
+						</div>
+					<?php else : ?>
+						<div style="margin-top: 12px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
+							<strong><?php esc_html_e( 'Attention:', 'kataskevi' ); ?></strong>
+							<?php esc_html_e( 'Bitbucket returned HTTP 404/401. Because the repository is private, you must provide your Bitbucket Username (or Atlassian Email) and an App Password with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
+						</div>
+					<?php endif; ?>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
@@ -611,10 +618,10 @@ function kataskevi_render_updater_page() {
 							</td>
 						</tr>
 
-						<!-- Bitbucket Username -->
+						<!-- Bitbucket Username / Email -->
 						<tr>
 							<th scope="row">
-								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Bitbucket Username', 'kataskevi' ); ?></label>
+								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Bitbucket Username or Atlassian Email', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
 							</th>
 							<td>
 								<input 
@@ -624,7 +631,7 @@ function kataskevi_render_updater_page() {
 									value="<?php echo esc_attr( $saved_user ); ?>" 
 									class="regular-text" 
 									autocomplete="off"
-									placeholder="<?php esc_attr_e( 'e.g. unionolivia', 'kataskevi' ); ?>"
+									placeholder="<?php esc_attr_e( 'e.g. your-email@domain.com', 'kataskevi' ); ?>"
 									style="width: 100%; max-width: 480px;"
 									<?php echo $has_const_user ? 'disabled' : ''; ?>
 								>
@@ -633,7 +640,10 @@ function kataskevi_render_updater_page() {
 										<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_USER constant in wp-config.php.', 'kataskevi' ); ?></em>
 									</p>
 								<?php else : ?>
-									<p class="description"><?php esc_html_e( 'Your Bitbucket account username (not your email address). Defaults to unionolivia.', 'kataskevi' ); ?></p>
+									<p class="description">
+										<strong><?php esc_html_e( 'Important:', 'kataskevi' ); ?></strong> 
+										<?php esc_html_e( 'If your token is an Atlassian API Token, enter your Atlassian registered email address (the email you log in with). If using a Bitbucket App Password, enter your Bitbucket username or email.', 'kataskevi' ); ?>
+									</p>
 								<?php endif; ?>
 							</td>
 						</tr>
