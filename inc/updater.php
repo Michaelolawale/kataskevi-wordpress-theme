@@ -630,10 +630,10 @@ function kataskevi_render_updater_page() {
 							</td>
 						</tr>
 
-						<!-- Bitbucket Username / Email -->
+						<!-- Bitbucket Username -->
 						<tr>
 							<th scope="row">
-								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Bitbucket Username or Atlassian Email', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
+								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Bitbucket Username', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
 							</th>
 							<td>
 								<input 
@@ -643,7 +643,7 @@ function kataskevi_render_updater_page() {
 									value="<?php echo esc_attr( $saved_user ); ?>" 
 									class="regular-text" 
 									autocomplete="off"
-									placeholder="<?php esc_attr_e( 'e.g. your-email@domain.com', 'kataskevi' ); ?>"
+									placeholder="<?php esc_attr_e( 'unionolivia (or x-token-auth for Access Tokens)', 'kataskevi' ); ?>"
 									style="width: 100%; max-width: 480px;"
 									<?php echo $has_const_user ? 'disabled' : ''; ?>
 								>
@@ -653,8 +653,7 @@ function kataskevi_render_updater_page() {
 									</p>
 								<?php else : ?>
 									<p class="description">
-										<strong><?php esc_html_e( 'Important:', 'kataskevi' ); ?></strong> 
-										<?php esc_html_e( 'If your token is an Atlassian API Token, enter your Atlassian registered email address (the email you log in with). If using a Bitbucket App Password, enter your Bitbucket username or email.', 'kataskevi' ); ?>
+										<?php esc_html_e( 'Enter "unionolivia" for a Bitbucket App Password, or "x-token-auth" if using a Repository Access Token.', 'kataskevi' ); ?>
 									</p>
 								<?php endif; ?>
 							</td>
@@ -705,15 +704,46 @@ function kataskevi_render_updater_page() {
 		<div class="card" style="max-width: 100%; padding: 20px 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); background: #fbfcfe;">
 			<h3 style="margin-top: 0; font-size: 1.05rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
 				<span>🔑</span>
-				<span><?php esc_html_e( 'How to generate your Bitbucket App Password (2 minutes)', 'kataskevi' ); ?></span>
+				<span><?php esc_html_e( 'How to generate your Bitbucket Credentials (2 Easy Options)', 'kataskevi' ); ?></span>
 			</h3>
-			<ol style="margin-left: 20px; line-height: 1.8; color: #475569; font-size: 0.92rem;">
-				<li><?php esc_html_e( 'Log into Bitbucket and open your ', 'kataskevi' ); ?><a href="https://bitbucket.org/account/settings/app-passwords/" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Personal Settings &rarr; App passwords', 'kataskevi' ); ?></strong></a>.</li>
-				<li><?php esc_html_e( 'Click the ', 'kataskevi' ); ?><strong><?php esc_html_e( 'Create app password', 'kataskevi' ); ?></strong><?php esc_html_e( ' button.', 'kataskevi' ); ?></li>
-				<li><?php esc_html_e( 'Set the Label to ', 'kataskevi' ); ?><code>Kataskevi Theme Updater</code>.</li>
-				<li><?php esc_html_e( 'Under ', 'kataskevi' ); ?><strong><?php esc_html_e( 'Permissions', 'kataskevi' ); ?></strong>, <?php esc_html_e( 'check only ', 'kataskevi' ); ?><strong><?php esc_html_e( 'Repositories &rarr; Read', 'kataskevi' ); ?></strong> (<code>read:repository:bitbucket</code>).</li>
-				<li><?php esc_html_e( 'Click ', 'kataskevi' ); ?><strong><?php esc_html_e( 'Create', 'kataskevi' ); ?></strong>, <?php esc_html_e( 'copy the generated password, and paste it into the field above.', 'kataskevi' ); ?></li>
-			</ol>
+
+			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
+				<!-- Option 1: Repository Access Token -->
+				<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px;">
+					<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
+						🏆 <?php esc_html_e( 'Option A (Fastest): Repository Access Token', 'kataskevi' ); ?>
+					</h4>
+					<ol style="margin-left: 18px; line-height: 1.7; color: #475569; font-size: 0.88rem; padding: 0;">
+						<li>Open your repo: <a href="https://bitbucket.org/unionolivia/kataskevi/admin/access-tokens" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Repository Access Tokens', 'kataskevi' ); ?></strong></a>.</li>
+						<li>Click <strong><?php esc_html_e( 'Create repository access token', 'kataskevi' ); ?></strong>.</li>
+						<li>Name it <code>Kataskevi Updater</code>.</li>
+						<li>Under <strong>Repositories</strong>, check: <strong>Read</strong>.</li>
+						<li>Click <strong>Create</strong> and copy the token.</li>
+						<li>In the form above:
+							<br>&bull; <strong>Username:</strong> <code>x-token-auth</code>
+							<br>&bull; <strong>Token:</strong> paste your token.
+						</li>
+					</ol>
+				</div>
+
+				<!-- Option 2: Personal Bitbucket App Password -->
+				<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px;">
+					<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
+						⚙️ <?php esc_html_e( 'Option B: Personal App Password', 'kataskevi' ); ?>
+					</h4>
+					<ol style="margin-left: 18px; line-height: 1.7; color: #475569; font-size: 0.88rem; padding: 0;">
+						<li>In Bitbucket, click your <strong>Profile avatar</strong> (or the gear icon ⚙️) in the top-right corner.</li>
+						<li>Click <strong>Personal Bitbucket settings</strong>.</li>
+						<li>Under <strong>Access Management</strong> on the left, click <strong>App passwords</strong>.</li>
+						<li>Click <strong>Create app password</strong>.</li>
+						<li>Under <strong>Repositories</strong>, check: <strong>Read</strong>.</li>
+						<li>In the form above:
+							<br>&bull; <strong>Username:</strong> <code>unionolivia</code>
+							<br>&bull; <strong>Token:</strong> paste your app password.
+						</li>
+					</ol>
+				</div>
+			</div>
 		</div>
 
 	</div>
