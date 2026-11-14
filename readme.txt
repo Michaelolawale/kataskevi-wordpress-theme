@@ -4,7 +4,7 @@ Tags: engineering, safety, telecommunications, corporate, responsive-layout, mod
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: v2.1.2
+Stable tag: v2.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,11 @@ Updates are distributed through the integrated Plugin Update Checker (PUC) v6.0 
 Navigate to Appearance > Theme Updates in your WordPress admin dashboard and input your Bitbucket Username (`unionolivia`) along with an App Password configured with `Repositories: Read` permissions.
 
 == Changelog ==
+
+= 2.1.3 =
+* Automated release verification update for Plugin Update Checker (PUC) via Bitbucket API.
+* Added live connection diagnostic telemetry in Appearance > Theme Updates.
+* Enhanced Atlassian email and Bitbucket App Password authentication handling.
 
 = 2.1.2 =
 * Added dedicated Single Service template (`single-service.php`) with dynamic custom post type integration and Customizer fallback content.
