@@ -160,7 +160,13 @@ foreach ( $all_projects as $k => $item ) {
 					<div class="case-block case-lifecycle-note">
 						<h3 class="note-title"><?php esc_html_e( 'Commissioning & Handover Protocol', 'kataskevi' ); ?></h3>
 						<p class="note-text">
-							<?php esc_html_e( 'Following final pressure integrity testing, NFPA audit verifications, and integrated BMS simulation runs, Kataskevi provided full as-built documentation, facility manager certifications, and active 24/7 on-call SLA maintenance coverage.', 'kataskevi' ); ?>
+							<?php
+							printf(
+								/* translators: %s: Company / Brand Name */
+								esc_html__( 'Following final pressure integrity testing, NFPA audit verifications, and integrated BMS simulation runs, %s provided full as-built documentation, facility manager certifications, and active 24/7 on-call SLA maintenance coverage.', 'kataskevi' ),
+								esc_html( kataskevi_get_brand_name() )
+							);
+							?>
 						</p>
 					</div>
 
@@ -206,16 +212,27 @@ foreach ( $all_projects as $k => $item ) {
 							<div class="quote-card-badge"><?php esc_html_e( 'Site Consultation', 'kataskevi' ); ?></div>
 							<h4 class="quote-card-title"><?php esc_html_e( 'Need a similar protection system?', 'kataskevi' ); ?></h4>
 							<p class="quote-card-text">
-								<?php esc_html_e( 'Speak directly with a Kataskevi systems engineer. We assess your facility floorplans and develop an end-to-end design.', 'kataskevi' ); ?>
+								<?php
+								printf(
+									/* translators: %s: Company / Brand Name */
+									esc_html__( 'Speak directly with a %s systems engineer. We assess your facility floorplans and develop an end-to-end design.', 'kataskevi' ),
+									esc_html( kataskevi_get_brand_name() )
+								);
+								?>
 							</p>
 							<a href="<?php echo esc_url( add_query_arg( array( 'project' => $proj['slug'] ), $contact_url ) ); ?>" class="btn-pill btn-pill-primary btn-block">
 								<span><?php esc_html_e( 'Request a Site Survey', 'kataskevi' ); ?></span>
 								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 							</a>
-							<div class="quote-card-direct">
-								<span><?php esc_html_e( 'Or call 24/7 support:', 'kataskevi' ); ?></span>
-								<strong><?php echo esc_html( kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' ) ); ?></strong>
-							</div>
+							<?php 
+							$emergency_phone = kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
+							if ( ! empty( $emergency_phone ) ) : 
+							?>
+								<div class="quote-card-direct">
+									<span><?php esc_html_e( 'Or call 24/7 support:', 'kataskevi' ); ?></span>
+									<strong><?php echo esc_html( $emergency_phone ); ?></strong>
+								</div>
+							<?php endif; ?>
 						</div>
 
 					</div>

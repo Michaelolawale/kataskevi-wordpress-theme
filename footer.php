@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$phone     = kataskevi_get_mod( 'kataskevi_phone', '+234 800 KATASKEVI' );
+$phone     = kataskevi_get_mod( 'kataskevi_phone', '+234 800 123 4567' );
 $emergency = kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
-$email     = kataskevi_get_mod( 'kataskevi_email', 'info@kataskevi.com' );
+$email     = kataskevi_get_mod( 'kataskevi_email', get_option( 'admin_email', 'info@example.com' ) );
 
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $works_url    = kataskevi_get_page_url( 'works', 'Our Works' );
@@ -37,15 +37,17 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 				<!-- Col 1: Brand & Bio -->
 				<div class="footer-col-brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand-link" rel="home">
-						<span class="footer-brand-title"><?php bloginfo( 'name' ); ?></span>
+						<span class="footer-brand-title"><?php echo esc_html( kataskevi_get_brand_name() ); ?></span>
 					</a>
-					<p class="footer-brand-desc">
-						<?php echo esc_html( $footer_desc ); ?>
-					</p>
+					<?php if ( ! empty( $footer_desc ) ) : ?>
+						<p class="footer-brand-desc">
+							<?php echo esc_html( $footer_desc ); ?>
+						</p>
+					<?php endif; ?>
 
 					<!-- Social Channels -->
 					<?php if ( ! empty( $socials ) ) : ?>
-						<div class="footer-social-strip" aria-label="<?php esc_attr_e( 'Follow Kataskevi', 'kataskevi' ); ?>">
+						<div class="footer-social-strip" aria-label="<?php echo esc_attr( sprintf( __( 'Follow %s', 'kataskevi' ), kataskevi_get_brand_name() ) ); ?>">
 							<?php foreach ( $socials as $s_key => $s_item ) : ?>
 								<a 
 									href="<?php echo esc_url( $s_item['url'] ); ?>" 
@@ -91,22 +93,26 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 				<!-- Col 4: Get in Touch -->
 				<div class="footer-col-contact">
 					<h3 class="footer-heading"><?php esc_html_e( 'Get in Touch', 'kataskevi' ); ?></h3>
-					<ul class="footer-links-list footer-contact-direct-list">
-						<li>
-							<a href="mailto:<?php echo esc_attr( $email ); ?>" class="footer-mail-link">
-								<?php echo kataskevi_render_icon( 'mail', 'icon icon-xs' ); ?>
-								<span><?php echo esc_html( $email ); ?></span>
-							</a>
-						</li>
-						<?php if ( ! empty( $phone ) ) : ?>
-							<li>
-								<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) ); ?>" class="footer-phone-link">
-									<?php echo kataskevi_render_icon( 'phone', 'icon icon-xs' ); ?>
-									<span><?php echo esc_html( $phone ); ?></span>
-								</a>
-							</li>
-						<?php endif; ?>
-					</ul>
+					<?php if ( ! empty( $email ) || ! empty( $phone ) ) : ?>
+						<ul class="footer-links-list footer-contact-direct-list">
+							<?php if ( ! empty( $email ) ) : ?>
+								<li>
+									<a href="mailto:<?php echo esc_attr( $email ); ?>" class="footer-mail-link">
+										<?php echo kataskevi_render_icon( 'mail', 'icon icon-xs' ); ?>
+										<span><?php echo esc_html( $email ); ?></span>
+									</a>
+								</li>
+							<?php endif; ?>
+							<?php if ( ! empty( $phone ) ) : ?>
+								<li>
+									<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) ); ?>" class="footer-phone-link">
+										<?php echo kataskevi_render_icon( 'phone', 'icon icon-xs' ); ?>
+										<span><?php echo esc_html( $phone ); ?></span>
+									</a>
+								</li>
+							<?php endif; ?>
+						</ul>
+					<?php endif; ?>
 					<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-outline btn-sm footer-quote-btn">
 						<?php esc_html_e( 'Request a Quote', 'kataskevi' ); ?>
 					</a>
@@ -117,11 +123,13 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 			<!-- Bottom Copyright Bar -->
 			<div class="footer-bottom-bar">
 				<p class="footer-copyright">
-					&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php esc_html_e( 'Engineering, Safety, IT & Telecommunications Support Services.', 'kataskevi' ); ?>
+					&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( kataskevi_get_brand_name() ); ?>. <?php esc_html_e( 'Engineering, Safety, IT & Telecommunications Support Services.', 'kataskevi' ); ?>
 				</p>
-				<span class="footer-tagline">
-					<?php echo esc_html( $footer_tagline ); ?>
-				</span>
+				<?php if ( ! empty( $footer_tagline ) ) : ?>
+					<span class="footer-tagline">
+						<?php echo esc_html( $footer_tagline ); ?>
+					</span>
+				<?php endif; ?>
 			</div>
 		</div>
 	</footer>

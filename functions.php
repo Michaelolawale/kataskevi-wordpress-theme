@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.0.0' );
+define( 'KATASKEVI_VERSION', '2.1.0' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -170,6 +170,22 @@ function kataskevi_get_page_url( $slug, $title = '' ) {
 }
 
 /**
+ * Safe helper to retrieve the dynamic company / brand name.
+ * Uses Theme Customizer option if set, otherwise automatically reflects
+ * the target WordPress Site Title (Settings -> General).
+ *
+ * @return string
+ */
+function kataskevi_get_brand_name() {
+	$brand = get_theme_mod( 'kataskevi_company_name', '' );
+	if ( ! empty( $brand ) ) {
+		return $brand;
+	}
+	$site_title = get_bloginfo( 'name' );
+	return ! empty( $site_title ) ? $site_title : esc_html__( 'Our Company', 'kataskevi' );
+}
+
+/**
  * Automatically create and integrate default pages (Services, Our Works, About, Contact)
  * if they do not exist yet, assign their templates, and build primary menu.
  */
@@ -281,6 +297,44 @@ function kataskevi_setup_default_pages() {
 			}
 			$locations['primary'] = $menu_obj->term_id;
 			set_theme_mod( 'nav_menu_locations', $locations );
+
+			// Ensure "Our Works" is always present in the existing menu
+			$existing_items = wp_get_nav_menu_items( $menu_obj->term_id );
+			$has_works      = false;
+			if ( ! empty( $existing_items ) ) {
+				foreach ( $existing_items as $item ) {
+					if ( false !== stripos( $item->title, 'Works' ) || false !== stripos( $item->url, '/works' ) ) {
+						$has_works = true;
+						break;
+					}
+				}
+			}
+			if ( ! $has_works ) {
+				$works_page_id = isset( $created_pages['works'] ) ? $created_pages['works'] : 0;
+				if ( $works_page_id ) {
+					wp_update_nav_menu_item(
+						$menu_obj->term_id,
+						0,
+						array(
+							'menu-item-title'     => __( 'Our Works', 'kataskevi' ),
+							'menu-item-object'    => 'page',
+							'menu-item-object-id' => $works_page_id,
+							'menu-item-type'      => 'post_type',
+							'menu-item-status'    => 'publish',
+						)
+					);
+				} else {
+					wp_update_nav_menu_item(
+						$menu_obj->term_id,
+						0,
+						array(
+							'menu-item-title'  => __( 'Our Works', 'kataskevi' ),
+							'menu-item-url'    => home_url( '/works/' ),
+							'menu-item-status' => 'publish',
+						)
+					);
+				}
+			}
 		}
 	}
 }
@@ -357,32 +411,32 @@ function kataskevi_get_social_links() {
 	$links = array(
 		'linkedin' => array(
 			'name'  => 'LinkedIn',
-			'url'   => get_theme_mod( 'kataskevi_linkedin', 'https://linkedin.com/company/kataskevi' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_linkedin', 'https://linkedin.com/company/kataskevi' ),
 			'icon'  => 'linkedin',
 		),
 		'twitter' => array(
 			'name'  => 'X (Twitter)',
-			'url'   => get_theme_mod( 'kataskevi_twitter', 'https://x.com/kataskevi' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_twitter', 'https://x.com/kataskevi' ),
 			'icon'  => 'twitter',
 		),
 		'facebook' => array(
 			'name'  => 'Facebook',
-			'url'   => get_theme_mod( 'kataskevi_facebook', 'https://facebook.com/kataskevi' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_facebook', 'https://facebook.com/kataskevi' ),
 			'icon'  => 'facebook',
 		),
 		'instagram' => array(
 			'name'  => 'Instagram',
-			'url'   => get_theme_mod( 'kataskevi_instagram', 'https://instagram.com/kataskevi' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_instagram', 'https://instagram.com/kataskevi' ),
 			'icon'  => 'instagram',
 		),
 		'youtube' => array(
 			'name'  => 'YouTube',
-			'url'   => get_theme_mod( 'kataskevi_youtube', 'https://youtube.com/@kataskevi' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_youtube', 'https://youtube.com/@kataskevi' ),
 			'icon'  => 'youtube',
 		),
 		'whatsapp' => array(
 			'name'  => 'WhatsApp',
-			'url'   => get_theme_mod( 'kataskevi_whatsapp', 'https://wa.me/2348005282753' ),
+			'url'   => kataskevi_get_mod( 'kataskevi_whatsapp', 'https://wa.me/2348005282753' ),
 			'icon'  => 'whatsapp',
 		),
 	);
@@ -575,6 +629,119 @@ function kataskevi_get_sectors() {
 }
 
 /**
+ * Data provider: Enterprise Clients and Partners
+ * Returns two curated sets of enterprise accounts for the dual-marquee scrolling section.
+ *
+ * @return array
+ */
+function kataskevi_get_clients() {
+	$clients = array(
+		'row_1' => array(
+			array(
+				'name'   => 'Shell Petroleum Development',
+				'sector' => 'Petrochemical & Energy',
+				'mark'   => 'SP',
+				'icon'   => 'flame',
+			),
+			array(
+				'name'   => 'MainOne / Equinix',
+				'sector' => 'Colocation & Telecoms',
+				'mark'   => 'MO',
+				'icon'   => 'server',
+			),
+			array(
+				'name'   => 'Dangote Industries',
+				'sector' => 'Refinery & Industrial',
+				'mark'   => 'DG',
+				'icon'   => 'factory',
+			),
+			array(
+				'name'   => 'Access Bank PLC',
+				'sector' => 'Corporate Banking HQ',
+				'mark'   => 'AB',
+				'icon'   => 'landmark',
+			),
+			array(
+				'name'   => 'Rack Centre',
+				'sector' => 'Tier III Data Center',
+				'mark'   => 'RC',
+				'icon'   => 'server',
+			),
+			array(
+				'name'   => 'Julius Berger',
+				'sector' => 'Civil & Marine Infrastructure',
+				'mark'   => 'JB',
+				'icon'   => 'compass',
+			),
+			array(
+				'name'   => 'TotalEnergies',
+				'sector' => 'Energy & Deepwater',
+				'mark'   => 'TE',
+				'icon'   => 'flame',
+			),
+			array(
+				'name'   => 'Medallion Data Centres',
+				'sector' => 'Interconnection Hub',
+				'mark'   => 'MD',
+				'icon'   => 'cpu',
+			),
+		),
+		'row_2' => array(
+			array(
+				'name'   => 'MTN Communications',
+				'sector' => 'Switching Centers & NOC',
+				'mark'   => 'MTN',
+				'icon'   => 'radio-tower',
+			),
+			array(
+				'name'   => 'Seplat Energy',
+				'sector' => 'Upstream Exploration',
+				'mark'   => 'SE',
+				'icon'   => 'flame',
+			),
+			array(
+				'name'   => 'Zenith Bank',
+				'sector' => 'Commercial Towers',
+				'mark'   => 'ZB',
+				'icon'   => 'landmark',
+			),
+			array(
+				'name'   => 'Africa Data Centres',
+				'sector' => 'Hyperscale Cloud Facility',
+				'mark'   => 'ADC',
+				'icon'   => 'layers',
+			),
+			array(
+				'name'   => 'APM Terminals',
+				'sector' => 'Port & Freight Logistics',
+				'mark'   => 'APM',
+				'icon'   => 'compass',
+			),
+			array(
+				'name'   => 'Airtel Africa',
+				'sector' => 'Cellular Infrastructure',
+				'mark'   => 'AT',
+				'icon'   => 'radio-tower',
+			),
+			array(
+				'name'   => 'FirstBank of Nigeria',
+				'sector' => 'Mission-Critical Processing',
+				'mark'   => 'FBN',
+				'icon'   => 'banknote',
+			),
+			array(
+				'name'   => 'Lafarge Africa',
+				'sector' => 'Industrial Processing Plants',
+				'mark'   => 'LA',
+				'icon'   => 'factory',
+			),
+		),
+	);
+
+	return apply_filters( 'kataskevi_clients_list', $clients );
+}
+
+/**
  * Helper to render SVG icons inline
  */
 function kataskevi_render_icon( $name, $class = 'icon' ) {
@@ -646,7 +813,7 @@ function kataskevi_get_default_projects() {
 			'short_desc'   => 'Turnkey delivery of FM-200 clean-agent suppression, anti-static raised flooring, and high-sensitivity VESDA smoke detection across four mission-critical halls.',
 			'scope'        => 'Turnkey Data Hall Protection & Site Preparation',
 			'challenge'    => 'The high-density colocation facility required zero-tolerance fire risk management. Standard water sprinkler systems were completely impermissible due to irreparable equipment damage, and the facility demanded 120-minute physical fire containment without disrupting live tenant feeds.',
-			'solution'     => 'Kataskevi engineered an integrated FM-200 clean-gas suppression matrix with dual-action solenoid actuators, VESDA laser aspirating smoke detectors, and fire-resistant raised airflow access floors. We established sub-floor acoustic dampening, automated damper shutdown, and full BMS integration.',
+			'solution'     => 'Our engineering team deployed an integrated FM-200 clean-gas suppression matrix with dual-action solenoid actuators, VESDA laser aspirating smoke detectors, and fire-resistant raised airflow access floors. We established sub-floor acoustic dampening, automated damper shutdown, and full BMS integration.',
 			'deliverables' => array(
 				'Synchronized FM-200 gaseous clean agent cylinder arrays',
 				'VESDA laser air-sampling smoke detection with sub-second alert',
@@ -702,7 +869,7 @@ function kataskevi_get_default_projects() {
 			'image'        => $img_base . 'commercial.jpg',
 			'short_desc'   => 'High-throughput optical speed turnstiles, multi-factor biometric access, and multi-zone addressable fire alarms across an 18-storey banking headquarters.',
 			'challenge'    => 'Controlling peak morning transit for over 1,800 personnel while satisfying stringent Central Bank security standards and delivering phased fire evacuation across an 18-floor high-rise.',
-			'solution'     => 'Kataskevi installed 14 lanes of optical glass speed turnstiles with dual facial-recognition and encrypted smartcard readers, unified with an addressable multi-loop voice evacuation fire system.',
+			'solution'     => 'Our technical team installed 14 lanes of optical glass speed turnstiles with dual facial-recognition and encrypted smartcard readers, unified with an addressable multi-loop voice evacuation fire system.',
 			'deliverables' => array(
 				'14 optical speed turnstile lanes with touchless facial recognition',
 				'Addressable multi-loop fire alarm system with phased voice evacuation',
@@ -992,7 +1159,9 @@ function kataskevi_handle_inquiry_submission() {
 	}
 
 	$admin_email = get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) );
-	$subject     = sprintf( '[Kataskevi Inquiry] New Request from %s', $name );
+	$brand_name  = kataskevi_get_brand_name();
+	/* translators: 1: Brand name, 2: Customer name */
+	$subject     = sprintf( '[%1$s Inquiry] New Request from %2$s', $brand_name, $name );
 	$body        = "You have received a new consultation / site survey request:\n\n";
 	$body       .= "Full Name: $name\n";
 	$body       .= "Email: $email\n";

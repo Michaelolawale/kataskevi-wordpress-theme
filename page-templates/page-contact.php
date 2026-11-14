@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $services     = kataskevi_get_services();
-$email        = kataskevi_get_mod( 'kataskevi_email', 'info@kataskevi.com' );
-$phone        = kataskevi_get_mod( 'kataskevi_phone', '+234 800 KATASKEVI' );
+$email        = kataskevi_get_mod( 'kataskevi_email', get_option( 'admin_email', 'info@example.com' ) );
+$phone        = kataskevi_get_mod( 'kataskevi_phone', '+234 800 123 4567' );
 $emergency    = kataskevi_get_mod( 'kataskevi_emergency_phone', '+234 802 345 6789' );
 $address      = kataskevi_get_mod( 'kataskevi_address', 'Engineering Hub, Commercial District, Victoria Island, Lagos' );
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
@@ -38,13 +38,19 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 	<!-- HERO -->
 	<section class="section-page-hero">
 		<div class="container-editorial">
-			<p class="eyebrow"><?php echo esc_html( $contact_eyebrow ); ?></p>
-			<h1 class="page-hero-title">
-				<?php echo wp_kses_post( $contact_title ); ?>
-			</h1>
-			<p class="page-hero-desc">
-				<?php echo esc_html( $contact_desc ); ?>
-			</p>
+			<?php if ( ! empty( $contact_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $contact_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $contact_title ) ) : ?>
+				<h1 class="page-hero-title">
+					<?php echo wp_kses_post( $contact_title ); ?>
+				</h1>
+			<?php endif; ?>
+			<?php if ( ! empty( $contact_desc ) ) : ?>
+				<p class="page-hero-desc">
+					<?php echo esc_html( $contact_desc ); ?>
+				</p>
+			<?php endif; ?>
 		</div>
 	</section>
 
@@ -55,46 +61,58 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 
 				<!-- LEFT COLUMN: DIRECT CHANNELS -->
 				<div class="contact-editorial-info">
-					<div class="contact-channels-stack border-y border-border">
-						<div class="channel-stack-item">
-							<h3 class="channel-stack-label"><?php esc_html_e( 'Email', 'kataskevi' ); ?></h3>
-							<a href="mailto:<?php echo esc_attr( $email ); ?>" class="channel-stack-link"><?php echo esc_html( $email ); ?></a>
-						</div>
+					<?php if ( ! empty( $email ) || ! empty( $phone ) || ! empty( $address ) ) : ?>
+						<div class="contact-channels-stack border-y border-border">
+							<?php if ( ! empty( $email ) ) : ?>
+								<div class="channel-stack-item">
+									<h3 class="channel-stack-label"><?php esc_html_e( 'Email', 'kataskevi' ); ?></h3>
+									<a href="mailto:<?php echo esc_attr( $email ); ?>" class="channel-stack-link"><?php echo esc_html( $email ); ?></a>
+								</div>
+							<?php endif; ?>
 
-						<div class="channel-stack-item">
-							<h3 class="channel-stack-label"><?php esc_html_e( 'Phone', 'kataskevi' ); ?></h3>
-							<p class="channel-stack-text"><?php esc_html_e( 'Speak with our engineering team during business hours.', 'kataskevi' ); ?></p>
 							<?php if ( ! empty( $phone ) ) : ?>
-								<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>" class="channel-stack-sublink">
-									<?php echo esc_html( $phone ); ?>
+								<div class="channel-stack-item">
+									<h3 class="channel-stack-label"><?php esc_html_e( 'Phone', 'kataskevi' ); ?></h3>
+									<p class="channel-stack-text"><?php esc_html_e( 'Speak with our engineering team during business hours.', 'kataskevi' ); ?></p>
+									<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $phone ) ); ?>" class="channel-stack-sublink">
+										<?php echo esc_html( $phone ); ?>
+									</a>
+								</div>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $address ) ) : ?>
+								<div class="channel-stack-item">
+									<h3 class="channel-stack-label"><?php esc_html_e( 'Headquarters', 'kataskevi' ); ?></h3>
+									<p class="channel-stack-text"><?php echo esc_html( $address ); ?></p>
+								</div>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<!-- URGENT SYSTEM ISSUE BOX -->
+					<?php if ( ! empty( $urgent_title ) || ! empty( $urgent_desc ) || ! empty( $emergency ) ) : ?>
+						<div class="urgent-editorial-box mt-8">
+							<?php if ( ! empty( $urgent_title ) ) : ?>
+								<h3 class="urgent-editorial-title"><?php echo esc_html( $urgent_title ); ?></h3>
+							<?php endif; ?>
+							<?php if ( ! empty( $urgent_desc ) ) : ?>
+								<p class="urgent-editorial-desc">
+									<?php echo esc_html( $urgent_desc ); ?>
+								</p>
+							<?php endif; ?>
+							<?php if ( ! empty( $emergency ) ) : ?>
+								<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $emergency ) ); ?>" class="urgent-editorial-link">
+									<span><?php echo esc_html( $emergency ); ?> (24/7 Desk)</span>
+									<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+								</a>
+							<?php else : ?>
+								<a href="<?php echo esc_url( $services_url ); ?>" class="urgent-editorial-link">
+									<span><?php esc_html_e( 'See our service lines', 'kataskevi' ); ?></span>
+									<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
 								</a>
 							<?php endif; ?>
 						</div>
-
-						<div class="channel-stack-item">
-							<h3 class="channel-stack-label"><?php esc_html_e( 'Headquarters', 'kataskevi' ); ?></h3>
-							<p class="channel-stack-text"><?php echo esc_html( $address ); ?></p>
-						</div>
-					</div>
-
-					<!-- URGENT SYSTEM ISSUE BOX -->
-					<div class="urgent-editorial-box mt-8">
-						<h3 class="urgent-editorial-title"><?php echo esc_html( $urgent_title ); ?></h3>
-						<p class="urgent-editorial-desc">
-							<?php echo esc_html( $urgent_desc ); ?>
-						</p>
-						<?php if ( ! empty( $emergency ) ) : ?>
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $emergency ) ); ?>" class="urgent-editorial-link">
-								<span><?php echo esc_html( $emergency ); ?> (24/7 Desk)</span>
-								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-							</a>
-						<?php else : ?>
-							<a href="<?php echo esc_url( $services_url ); ?>" class="urgent-editorial-link">
-								<span><?php esc_html_e( 'See our service lines', 'kataskevi' ); ?></span>
-								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-							</a>
-						<?php endif; ?>
-					</div>
+					<?php endif; ?>
 				</div>
 
 				<!-- RIGHT COLUMN: INTERACTIVE EDITORIAL FORM -->

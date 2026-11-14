@@ -37,13 +37,19 @@ $how_btn     = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Start with a si
 	<!-- HERO -->
 	<section class="section-page-hero">
 		<div class="container-editorial">
-			<p class="eyebrow"><?php echo esc_html( $page_eyebrow ); ?></p>
-			<h1 class="page-hero-title">
-				<?php echo wp_kses_post( $page_title ); ?>
-			</h1>
-			<p class="page-hero-desc">
-				<?php echo esc_html( $page_desc ); ?>
-			</p>
+			<?php if ( ! empty( $page_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $page_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $page_title ) ) : ?>
+				<h1 class="page-hero-title">
+					<?php echo wp_kses_post( $page_title ); ?>
+				</h1>
+			<?php endif; ?>
+			<?php if ( ! empty( $page_desc ) ) : ?>
+				<p class="page-hero-desc">
+					<?php echo esc_html( $page_desc ); ?>
+				</p>
+			<?php endif; ?>
 		</div>
 	</section>
 
@@ -92,11 +98,17 @@ $how_btn     = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Start with a si
 	<!-- HOW WE WORK / FROM SURVEY TO SUPPORT -->
 	<section class="section-how-we-work border-y border-border">
 		<div class="container-editorial py-20">
-			<p class="eyebrow"><?php echo esc_html( $how_eyebrow ); ?></p>
-			<h2 class="section-title"><?php echo esc_html( $how_title ); ?></h2>
-			<p class="section-lead-muted" style="max-width: 36rem;">
-				<?php echo esc_html( $how_desc ); ?>
-			</p>
+			<?php if ( ! empty( $how_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $how_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $how_title ) ) : ?>
+				<h2 class="section-title"><?php echo esc_html( $how_title ); ?></h2>
+			<?php endif; ?>
+			<?php if ( ! empty( $how_desc ) ) : ?>
+				<p class="section-lead-muted" style="max-width: 36rem;">
+					<?php echo esc_html( $how_desc ); ?>
+				</p>
+			<?php endif; ?>
 
 			<div class="lifecycle-cards-grid mt-12">
 				<?php 
@@ -115,12 +127,14 @@ $how_btn     = kataskevi_get_mod( 'kataskevi_services_how_btn', 'Start with a si
 				?>
 			</div>
 
-			<div class="how-we-work-action mt-12">
-				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
-					<span><?php echo esc_html( $how_btn ); ?></span>
-					<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-				</a>
-			</div>
+			<?php if ( ! empty( $how_btn ) ) : ?>
+				<div class="how-we-work-action mt-12">
+					<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
+						<span><?php echo esc_html( $how_btn ); ?></span>
+						<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+					</a>
+				</div>
+			<?php endif; ?>
 		</div>
 	</section>
 

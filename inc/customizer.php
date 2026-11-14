@@ -49,7 +49,26 @@ function kataskevi_customize_register( $wp_customize ) {
 			'title'       => esc_html__( '1. Company & Contact Details', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 10,
-			'description' => esc_html__( 'Configure corporate phone numbers, emergency lines, office location, and business hours.', 'kataskevi' ),
+			'description' => esc_html__( 'Configure corporate company name, phone numbers, emergency lines, office location, and business hours.', 'kataskevi' ),
+		)
+	);
+
+	// Company / Brand Name.
+	$wp_customize->add_setting(
+		'kataskevi_company_name',
+		array(
+			'default'           => get_bloginfo( 'name' ),
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_company_name',
+		array(
+			'label'       => esc_html__( 'Company / Brand Name', 'kataskevi' ),
+			'description' => esc_html__( 'Defaults to your WordPress Site Title. Used dynamically across branding, headings, and footer copyright.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_company',
+			'type'        => 'text',
 		)
 	);
 
@@ -57,7 +76,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_phone',
 		array(
-			'default'           => '+234 800 KATASKEVI',
+			'default'           => '+234 800 123 4567',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -93,7 +112,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_email',
 		array(
-			'default'           => 'info@kataskevi.com',
+			'default'           => get_option( 'admin_email', 'info@example.com' ),
 			'sanitize_callback' => 'sanitize_email',
 			'transport'         => 'refresh',
 		)
@@ -257,16 +276,16 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 4: HOMEPAGE HERO & LIVE STATS
+	 * SECTION 4: HOMEPAGE HERO SECTION
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_hero',
 		array(
-			'title'       => esc_html__( '4. Homepage: Hero & Live Stats', 'kataskevi' ),
+			'title'       => esc_html__( '4. Homepage: Hero Section', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 40,
-			'description' => esc_html__( 'Configure homepage hero titles, description, CTA buttons, hero image, and key metric numbers.', 'kataskevi' ),
+			'description' => esc_html__( 'Configure homepage hero titles, description, CTA buttons, and the full-width hero feature image.', 'kataskevi' ),
 		)
 	);
 
@@ -311,7 +330,11 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_hero_description',
 		array(
-			'default'           => 'Kataskevi provides full-service support in the design, supply, installation and maintenance of fire safety, electronic security and IT/telecoms infrastructure — from site survey to commissioning and beyond.',
+			'default'           => sprintf(
+				/* translators: %s: Company / Brand Name */
+				esc_html__( '%s provides full-service support in the design, supply, installation and maintenance of fire safety, electronic security and IT/telecoms infrastructure — from site survey to commissioning and beyond.', 'kataskevi' ),
+				kataskevi_get_brand_name()
+			),
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -381,52 +404,6 @@ function kataskevi_customize_register( $wp_customize ) {
 			)
 		)
 	);
-
-	// 4 Live Stats.
-	$stats_defaults = array(
-		1 => array( 'val' => '7', 'lbl' => 'Specialised service lines' ),
-		2 => array( 'val' => '7', 'lbl' => 'Industry sectors served' ),
-		3 => array( 'val' => 'End-to-end', 'lbl' => 'Supply to maintenance' ),
-		4 => array( 'val' => '24/7', 'lbl' => 'Critical-systems support' ),
-	);
-
-	for ( $i = 1; $i <= 4; $i++ ) {
-		$wp_customize->add_setting(
-			'kataskevi_stat' . $i . '_val',
-			array(
-				'default'           => $stats_defaults[ $i ]['val'],
-				'sanitize_callback' => 'sanitize_text_field',
-				'transport'         => 'refresh',
-			)
-		);
-		$wp_customize->add_control(
-			'kataskevi_stat' . $i . '_val',
-			array(
-				/* translators: %d: stat index number */
-				'label'   => sprintf( esc_html__( 'Stat %d Number / Metric', 'kataskevi' ), $i ),
-				'section' => 'kataskevi_sec_home_hero',
-				'type'    => 'text',
-			)
-		);
-
-		$wp_customize->add_setting(
-			'kataskevi_stat' . $i . '_lbl',
-			array(
-				'default'           => $stats_defaults[ $i ]['lbl'],
-				'sanitize_callback' => 'sanitize_text_field',
-				'transport'         => 'refresh',
-			)
-		);
-		$wp_customize->add_control(
-			'kataskevi_stat' . $i . '_lbl',
-			array(
-				/* translators: %d: stat index number */
-				'label'   => sprintf( esc_html__( 'Stat %d Label', 'kataskevi' ), $i ),
-				'section' => 'kataskevi_sec_home_hero',
-				'type'    => 'text',
-			)
-		);
-	}
 
 	/*
 	 * =========================================================================
@@ -695,10 +672,10 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_section(
 		'kataskevi_sec_home_dark_cta',
 		array(
-			'title'       => esc_html__( '7. Homepage: Sectors & Dark CTA', 'kataskevi' ),
+			'title'       => esc_html__( '7. Homepage: Sectors, Clients & Dark CTA', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 70,
-			'description' => esc_html__( 'Configure the industry sectors header and the high-contrast dark CTA banner at the bottom of the front page.', 'kataskevi' ),
+			'description' => esc_html__( 'Configure the industry sectors header, our clients dual marquee section, and the high-contrast dark CTA banner at the bottom of the front page.', 'kataskevi' ),
 		)
 	);
 
@@ -751,6 +728,64 @@ function kataskevi_customize_register( $wp_customize ) {
 		'kataskevi_home_sectors_desc',
 		array(
 			'label'   => esc_html__( 'Sectors Lead Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_home_dark_cta',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Clients Eyebrow.
+	$wp_customize->add_setting(
+		'kataskevi_clients_eyebrow',
+		array(
+			'default'           => 'Our Clients',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_clients_eyebrow',
+		array(
+			'label'   => esc_html__( 'Clients Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_home_dark_cta',
+			'type'    => 'text',
+		)
+	);
+
+	// Clients Title.
+	$wp_customize->add_setting(
+		'kataskevi_clients_title',
+		array(
+			'default'           => 'Trusted by industry leaders across Nigeria',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_clients_title',
+		array(
+			'label'   => esc_html__( 'Clients Headline', 'kataskevi' ),
+			'section' => 'kataskevi_sec_home_dark_cta',
+			'type'    => 'text',
+		)
+	);
+
+	// Clients Description.
+	$wp_customize->add_setting(
+		'kataskevi_clients_desc',
+		array(
+			'default'           => sprintf(
+				/* translators: %s: Company / Brand Name */
+				esc_html__( 'From Tier III data centers and telecommunications networks to corporate financial institutions and energy complexes, Nigeria\'s leading enterprises rely on %s for mission-critical infrastructure.', 'kataskevi' ),
+				kataskevi_get_brand_name()
+			),
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_clients_desc',
+		array(
+			'label'   => esc_html__( 'Clients Description', 'kataskevi' ),
 			'section' => 'kataskevi_sec_home_dark_cta',
 			'type'    => 'textarea',
 		)
@@ -995,7 +1030,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_section(
 		'kataskevi_sec_page_about',
 		array(
-			'title'       => esc_html__( '9. Page: About Kataskevi', 'kataskevi' ),
+			'title'       => esc_html__( '9. Page: About Us', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 90,
 			'description' => esc_html__( 'Configure hero text, full-width media banner, "Why we exist" narrative story, and sector CTA on the About page.', 'kataskevi' ),
@@ -1117,7 +1152,11 @@ function kataskevi_customize_register( $wp_customize ) {
 	$why_paragraphs = array(
 		1 => 'Modern facilities run on interdependent systems — suppression, detection, security, access, connectivity. When any one of them fails, everything downstream is at risk.',
 		2 => 'Too often, these systems are procured in silos, installed by different vendors with no shared accountability, and handed over without ongoing maintenance plans. When something goes wrong, the finger-pointing begins.',
-		3 => 'Kataskevi was founded to eliminate those gaps. We take end-to-end responsibility for every system we deliver — from initial survey through engineering, procurement, installation, and lifecycle maintenance. One partner. One standard.',
+		3 => sprintf(
+			/* translators: %s: Company / Brand Name */
+			esc_html__( '%s was founded to eliminate those gaps. We take end-to-end responsibility for every system we deliver — from initial survey through engineering, procurement, installation, and lifecycle maintenance. One partner. One standard.', 'kataskevi' ),
+			kataskevi_get_brand_name()
+		),
 		4 => 'Whether designing a clean-agent suppression system for a colocation suite, securing a corporate headquarters, or outfitting a marine terminal with certified safety gear, we bring the same engineering rigor to every engagement.',
 	);
 
@@ -1140,6 +1179,60 @@ function kataskevi_customize_register( $wp_customize ) {
 			)
 		);
 	}
+
+	// Who We Serve Eyebrow.
+	$wp_customize->add_setting(
+		'kataskevi_about_who_eyebrow',
+		array(
+			'default'           => 'Who we serve',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_who_eyebrow',
+		array(
+			'label'   => esc_html__( 'Who We Serve Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	// Who We Serve Title.
+	$wp_customize->add_setting(
+		'kataskevi_about_who_title',
+		array(
+			'default'           => 'Different industries, one standard',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_who_title',
+		array(
+			'label'   => esc_html__( 'Who We Serve Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	// Who We Serve Description.
+	$wp_customize->add_setting(
+		'kataskevi_about_who_desc',
+		array(
+			'default'           => 'Systems that work when they\'re needed most.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_who_desc',
+		array(
+			'label'   => esc_html__( 'Who We Serve Subtitle / Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
 
 	// Who We Serve CTA Button Text.
 	$wp_customize->add_setting(
@@ -1214,7 +1307,11 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_works_page_desc',
 		array(
-			'default'           => 'From mission-critical colocation suites and high-throughput corporate towers to petrochemical terminals, explore how Kataskevi delivers turnkey safety, security, and IT infrastructure.',
+			'default'           => sprintf(
+				/* translators: %s: Company / Brand Name */
+				esc_html__( 'From mission-critical colocation suites and high-throughput corporate towers to petrochemical terminals, explore how %s delivers turnkey safety, security, and IT infrastructure.', 'kataskevi' ),
+				kataskevi_get_brand_name()
+			),
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'transport'         => 'refresh',
 		)
@@ -1291,6 +1388,92 @@ function kataskevi_customize_register( $wp_customize ) {
 			)
 		);
 	}
+
+	// Works Bottom CTA Settings.
+	$wp_customize->add_setting(
+		'kataskevi_works_cta_eyebrow',
+		array(
+			'default'           => 'Plan Your Project',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_works_cta_eyebrow',
+		array(
+			'label'   => esc_html__( 'Bottom CTA Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_works',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_works_cta_title',
+		array(
+			'default'           => 'Have a facility requiring protection?',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_works_cta_title',
+		array(
+			'label'   => esc_html__( 'Bottom CTA Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_works',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_works_cta_desc',
+		array(
+			'default'           => 'From architectural blueprint review to full-scale engineering execution, our technical team works with facility managers, contractors, and project directors across Nigeria.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_works_cta_desc',
+		array(
+			'label'   => esc_html__( 'Bottom CTA Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_works',
+			'type'    => 'textarea',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_works_cta_btn1',
+		array(
+			'default'           => 'Request Consultation',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_works_cta_btn1',
+		array(
+			'label'   => esc_html__( 'Bottom CTA Button 1 Text', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_works',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_works_cta_btn2',
+		array(
+			'default'           => 'View Capabilities',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_works_cta_btn2',
+		array(
+			'label'   => esc_html__( 'Bottom CTA Button 2 Text', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_works',
+			'type'    => 'text',
+		)
+	);
 
 	/*
 	 * =========================================================================
@@ -1495,15 +1678,24 @@ add_action( 'customize_register', 'kataskevi_customize_register' );
 /**
  * Safe helper to retrieve Theme Customizer options with fallback default.
  *
+ * Intelligently distinguishes between a setting that has NEVER been saved in
+ * the database (in which case the default fallback is returned) and a setting
+ * where the user deliberately emptied/cleared the field in Customizer to delete
+ * or hide the text/section (in which case the empty string is respected).
+ *
  * @param string $key     Theme mod setting name.
- * @param mixed  $default Fallback value if setting is not defined.
+ * @param mixed  $default Fallback value if setting has never been configured.
  * @return mixed The theme mod value or fallback.
  */
 function kataskevi_get_mod( $key, $default = '' ) {
-	$value = get_theme_mod( $key, $default );
-	if ( '' === $value || null === $value || false === $value ) {
+	$sentinel = '__KATASKEVI_MOD_NOT_SET__';
+	$value    = get_theme_mod( $key, $sentinel );
+
+	// Setting has never been customized or saved in database.
+	if ( $sentinel === $value || null === $value ) {
 		return $default;
 	}
+
 	return $value;
 }
 

@@ -23,7 +23,7 @@ get_header();
 		<article id="post-<?php the_ID(); ?>" <?php post_class( 'page-single-article' ); ?>>
 			<section class="section-page-hero">
 				<div class="container-editorial">
-					<p class="eyebrow"><?php bloginfo( 'name' ); ?></p>
+					<p class="eyebrow"><?php echo esc_html( kataskevi_get_brand_name() ); ?></p>
 					<h1 class="page-hero-title"><?php the_title(); ?></h1>
 					<?php if ( has_excerpt() ) : ?>
 						<p class="page-hero-desc"><?php echo esc_html( get_the_excerpt() ); ?></p>

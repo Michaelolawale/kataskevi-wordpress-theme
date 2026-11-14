@@ -74,9 +74,10 @@ Kataskevi Theme Settings
 ### Section 1: Company & Contact Details
 | Setting ID | Control Type | Default Value | Description |
 |---|---|---|---|
-| `kataskevi_phone` | Text | `+234 800 KATASKEVI` | Primary hotline / support line |
+| `kataskevi_company_name` | Text | `get_bloginfo('name')` | Dynamic company/brand name automatically inherited from target site |
+| `kataskevi_phone` | Text | `+234 800 123 4567` | Primary hotline / support line |
 | `kataskevi_emergency_phone` | Text | `+234 802 345 6789` | 24/7 emergency dispatch line |
-| `kataskevi_email` | Email | `info@kataskevi.com` | Official contact email |
+| `kataskevi_email` | Email | `get_option('admin_email')` | Official contact email (defaults to WordPress admin email) |
 | `kataskevi_address` | Textarea | `Engineering Hub, Commercial District, Victoria Island, Lagos` | Physical headquarters address |
 | `kataskevi_hours` | Text | `Mon - Fri: 8:00 AM - 6:00 PM \| 24/7 Emergency Response` | Business and support hours |
 
@@ -97,19 +98,15 @@ Kataskevi Theme Settings
 | `kataskevi_footer_brand_desc` | Textarea | `Engineering, Safety, Information Technology and Telecommunications support services — design, supply, installation and maintenance, end to end.` |
 | `kataskevi_footer_tagline` | Text | `Design · Supply · Install · Maintain` |
 
-### Section 4: Homepage Hero & Live Stats
-| Setting ID | Control Type | Default Value |
-|---|---|---|
-| `kataskevi_hero_eyebrow` | Text | `Engineering · Safety · IT · Telecoms` |
-| `kataskevi_hero_title` | Textarea (HTML) | `Complete protection, <em class="text-primary italic">engineered end&nbsp;to&nbsp;end.</em>` |
-| `kataskevi_hero_description` | Textarea | `Kataskevi provides full-service support in the design, supply, installation and maintenance of fire safety, electronic security and IT/telecoms infrastructure — from site survey to commissioning and beyond.` |
-| `kataskevi_hero_btn1_text` | Text | `Explore Services` |
-| `kataskevi_hero_btn2_text` | Text | `Request a Quote` |
-| **`kataskevi_hero_image`** | **Image Upload** (`WP_Customize_Image_Control`) | `assets/images/hero.jpg` |
-| `kataskevi_stat1_val` / `_lbl` | Text | `7` / `Specialised service lines` |
-| `kataskevi_stat2_val` / `_lbl` | Text | `7` / `Industry sectors served` |
-| `kataskevi_stat3_val` / `_lbl` | Text | `End-to-end` / `Supply to maintenance` |
-| `kataskevi_stat4_val` / `_lbl` | Text | `24/7` / `Critical-systems support` |
+### Section 4: Homepage Hero Section
+| Setting ID | Control Type | Default Value | Description |
+|---|---|---|---|
+| `kataskevi_hero_eyebrow` | Text | `Engineering · Safety · IT · Telecoms` | Hero eyebrow badge |
+| `kataskevi_hero_title` | Textarea (HTML) | `Complete protection, <em class="text-primary italic">engineered end&nbsp;to&nbsp;end.</em>` | Main hero headline |
+| `kataskevi_hero_description` | Textarea | `Kataskevi provides full-service support in the design, supply, installation and maintenance of fire safety, electronic security and IT/telecoms infrastructure — from site survey to commissioning and beyond.` | Hero narrative lead |
+| `kataskevi_hero_btn1_text` | Text | `Explore Services` | Primary button text |
+| `kataskevi_hero_btn2_text` | Text | `Request a Quote` | Secondary button text |
+| **`kataskevi_hero_image`** | **Image Upload** (`WP_Customize_Image_Control`) | `assets/images/hero.jpg` | Full-width modern facility feature image |
 
 ### Section 5: Homepage Services & Featured Works
 | Setting ID | Control Type | Default Value |
@@ -133,17 +130,20 @@ Kataskevi Theme Settings
 | `kataskevi_lifecycle_step3_title` / `_desc` | Text / Textarea | `Project Commissioning` / `Structured commissioning and handover so systems perform from day one.` |
 | `kataskevi_lifecycle_step4_title` / `_desc` | Text / Textarea | `Sales & Installation` / `Supply and professional installation backed by ongoing maintenance.` |
 
-### Section 7: Homepage Sectors & Dark CTA
-| Setting ID | Control Type | Default Value |
-|---|---|---|
-| `kataskevi_home_sectors_eyebrow` | Text | `Sectors` |
-| `kataskevi_home_sectors_title` | Text | `Sectors we serve` |
-| `kataskevi_home_sectors_desc` | Textarea | `Every industry has its own risks, standards and uptime demands. We tailor each system to the environment it protects.` |
-| `kataskevi_dark_cta_eyebrow` | Text | `Request a survey` |
-| `kataskevi_dark_cta_title` | Text | `Ready to protect what matters?` |
-| `kataskevi_dark_cta_desc` | Textarea | `Request a site survey or a quote — our team will design a system around your facility, your risks and your budget.` |
-| `kataskevi_dark_cta_btn1_text` | Text | `Get a Quote` |
-| `kataskevi_dark_cta_btn2_text` | Text | `View All Services` |
+### Section 7: Homepage Sectors, Clients & Dark CTA
+| Setting ID | Control Type | Default Value | Description |
+|---|---|---|---|
+| `kataskevi_home_sectors_eyebrow` | Text | `Sectors` | Industry sectors eyebrow label |
+| `kataskevi_home_sectors_title` | Text | `Sectors we serve` | Industry sectors headline |
+| `kataskevi_home_sectors_desc` | Textarea | `Every industry has its own risks, standards and uptime demands. We tailor each system to the environment it protects.` | Sector section lead copy |
+| `kataskevi_clients_eyebrow` | Text | `Our Clients` | Clients dual marquee eyebrow |
+| `kataskevi_clients_title` | Text | `Trusted by industry leaders across Nigeria` | Clients dual marquee headline |
+| `kataskevi_clients_desc` | Textarea | `From Tier III data centers and telecommunications networks to corporate financial institutions and energy complexes, Nigeria's leading enterprises rely on Kataskevi for mission-critical infrastructure.` | Clients description copy |
+| `kataskevi_dark_cta_eyebrow` | Text | `Request a survey` | Dark CTA badge |
+| `kataskevi_dark_cta_title` | Text | `Ready to protect what matters?` | Dark CTA high-contrast headline |
+| `kataskevi_dark_cta_desc` | Textarea | `Request a site survey or a quote — our team will design a system around your facility, your risks and your budget.` | Dark CTA narrative |
+| `kataskevi_dark_cta_btn1_text` | Text | `Get a Quote` | Primary button text |
+| `kataskevi_dark_cta_btn2_text` | Text | `View All Services` | Secondary button text |
 
 ### Section 8: Page — Services Overview
 | Setting ID | Control Type | Default Value |
@@ -209,20 +209,31 @@ All templates retrieve settings through the resilient helper declared in `inc/cu
 /**
  * Safe helper to retrieve Theme Customizer options with fallback default.
  *
+ * Intelligently distinguishes between a setting that has NEVER been saved in
+ * the database (in which case the default fallback is returned) and a setting
+ * where the user deliberately emptied/cleared the field in Customizer to delete
+ * or hide the text/section (in which case the empty string is respected).
+ *
  * @param string $key     Theme mod setting name.
- * @param mixed  $default Fallback value if setting is not defined.
+ * @param mixed  $default Fallback value if setting has never been configured.
  * @return mixed The theme mod value or fallback.
  */
 function kataskevi_get_mod( $key, $default = '' ) {
-	$value = get_theme_mod( $key, $default );
-	if ( '' === $value || null === $value || false === $value ) {
+	$sentinel = '__KATASKEVI_MOD_NOT_SET__';
+	$value    = get_theme_mod( $key, $sentinel );
+
+	// Setting has never been customized or saved in database.
+	if ( $sentinel === $value || null === $value ) {
 		return $default;
 	}
+
 	return $value;
 }
 ```
 
-This guarantees that even before an administrator modifies any setting in the Customizer, the site renders all default editorial text, images, and metrics smoothly without empty placeholders.
+This guarantees that:
+1. **Fresh Installations**: Before an administrator modifies any setting in the Customizer, the site renders all default editorial text, images, and metrics smoothly.
+2. **Explicit Deletion**: When an administrator clears or empties a field in the Customizer (e.g. to remove an eyebrow, hide an extra button, omit a phone number, or eliminate a section), `kataskevi_get_mod()` respects the deletion and returns an empty string instead of forcing hardcoded fallback text back onto the page. Templates cleanly omit the corresponding markup.
 
 ---
 

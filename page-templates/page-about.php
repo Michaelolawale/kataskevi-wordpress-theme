@@ -30,7 +30,10 @@ $about_image   = kataskevi_get_mod( 'kataskevi_about_image', get_template_direct
 $why_eyebrow = kataskevi_get_mod( 'kataskevi_about_why_eyebrow', 'Why we exist' );
 $why_title   = kataskevi_get_mod( 'kataskevi_about_why_title', 'Closing the gaps between systems' );
 
-$who_btn = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility' );
+$who_eyebrow = kataskevi_get_mod( 'kataskevi_about_who_eyebrow', 'Who we serve' );
+$who_title   = kataskevi_get_mod( 'kataskevi_about_who_title', 'Different industries, one standard' );
+$who_desc    = kataskevi_get_mod( 'kataskevi_about_who_desc', 'Systems that work when they\'re needed most.' );
+$who_btn     = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility' );
 ?>
 
 <main id="primary" class="site-main">
@@ -38,44 +41,63 @@ $who_btn = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility'
 	<!-- HERO -->
 	<section class="section-page-hero">
 		<div class="container-editorial">
-			<p class="eyebrow"><?php echo esc_html( $about_eyebrow ); ?></p>
-			<h1 class="page-hero-title">
-				<?php echo wp_kses_post( $about_title ); ?>
-			</h1>
-			<p class="page-hero-desc">
-				<?php echo esc_html( $about_desc ); ?>
-			</p>
+			<?php if ( ! empty( $about_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $about_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $about_title ) ) : ?>
+				<h1 class="page-hero-title">
+					<?php echo wp_kses_post( $about_title ); ?>
+				</h1>
+			<?php endif; ?>
+			<?php if ( ! empty( $about_desc ) ) : ?>
+				<p class="page-hero-desc">
+					<?php echo esc_html( $about_desc ); ?>
+				</p>
+			<?php endif; ?>
 		</div>
 	</section>
 
 	<!-- FULL-WIDTH MEDIA -->
-	<section class="section-about-fullmedia">
-		<img 
-			src="<?php echo esc_url( $about_image ); ?>" 
-			alt="<?php esc_attr_e( 'Engineering drawings and system schematics on a bright design workspace', 'kataskevi' ); ?>" 
-			width="1400" 
-			height="1000" 
-			class="about-fullmedia-img"
-			loading="lazy"
-		>
-	</section>
+	<?php if ( ! empty( $about_image ) ) : ?>
+		<section class="section-about-fullmedia">
+			<img 
+				src="<?php echo esc_url( $about_image ); ?>" 
+				alt="<?php esc_attr_e( 'Engineering drawings and system schematics on a bright design workspace', 'kataskevi' ); ?>" 
+				width="1400" 
+				height="1000" 
+				class="about-fullmedia-img"
+				loading="lazy"
+			>
+		</section>
+	<?php endif; ?>
 
 	<!-- WHY WE EXIST -->
 	<section class="section-why-we-exist">
 		<div class="container-editorial py-20">
 			<div class="why-split-grid">
 				<div>
-					<p class="eyebrow"><?php echo esc_html( $why_eyebrow ); ?></p>
-					<h2 class="section-title"><?php echo esc_html( $why_title ); ?></h2>
+					<?php if ( ! empty( $why_eyebrow ) ) : ?>
+						<p class="eyebrow"><?php echo esc_html( $why_eyebrow ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $why_title ) ) : ?>
+						<h2 class="section-title"><?php echo esc_html( $why_title ); ?></h2>
+					<?php endif; ?>
 				</div>
 				<div class="why-copy-column">
-					<?php for ( $p = 1; $p <= 4; $p++ ) : ?>
+					<?php
+					$brand_name = kataskevi_get_brand_name();
+					for ( $p = 1; $p <= 4; $p++ ) :
+					?>
 						<?php
 						$default_p = '';
 						if ( 1 === $p ) {
 							$default_p = 'Modern facilities run on interdependent systems — suppression, detection, security, access, connectivity. When any one of them fails, everything downstream is at risk.';
 						} elseif ( 2 === $p ) {
-							$default_p = 'Kataskevi was established to close that gap: a single engineering partner that surveys your site, designs the specification, supplies the equipment, installs it professionally and keeps it maintained for the life of the system.';
+							$default_p = sprintf(
+								/* translators: %s: Company / Brand Name */
+								esc_html__( '%s was established to close that gap: a single engineering partner that surveys your site, designs the specification, supplies the equipment, installs it professionally and keeps it maintained for the life of the system.', 'kataskevi' ),
+								$brand_name
+							);
 						} elseif ( 3 === $p ) {
 							$default_p = 'We service the energy sector, oil and gas, hospitality, government, telecommunications, financial institutions, education institutions and manufacturing companies — tailoring every system to the environment it protects.';
 						} else {
@@ -110,9 +132,15 @@ $who_btn = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility'
 	<!-- WHO WE SERVE -->
 	<section class="section-who-we-serve">
 		<div class="container-editorial py-20">
-			<p class="eyebrow"><?php esc_html_e( 'Who we serve', 'kataskevi' ); ?></p>
-			<h2 class="section-title"><?php esc_html_e( 'Different industries, one standard', 'kataskevi' ); ?></h2>
-			<p class="section-lead-muted mt-2"><?php esc_html_e( 'Systems that work when they\'re needed most.', 'kataskevi' ); ?></p>
+			<?php if ( ! empty( $who_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $who_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $who_title ) ) : ?>
+				<h2 class="section-title"><?php echo esc_html( $who_title ); ?></h2>
+			<?php endif; ?>
+			<?php if ( ! empty( $who_desc ) ) : ?>
+				<p class="section-lead-muted mt-2"><?php echo esc_html( $who_desc ); ?></p>
+			<?php endif; ?>
 
 			<div class="sectors-horizontal-list mt-12 border-t border-border">
 				<?php foreach ( $sectors as $sector ) : ?>
@@ -126,12 +154,14 @@ $who_btn = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility'
 				<?php endforeach; ?>
 			</div>
 
-			<div class="who-we-serve-action mt-12">
-				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
-					<span><?php echo esc_html( $who_btn ); ?></span>
-					<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-				</a>
-			</div>
+			<?php if ( ! empty( $who_btn ) ) : ?>
+				<div class="who-we-serve-action mt-12">
+					<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-primary">
+						<span><?php echo esc_html( $who_btn ); ?></span>
+						<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+					</a>
+				</div>
+			<?php endif; ?>
 		</div>
 	</section>
 

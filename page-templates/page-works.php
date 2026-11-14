@@ -31,9 +31,22 @@ $sectors = array(
 );
 
 // Customizer Theme Options.
+$brand_name    = kataskevi_get_brand_name();
 $works_eyebrow = kataskevi_get_mod( 'kataskevi_works_page_eyebrow', 'Case Studies & Delivered Systems' );
 $works_title   = kataskevi_get_mod( 'kataskevi_works_page_title', 'Engineered reliability, <em class="text-primary italic">proven in the field.</em>' );
-$works_desc    = kataskevi_get_mod( 'kataskevi_works_page_desc', 'From mission-critical colocation suites and high-throughput corporate towers to petrochemical terminals, explore how Kataskevi delivers turnkey safety, security, and IT infrastructure.' );
+$works_desc    = kataskevi_get_mod(
+	'kataskevi_works_page_desc',
+	sprintf(
+		/* translators: %s: Company / Brand Name */
+		esc_html__( 'From mission-critical colocation suites and high-throughput corporate towers to petrochemical terminals, explore how %s delivers turnkey safety, security, and IT infrastructure.', 'kataskevi' ),
+		$brand_name
+	)
+);
+$cta_eyebrow = kataskevi_get_mod( 'kataskevi_works_cta_eyebrow', 'Plan Your Project' );
+$cta_title   = kataskevi_get_mod( 'kataskevi_works_cta_title', 'Have a facility requiring protection?' );
+$cta_desc    = kataskevi_get_mod( 'kataskevi_works_cta_desc', 'From architectural blueprint review to full-scale engineering execution, our technical team works with facility managers, contractors, and project directors across Nigeria.' );
+$cta_btn1    = kataskevi_get_mod( 'kataskevi_works_cta_btn1', 'Request Consultation' );
+$cta_btn2    = kataskevi_get_mod( 'kataskevi_works_cta_btn2', 'View Capabilities' );
 ?>
 
 <main id="primary" class="site-main page-works-view">
@@ -41,13 +54,19 @@ $works_desc    = kataskevi_get_mod( 'kataskevi_works_page_desc', 'From mission-c
 	<!-- WORKS HERO -->
 	<header class="section-works-hero">
 		<div class="container-editorial">
-			<p class="eyebrow"><?php echo esc_html( $works_eyebrow ); ?></p>
-			<h1 class="works-hero-title">
-				<?php echo wp_kses_post( $works_title ); ?>
-			</h1>
-			<p class="works-hero-lead">
-				<?php echo esc_html( $works_desc ); ?>
-			</p>
+			<?php if ( ! empty( $works_eyebrow ) ) : ?>
+				<p class="eyebrow"><?php echo esc_html( $works_eyebrow ); ?></p>
+			<?php endif; ?>
+			<?php if ( ! empty( $works_title ) ) : ?>
+				<h1 class="works-hero-title">
+					<?php echo wp_kses_post( $works_title ); ?>
+				</h1>
+			<?php endif; ?>
+			<?php if ( ! empty( $works_desc ) ) : ?>
+				<p class="works-hero-lead">
+					<?php echo esc_html( $works_desc ); ?>
+				</p>
+			<?php endif; ?>
 
 			<!-- INTERACTIVE SECTOR FILTER -->
 			<div class="works-filter-nav" role="tablist" aria-label="<?php esc_attr_e( 'Filter projects by sector', 'kataskevi' ); ?>">
@@ -150,11 +169,21 @@ $works_desc    = kataskevi_get_mod( 'kataskevi_works_page_desc', 'From mission-c
 					$commit_val = kataskevi_get_mod( 'kataskevi_commit' . $c . '_val', $default_val );
 					$commit_lbl = kataskevi_get_mod( 'kataskevi_commit' . $c . '_lbl', $default_lbl );
 					$commit_sub = kataskevi_get_mod( 'kataskevi_commit' . $c . '_sub', $default_sub );
+
+					if ( empty( $commit_val ) && empty( $commit_lbl ) && empty( $commit_sub ) ) {
+						continue;
+					}
 					?>
 					<div class="commitment-item">
-						<div class="commitment-value"><?php echo esc_html( $commit_val ); ?></div>
-						<div class="commitment-label"><?php echo esc_html( $commit_lbl ); ?></div>
-						<p class="commitment-sub"><?php echo esc_html( $commit_sub ); ?></p>
+						<?php if ( ! empty( $commit_val ) ) : ?>
+							<div class="commitment-value"><?php echo esc_html( $commit_val ); ?></div>
+						<?php endif; ?>
+						<?php if ( ! empty( $commit_lbl ) ) : ?>
+							<div class="commitment-label"><?php echo esc_html( $commit_lbl ); ?></div>
+						<?php endif; ?>
+						<?php if ( ! empty( $commit_sub ) ) : ?>
+							<p class="commitment-sub"><?php echo esc_html( $commit_sub ); ?></p>
+						<?php endif; ?>
 					</div>
 				<?php endfor; ?>
 			</div>
@@ -162,24 +191,38 @@ $works_desc    = kataskevi_get_mod( 'kataskevi_works_page_desc', 'From mission-c
 	</section>
 
 	<!-- BOTTOM CALL TO ACTION -->
-	<section class="section-dark-cta">
-		<div class="container-editorial text-center">
-			<p class="dark-cta-eyebrow"><?php esc_html_e( 'Plan Your Project', 'kataskevi' ); ?></p>
-			<h2 class="dark-cta-title"><?php esc_html_e( 'Have a facility requiring protection?', 'kataskevi' ); ?></h2>
-			<p class="dark-cta-lead">
-				<?php esc_html_e( 'From architectural blueprint review to full-scale engineering execution, our technical team works with facility managers, contractors, and project directors across Nigeria.', 'kataskevi' ); ?>
-			</p>
-			<div class="dark-cta-actions">
-				<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-light">
-					<span><?php esc_html_e( 'Request Consultation', 'kataskevi' ); ?></span>
-					<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
-				</a>
-				<a href="<?php echo esc_url( $services_url ); ?>" class="btn-pill btn-pill-outline-light">
-					<span><?php esc_html_e( 'View Capabilities', 'kataskevi' ); ?></span>
-				</a>
+	<?php if ( ! empty( $cta_title ) || ! empty( $cta_desc ) || ! empty( $cta_btn1 ) || ! empty( $cta_btn2 ) ) : ?>
+		<section class="section-dark-cta">
+			<div class="container-editorial text-center">
+				<?php if ( ! empty( $cta_eyebrow ) ) : ?>
+					<p class="dark-cta-eyebrow"><?php echo esc_html( $cta_eyebrow ); ?></p>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_title ) ) : ?>
+					<h2 class="dark-cta-title"><?php echo esc_html( $cta_title ); ?></h2>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_desc ) ) : ?>
+					<p class="dark-cta-lead">
+						<?php echo esc_html( $cta_desc ); ?>
+					</p>
+				<?php endif; ?>
+				<?php if ( ! empty( $cta_btn1 ) || ! empty( $cta_btn2 ) ) : ?>
+					<div class="dark-cta-actions">
+						<?php if ( ! empty( $cta_btn1 ) ) : ?>
+							<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-light">
+								<span><?php echo esc_html( $cta_btn1 ); ?></span>
+								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+							</a>
+						<?php endif; ?>
+						<?php if ( ! empty( $cta_btn2 ) ) : ?>
+							<a href="<?php echo esc_url( $services_url ); ?>" class="btn-pill btn-pill-outline-light">
+								<span><?php echo esc_html( $cta_btn2 ); ?></span>
+							</a>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
 			</div>
-		</div>
-	</section>
+		</section>
+	<?php endif; ?>
 
 </main>
 

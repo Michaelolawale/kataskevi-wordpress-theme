@@ -111,10 +111,10 @@ All text and image content can be configured via **Appearance &rarr; Customize &
 1. **Company & Contact Details**: Phone hotline, 24/7 emergency dispatch line, email address, physical office location, and business hours.
 2. **Social Channels**: URLs for LinkedIn, X (Twitter), Facebook, Instagram, YouTube, and WhatsApp.
 3. **Header & Footer Copy**: Navigation CTA label, footer brand narrative, and copyright tagline.
-4. **Homepage: Hero & Live Stats**: Hero eyebrow, headline, lead summary, button labels, hero feature image upload, and the 4 live statistics metrics.
+4. **Homepage: Hero Section**: Hero eyebrow, headline, lead summary, CTA button labels and URLs, and hero feature image upload.
 5. **Homepage: Services & Featured Works**: Headings and introductory copy for core disciplines and featured project cards.
 6. **Homepage: Lifecycle Support Banner**: Lifecycle banner image upload, section headline, lead summary, and the 4-step lifecycle cards (*Site Surveys, Design, Commissioning, Sales & Installation*).
-7. **Homepage: Sectors & Dark CTA**: Sectors header copy, Dark CTA headline, description, and action button labels.
+7. **Homepage: Sectors, Clients & Dark CTA**: Sectors header copy, Our Clients dual infinite marquee copy (eyebrow, headline, description), and Dark CTA banner headline, description, and action button labels.
 8. **Page: Services Overview**: Services page hero text, "How We Work" lifecycle copy, and CTA button text.
 9. **Page: About Kataskevi**: Hero headline, full-width media banner upload, the 4 "Why We Exist" story paragraphs, and the "Who We Serve" action button.
 10. **Page: Our Works & Commitments**: Portfolio hero copy and the 4 delivery performance metrics (*100% Commissioned, Tier III & IV Prepared, Zero Incidents, 24/7 Support*).
