@@ -430,10 +430,22 @@ function kataskevi_render_updater_page() {
 				<p><strong>✅ <?php esc_html_e( 'Your Kataskevi theme is fully up to date! (Current Version: ', 'kataskevi' ); ?><?php echo esc_html( $current_ver ); ?>)</strong></p>
 			</div>
 		<?php elseif ( 'check_error' === $check_result ) : ?>
-			<div class="notice notice-error is-dismissible">
-				<p><strong>⚠️ <?php esc_html_e( 'Could not fetch updates from Bitbucket.', 'kataskevi' ); ?></strong></p>
+			<div class="notice notice-error is-dismissible" style="padding: 12px 16px;">
+				<p style="font-size: 0.95rem; margin: 0 0 6px 0;"><strong>⚠️ <?php esc_html_e( 'Could not fetch updates from Bitbucket.', 'kataskevi' ); ?></strong></p>
 				<?php if ( ! empty( $error_notice ) ) : ?>
-					<p style="margin-top: 4px; font-family: monospace; font-size: 0.88rem;"><?php echo esc_html( $error_notice ); ?></p>
+					<p style="margin: 0 0 8px 0; font-family: monospace; font-size: 0.88rem;"><?php echo esc_html( $error_notice ); ?></p>
+				<?php endif; ?>
+				<?php if ( ! empty( $error_notice ) && false !== strpos( $error_notice, '403' ) ) : ?>
+					<div style="background: #fff; border: 1px solid #fecaca; border-radius: 6px; padding: 12px 14px; margin-top: 8px; color: #1e293b; font-size: 0.9rem; line-height: 1.6;">
+						<strong style="color: #b91c1c;"><?php esc_html_e( 'Why did Bitbucket return HTTP 403 (Forbidden)?', 'kataskevi' ); ?></strong>
+						<ol style="margin: 8px 0 8px 18px; padding: 0;">
+							<li><strong><?php esc_html_e( 'Atlassian API Token vs Bitbucket App Password:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Tokens created at id.atlassian.com are Jira/Confluence tokens and cannot access Bitbucket code. You must create a Bitbucket App Password instead.', 'kataskevi' ); ?></li>
+							<li><strong><?php esc_html_e( 'Missing Permission Scope:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'When creating your Bitbucket App Password, the "Repositories: Read" checkbox must be selected.', 'kataskevi' ); ?></li>
+						</ol>
+						<p style="margin: 0;">
+							👉 <a href="https://bitbucket.org/account/settings/app-passwords/" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Open Bitbucket App Passwords &rarr;', 'kataskevi' ); ?></strong></a> <?php esc_html_e( 'Create a new password with "Repositories: Read", then enter your username "unionolivia" and the new password below.', 'kataskevi' ); ?>
+						</p>
+					</div>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
