@@ -6,12 +6,12 @@
  * theme updates from Bitbucket repository (https://bitbucket.org/unionolivia/kataskevi).
  * Includes an administrative backend interface under Appearance -> Theme Updates
  * allowing administrators to configure private repository credentials, test connectivity,
- * and check for theme releases.
+ * inspect release metadata (readme.txt Stable tag & Git tags), and check for theme releases.
  *
  * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
  *
  * @package Kataskevi
- * @version 2.0.0
+ * @version 2.1.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -99,6 +99,16 @@ function kataskevi_init_update_checker() {
 		);
 	}
 
+	// Auto-extract or fallback username if only api_token was provided.
+	if ( empty( $auth_creds['username'] ) && ! empty( $auth_creds['api_token'] ) ) {
+		$path = (string) wp_parse_url( $repo_url, PHP_URL_PATH );
+		if ( preg_match( '@^/?(?P<username>[^/]+?)/(?P<repository>[^/#?&]+?)/?$@', $path, $matches ) ) {
+			$auth_creds['username'] = $matches['username'];
+		} else {
+			$auth_creds['username'] = 'unionolivia';
+		}
+	}
+
 	$auth_creds = apply_filters( 'kataskevi_bitbucket_credentials', $auth_creds, $update_checker );
 
 	if ( ! empty( $auth_creds ) && method_exists( $update_checker, 'setAuthentication' ) ) {
@@ -132,6 +142,131 @@ function kataskevi_register_updater_menu() {
 	);
 }
 add_action( 'admin_menu', 'kataskevi_register_updater_menu' );
+
+/**
+ * Perform a live diagnostic test against the Bitbucket API.
+ *
+ * @return array Diagnostic details.
+ */
+function kataskevi_test_bitbucket_connection() {
+	$repo_url = get_option( 'kataskevi_bitbucket_repo', 'https://bitbucket.org/unionolivia/kataskevi' );
+	$branch   = get_option( 'kataskevi_bitbucket_branch', 'main' );
+	$user     = get_option( 'kataskevi_bitbucket_user', '' );
+	$token    = get_option( 'kataskevi_bitbucket_token', '' );
+
+	if ( empty( $user ) && defined( 'KATASKEVI_BITBUCKET_USER' ) ) {
+		$user = KATASKEVI_BITBUCKET_USER;
+	}
+	if ( empty( $token ) && defined( 'KATASKEVI_BITBUCKET_TOKEN' ) ) {
+		$token = KATASKEVI_BITBUCKET_TOKEN;
+	}
+
+	$path = (string) wp_parse_url( $repo_url, PHP_URL_PATH );
+	if ( preg_match( '@^/?(?P<owner>[^/]+?)/(?P<repo>[^/#?&]+?)/?$@', $path, $matches ) ) {
+		$owner = $matches['owner'];
+		$repo  = $matches['repo'];
+	} else {
+		$owner = 'unionolivia';
+		$repo  = 'kataskevi';
+	}
+
+	if ( empty( $user ) && ! empty( $token ) ) {
+		$user = $owner;
+	}
+
+	$results = array(
+		'timestamp'        => current_time( 'mysql' ),
+		'repo_url'         => $repo_url,
+		'branch'           => $branch,
+		'owner'            => $owner,
+		'repo'             => $repo,
+		'user'             => $user,
+		'has_token'        => ! empty( $token ),
+		'api_accessible'   => false,
+		'http_code'        => 0,
+		'error_message'    => '',
+		'readme_found'     => false,
+		'stable_tag'       => '',
+		'latest_git_tag'   => '',
+		'all_tags'         => array(),
+		'remote_style_ver' => '',
+	);
+
+	$args = array(
+		'timeout' => 15,
+		'headers' => array(
+			'Accept' => 'application/json',
+		),
+	);
+
+	if ( ! empty( $user ) && ! empty( $token ) ) {
+		$args['headers']['Authorization'] = 'Basic ' . base64_encode( $user . ':' . $token );
+	}
+
+	// 1. Check Repository Access.
+	$repo_api_url = "https://api.bitbucket.org/2.0/repositories/{$owner}/{$repo}";
+	$response     = wp_remote_get( $repo_api_url, $args );
+
+	if ( is_wp_error( $response ) ) {
+		$results['error_message'] = $response->get_error_message();
+		return $results;
+	}
+
+	$code                 = wp_remote_retrieve_response_code( $response );
+	$results['http_code'] = $code;
+
+	if ( 200 === $code ) {
+		$results['api_accessible'] = true;
+	} else {
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( isset( $body['error']['message'] ) ) {
+			$results['error_message'] = sanitize_text_field( $body['error']['message'] );
+		} else {
+			$results['error_message'] = sprintf( 'Bitbucket API returned HTTP %d', $code );
+		}
+		return $results;
+	}
+
+	// 2. Check readme.txt on branch.
+	$readme_url  = "https://api.bitbucket.org/2.0/repositories/{$owner}/{$repo}/src/{$branch}/readme.txt";
+	$readme_resp = wp_remote_get( $readme_url, $args );
+	if ( ! is_wp_error( $readme_resp ) && 200 === wp_remote_retrieve_response_code( $readme_resp ) ) {
+		$readme_body             = wp_remote_retrieve_body( $readme_resp );
+		$results['readme_found'] = true;
+		if ( preg_match( '/^[ \t\/*#@]*Stable tag:[ \t]*(.+?)\s*$/mi', $readme_body, $m ) ) {
+			$results['stable_tag'] = trim( $m[1] );
+		}
+	}
+
+	// 3. Query Tags.
+	$tags_url  = "https://api.bitbucket.org/2.0/repositories/{$owner}/{$repo}/refs/tags?sort=-target.date";
+	$tags_resp = wp_remote_get( $tags_url, $args );
+	if ( ! is_wp_error( $tags_resp ) && 200 === wp_remote_retrieve_response_code( $tags_resp ) ) {
+		$tags_body = json_decode( wp_remote_retrieve_body( $tags_resp ), true );
+		if ( isset( $tags_body['values'] ) && is_array( $tags_body['values'] ) ) {
+			foreach ( $tags_body['values'] as $tag_obj ) {
+				if ( isset( $tag_obj['name'] ) ) {
+					$results['all_tags'][] = sanitize_text_field( $tag_obj['name'] );
+				}
+			}
+			if ( ! empty( $results['all_tags'] ) ) {
+				$results['latest_git_tag'] = $results['all_tags'][0];
+			}
+		}
+	}
+
+	// 4. Query style.css on branch.
+	$style_url  = "https://api.bitbucket.org/2.0/repositories/{$owner}/{$repo}/src/{$branch}/style.css";
+	$style_resp = wp_remote_get( $style_url, $args );
+	if ( ! is_wp_error( $style_resp ) && 200 === wp_remote_retrieve_response_code( $style_resp ) ) {
+		$style_body = wp_remote_retrieve_body( $style_resp );
+		if ( preg_match( '/^[ \t\/*#@]*Version:[ \t]*(.+?)\s*$/mi', $style_body, $m ) ) {
+			$results['remote_style_ver'] = trim( $m[1] );
+		}
+	}
+
+	return $results;
+}
 
 /**
  * Handle form submissions and manual update checks for the updater page.
@@ -174,7 +309,11 @@ function kataskevi_handle_updater_actions() {
 			update_option( 'kataskevi_bitbucket_token', $token );
 		}
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'updated' => '1' ), admin_url( 'themes.php' ) ) );
+		// Also run a test connection right after saving so the user gets instant feedback.
+		$diag = kataskevi_test_bitbucket_connection();
+		set_transient( 'kataskevi_diag_results', $diag, 300 );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'updated' => '1', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 
@@ -184,9 +323,22 @@ function kataskevi_handle_updater_actions() {
 
 		global $kataskevi_update_checker;
 
+		// Purge update transients to prevent caching old results.
+		delete_site_transient( 'update_themes' );
+
 		if ( $kataskevi_update_checker && method_exists( $kataskevi_update_checker, 'checkForUpdates' ) ) {
+			$kataskevi_update_checker->resetUpdateState();
 			$update = $kataskevi_update_checker->checkForUpdates();
-			if ( $update ) {
+			$errors = method_exists( $kataskevi_update_checker, 'getLastRequestApiErrors' ) ? $kataskevi_update_checker->getLastRequestApiErrors() : array();
+
+			if ( ! empty( $errors ) ) {
+				$status    = 'check_error';
+				$error_msg = '';
+				if ( isset( $errors[0]['error'] ) && is_wp_error( $errors[0]['error'] ) ) {
+					$error_msg = $errors[0]['error']->get_error_message();
+				}
+				set_transient( 'kataskevi_update_error_notice', $error_msg, 60 );
+			} elseif ( $update ) {
 				$status = 'update_available';
 			} else {
 				$status = 'up_to_date';
@@ -195,7 +347,22 @@ function kataskevi_handle_updater_actions() {
 			$status = 'check_error';
 		}
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'check_result' => $status ), admin_url( 'themes.php' ) ) );
+		// Also refresh diagnostic check.
+		$diag = kataskevi_test_bitbucket_connection();
+		set_transient( 'kataskevi_diag_results', $diag, 300 );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'check_result' => $status, 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
+		exit;
+	}
+
+	// 3. Handle Diagnostic "Test Connection" Button.
+	if ( isset( $_GET['action'] ) && 'test_connection' === $_GET['action'] ) {
+		check_admin_referer( 'kataskevi_test_connection_nonce' );
+
+		$diag = kataskevi_test_bitbucket_connection();
+		set_transient( 'kataskevi_diag_results', $diag, 300 );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 }
@@ -214,7 +381,7 @@ function kataskevi_render_updater_page() {
 	global $kataskevi_update_checker;
 
 	$theme         = wp_get_theme( 'kataskevi' );
-	$current_ver   = $theme->exists() ? $theme->get( 'Version' ) : '2.0.0';
+	$current_ver   = $theme->exists() ? $theme->get( 'Version' ) : '2.1.2';
 	$saved_repo    = get_option( 'kataskevi_bitbucket_repo', 'https://bitbucket.org/unionolivia/kataskevi' );
 	$saved_branch  = get_option( 'kataskevi_bitbucket_branch', 'main' );
 	$saved_user    = get_option( 'kataskevi_bitbucket_user', '' );
@@ -227,6 +394,9 @@ function kataskevi_render_updater_page() {
 
 	$check_result = isset( $_GET['check_result'] ) ? sanitize_text_field( wp_unslash( $_GET['check_result'] ) ) : '';
 	$is_updated   = isset( $_GET['updated'] ) && '1' === $_GET['updated'];
+	$diag_run     = isset( $_GET['diag_run'] ) && '1' === $_GET['diag_run'];
+	$diag_results = get_transient( 'kataskevi_diag_results' );
+	$error_notice = get_transient( 'kataskevi_update_error_notice' );
 	?>
 	<div class="wrap kataskevi-admin-wrap" style="max-width: 960px; margin-top: 2rem;">
 		
@@ -261,7 +431,10 @@ function kataskevi_render_updater_page() {
 			</div>
 		<?php elseif ( 'check_error' === $check_result ) : ?>
 			<div class="notice notice-error is-dismissible">
-				<p><strong>⚠️ <?php esc_html_e( 'Could not fetch updates from Bitbucket. Please check your repository URL and credentials below.', 'kataskevi' ); ?></strong></p>
+				<p><strong>⚠️ <?php esc_html_e( 'Could not fetch updates from Bitbucket.', 'kataskevi' ); ?></strong></p>
+				<?php if ( ! empty( $error_notice ) ) : ?>
+					<p style="margin-top: 4px; font-family: monospace; font-size: 0.88rem;"><?php echo esc_html( $error_notice ); ?></p>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
@@ -290,7 +463,7 @@ function kataskevi_render_updater_page() {
 						</span>
 					<?php else : ?>
 						<span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
-							○ <?php esc_html_e( 'Public Access Only', 'kataskevi' ); ?>
+							○ <?php esc_html_e( 'Unauthenticated (Requires App Password for Private Repo)', 'kataskevi' ); ?>
 						</span>
 					<?php endif; ?>
 				</div>
@@ -298,18 +471,94 @@ function kataskevi_render_updater_page() {
 
 			<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
 				<div style="font-size: 0.875rem; color: #64748b;">
-					<span><?php esc_html_e( 'Remote:', 'kataskevi' ); ?></span>
+					<span><?php esc_html_e( 'Remote Repository:', 'kataskevi' ); ?></span>
 					<a href="<?php echo esc_url( $saved_repo ); ?>" target="_blank" rel="noopener noreferrer" style="font-family: monospace; color: #3f75a1;">
 						<?php echo esc_html( $saved_repo ); ?>
 					</a>
 				</div>
-				<div>
-					<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button button-secondary">
+				<div style="display: flex; gap: 8px;">
+					<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&action=test_connection' ), 'kataskevi_test_connection_nonce' ) ); ?>" class="button button-secondary">
+						🔍 <?php esc_html_e( 'Test Connection & Diagnostics', 'kataskevi' ); ?>
+					</a>
+					<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1;">
 						🔄 <?php esc_html_e( 'Check for Updates Now', 'kataskevi' ); ?>
 					</a>
 				</div>
 			</div>
 		</div>
+
+		<?php if ( $diag_run && is_array( $diag_results ) ) : ?>
+			<!-- Live Diagnostic Report Card -->
+			<div class="card" style="max-width: 100%; padding: 20px 24px; border-radius: 8px; border: 1px solid #bbf7d0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #f0fdf4;">
+				<h3 style="margin-top: 0; font-size: 1.1rem; color: #166534; display: flex; align-items: center; gap: 8px;">
+					<span>🩺</span>
+					<span><?php esc_html_e( 'Bitbucket API Live Diagnostics Report', 'kataskevi' ); ?></span>
+					<span style="font-size: 0.8rem; font-weight: normal; color: #15803d; margin-left: auto;">
+						<?php echo esc_html( $diag_results['timestamp'] ); ?>
+					</span>
+				</h3>
+
+				<div style="background: #fff; border: 1px solid #dcfce7; border-radius: 6px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;">
+					<table style="width: 100%; border-collapse: collapse; text-align: left;">
+						<tbody>
+							<tr style="border-bottom: 1px solid #f1f5f9;">
+								<td style="padding: 6px 0; color: #64748b; width: 220px; font-weight: 600;"><?php esc_html_e( 'API Connection Status', 'kataskevi' ); ?></td>
+								<td style="padding: 6px 0;">
+									<?php if ( $diag_results['api_accessible'] ) : ?>
+										<strong style="color: #15803d;">HTTP 200 OK — Repository Accessible</strong>
+									<?php else : ?>
+										<strong style="color: #dc2626;">HTTP <?php echo esc_html( $diag_results['http_code'] ); ?> — <?php echo esc_html( $diag_results['error_message'] ); ?></strong>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr style="border-bottom: 1px solid #f1f5f9;">
+								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'readme.txt Stable Tag', 'kataskevi' ); ?></td>
+								<td style="padding: 6px 0;">
+									<?php if ( $diag_results['readme_found'] && ! empty( $diag_results['stable_tag'] ) ) : ?>
+										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['stable_tag'] ); ?></code>
+										<span style="color: #15803d; font-size: 0.85rem; margin-left: 6px;">(Primary PUC Strategy)</span>
+									<?php elseif ( $diag_results['readme_found'] ) : ?>
+										<span style="color: #b45309;">readme.txt present but missing 'Stable tag:' header</span>
+									<?php else : ?>
+										<span style="color: #dc2626;">readme.txt not found on branch <?php echo esc_html( $diag_results['branch'] ); ?></span>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr style="border-bottom: 1px solid #f1f5f9;">
+								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'Latest Git Tag on Remote', 'kataskevi' ); ?></td>
+								<td style="padding: 6px 0;">
+									<?php if ( ! empty( $diag_results['latest_git_tag'] ) ) : ?>
+										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['latest_git_tag'] ); ?></code>
+										<?php if ( count( $diag_results['all_tags'] ) > 1 ) : ?>
+											<span style="color: #64748b; font-size: 0.85rem; margin-left: 6px;">(All tags: <?php echo esc_html( implode( ', ', $diag_results['all_tags'] ) ); ?>)</span>
+										<?php endif; ?>
+									<?php else : ?>
+										<span style="color: #64748b;">No tags found or authentication required</span>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'Remote style.css Version', 'kataskevi' ); ?></td>
+								<td style="padding: 6px 0;">
+									<?php if ( ! empty( $diag_results['remote_style_ver'] ) ) : ?>
+										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['remote_style_ver'] ); ?></code>
+									<?php else : ?>
+										<span style="color: #64748b;">Not readable or authentication required</span>
+									<?php endif; ?>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<?php if ( ! $diag_results['api_accessible'] ) : ?>
+					<div style="margin-top: 12px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
+						<strong><?php esc_html_e( 'Attention:', 'kataskevi' ); ?></strong>
+						<?php esc_html_e( 'Bitbucket returned HTTP 404/401. Because the repository is private, you must provide your Bitbucket Username and an App Password with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
+					</div>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 
 		<!-- Main Settings Form -->
 		<div class="card" style="max-width: 100%; padding: 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">
@@ -384,7 +633,7 @@ function kataskevi_render_updater_page() {
 										<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_USER constant in wp-config.php.', 'kataskevi' ); ?></em>
 									</p>
 								<?php else : ?>
-									<p class="description"><?php esc_html_e( 'Your Bitbucket account username (not your email address).', 'kataskevi' ); ?></p>
+									<p class="description"><?php esc_html_e( 'Your Bitbucket account username (not your email address). Defaults to unionolivia.', 'kataskevi' ); ?></p>
 								<?php endif; ?>
 							</td>
 						</tr>

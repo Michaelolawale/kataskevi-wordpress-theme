@@ -75,6 +75,12 @@ if ( !class_exists(BitBucketApi::class, false) ):
 		 */
 		public function getTag($tagName) {
 			$tag = $this->api('/refs/tags/' . $tagName);
+			if ( ( is_wp_error($tag) || empty($tag) ) ) {
+				// Retry with or without leading 'v'.
+				$alternate = ( 0 === strpos($tagName, 'v') ) ? substr($tagName, 1) : 'v' . $tagName;
+				$tag = $this->api('/refs/tags/' . $alternate);
+			}
+
 			if ( is_wp_error($tag) || empty($tag) ) {
 				return null;
 			}
