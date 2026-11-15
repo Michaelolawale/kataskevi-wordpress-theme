@@ -484,70 +484,16 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 5: HOMEPAGE SERVICES & FEATURED WORKS
+	 * SECTION 5: HOMEPAGE FEATURED WORKS
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_sections',
 		array(
-			'title'       => esc_html__( '5. Homepage: Services & Featured Works', 'kataskevi' ),
+			'title'       => esc_html__( '5. Homepage: Featured Works', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 50,
-			'description' => esc_html__( 'Headings and introductory text for the core disciplines and featured projects sections.', 'kataskevi' ),
-		)
-	);
-
-	// Services Section Eyebrow.
-	$wp_customize->add_setting(
-		'kataskevi_home_services_eyebrow',
-		array(
-			'default'           => 'Services',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'refresh',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_home_services_eyebrow',
-		array(
-			'label'   => esc_html__( 'Services Eyebrow', 'kataskevi' ),
-			'section' => 'kataskevi_sec_home_sections',
-			'type'    => 'text',
-		)
-	);
-
-	// Services Section Title.
-	$wp_customize->add_setting(
-		'kataskevi_home_services_title',
-		array(
-			'default'           => 'What we deliver',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'refresh',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_home_services_title',
-		array(
-			'label'   => esc_html__( 'Services Headline', 'kataskevi' ),
-			'section' => 'kataskevi_sec_home_sections',
-			'type'    => 'text',
-		)
-	);
-
-	// Services Section Description.
-	$wp_customize->add_setting(
-		'kataskevi_home_services_desc',
-		array(
-			'default'           => 'Specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.',
-			'sanitize_callback' => 'sanitize_textarea_field',
-			'transport'         => 'refresh',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_home_services_desc',
-		array(
-			'label'   => esc_html__( 'Services Lead Description', 'kataskevi' ),
-			'section' => 'kataskevi_sec_home_sections',
-			'type'    => 'textarea',
+			'description' => esc_html__( 'Headings and introductory text for the Featured Works carousel section on the homepage.', 'kataskevi' ),
 		)
 	);
 
@@ -969,7 +915,7 @@ function kataskevi_customize_register( $wp_customize ) {
 			'title'       => esc_html__( '8. Page: Services Overview', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 80,
-			'description' => esc_html__( 'Configure the header titles and "How we work" lifecycle section of the Services page template.', 'kataskevi' ),
+			'description' => esc_html__( 'Configure the hero header titles and bottom Call to Action section on the Services page template.', 'kataskevi' ),
 		)
 	);
 
@@ -1654,99 +1600,6 @@ function kataskevi_customize_register( $wp_customize ) {
 			'label'   => esc_html__( 'Urgent Box Description', 'kataskevi' ),
 			'section' => 'kataskevi_sec_page_contact',
 			'type'    => 'textarea',
-		)
-	);
-
-	/*
-	 * =========================================================================
-	 * SECTION 12: THEME UPDATES & BITBUCKET REPOSITORY
-	 * =========================================================================
-	 */
-	$wp_customize->add_section(
-		'kataskevi_sec_theme_updates',
-		array(
-			'title'       => esc_html__( '12. Theme Updates (Bitbucket)', 'kataskevi' ),
-			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 120,
-			'description' => esc_html__( 'Configure your Bitbucket repository and private access token to receive automated one-click theme updates.', 'kataskevi' ),
-		)
-	);
-
-	// Bitbucket Repo URL.
-	$wp_customize->add_setting(
-		'kataskevi_bitbucket_repo',
-		array(
-			'default'           => 'https://bitbucket.org/unionolivia/kataskevi',
-			'type'              => 'option',
-			'sanitize_callback' => 'esc_url_raw',
-			'transport'         => 'postMessage',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_bitbucket_repo',
-		array(
-			'label'   => esc_html__( 'Bitbucket Repository URL', 'kataskevi' ),
-			'section' => 'kataskevi_sec_theme_updates',
-			'type'    => 'url',
-		)
-	);
-
-	// Bitbucket Branch.
-	$wp_customize->add_setting(
-		'kataskevi_bitbucket_branch',
-		array(
-			'default'           => 'main',
-			'type'              => 'option',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'postMessage',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_bitbucket_branch',
-		array(
-			'label'   => esc_html__( 'Target Branch', 'kataskevi' ),
-			'section' => 'kataskevi_sec_theme_updates',
-			'type'    => 'text',
-		)
-	);
-
-	// Bitbucket Username.
-	$wp_customize->add_setting(
-		'kataskevi_bitbucket_user',
-		array(
-			'default'           => '',
-			'type'              => 'option',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'postMessage',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_bitbucket_user',
-		array(
-			'label'       => esc_html__( 'Bitbucket Username', 'kataskevi' ),
-			'description' => esc_html__( 'Your Bitbucket account username.', 'kataskevi' ),
-			'section'     => 'kataskevi_sec_theme_updates',
-			'type'        => 'text',
-		)
-	);
-
-	// Bitbucket App Password / Token.
-	$wp_customize->add_setting(
-		'kataskevi_bitbucket_token',
-		array(
-			'default'           => '',
-			'type'              => 'option',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'postMessage',
-		)
-	);
-	$wp_customize->add_control(
-		'kataskevi_bitbucket_token',
-		array(
-			'label'       => esc_html__( 'Bitbucket App Password / Token', 'kataskevi' ),
-			'description' => esc_html__( 'Generate in Bitbucket Settings -> App passwords with "Repositories: Read" permission.', 'kataskevi' ),
-			'section'     => 'kataskevi_sec_theme_updates',
-			'type'        => 'password',
 		)
 	);
 }

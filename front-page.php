@@ -55,10 +55,6 @@ $hero_btn1    = kataskevi_get_mod( 'kataskevi_hero_btn1_text', 'Explore Services
 $hero_btn2    = kataskevi_get_mod( 'kataskevi_hero_btn2_text', 'Request a Quote' );
 $hero_image   = kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' );
 
-$services_eyebrow = kataskevi_get_mod( 'kataskevi_home_services_eyebrow', 'Services' );
-$services_title   = kataskevi_get_mod( 'kataskevi_home_services_title', 'What we deliver' );
-$services_desc    = kataskevi_get_mod( 'kataskevi_home_services_desc', 'Specialised service lines, delivered as complete systems — designed, supplied, installed and maintained by one accountable partner.' );
-
 $works_eyebrow = kataskevi_get_mod( 'kataskevi_home_works_eyebrow', 'Proven in the field' );
 $works_title   = kataskevi_get_mod( 'kataskevi_home_works_title', 'Featured works' );
 $works_desc    = kataskevi_get_mod( 'kataskevi_home_works_desc', 'A cross-section of recent installations where life safety, mission-critical uptime, and rigorous engineering were non-negotiable.' );
