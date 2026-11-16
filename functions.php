@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.4' );
+define( 'KATASKEVI_VERSION', '2.1.5' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -958,6 +958,37 @@ function kataskevi_service_template_include( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'kataskevi_service_template_include' );
+
+/**
+ * Remove standard 'Archives:' prefix from all archive titles.
+ */
+add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
+
+/**
+ * Filter archive titles to display clean, human-readable titles.
+ *
+ * @param string $title Default archive title.
+ * @return string Cleaned archive title.
+ */
+function kataskevi_clean_archive_titles( $title ) {
+	if ( is_post_type_archive( 'project' ) ) {
+		return esc_html__( 'Our Works', 'kataskevi' );
+	}
+	if ( is_post_type_archive( 'service' ) ) {
+		return esc_html__( 'Our Services', 'kataskevi' );
+	}
+	if ( is_tax( 'project_sector' ) ) {
+		return single_term_title( '', false );
+	}
+	if ( is_category() || is_tag() || is_tax() ) {
+		return single_term_title( '', false );
+	}
+	if ( is_post_type_archive() ) {
+		return post_type_archive_title( '', false );
+	}
+	return $title;
+}
+add_filter( 'get_the_archive_title', 'kataskevi_clean_archive_titles' );
 
 /**
  * Auto-seed default services into WordPress CPT if none exist

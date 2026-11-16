@@ -14,13 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'post-card' ); ?>>
-	<?php if ( has_post_thumbnail() ) : ?>
-		<div class="post-card__thumb">
-			<a href="<?php the_permalink(); ?>">
-				<?php the_post_thumbnail( 'kataskevi-card' ); ?>
-			</a>
-		</div>
-	<?php endif; ?>
+	<?php
+	$post_type = get_post_type();
+	$thumb_src = '';
+	if ( has_post_thumbnail() ) {
+		$thumb_src = get_the_post_thumbnail_url( get_the_ID(), 'kataskevi-card' );
+	} elseif ( 'project' === $post_type ) {
+		$proj_data = kataskevi_get_project_by_slug( get_post_field( 'post_name', get_the_ID() ) );
+		$thumb_src = ! empty( $proj_data['image'] ) ? $proj_data['image'] : get_template_directory_uri() . '/assets/images/projects/datacenter.jpg';
+	} else {
+		$thumb_src = get_template_directory_uri() . '/assets/images/hero.jpg';
+	}
+	?>
+	<div class="post-card__thumb">
+		<a href="<?php the_permalink(); ?>">
+			<img src="<?php echo esc_url( $thumb_src ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" />
+		</a>
+	</div>
 
 	<div class="post-card__body">
 		<div class="post-card__meta">

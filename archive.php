@@ -15,10 +15,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
+<?php
+$archive_eyebrow = esc_html__( 'Delivered Systems', 'kataskevi' );
+if ( is_post_type_archive( 'project' ) ) {
+	$archive_eyebrow = esc_html__( 'Case Studies & Delivered Systems', 'kataskevi' );
+} elseif ( is_post_type_archive( 'service' ) ) {
+	$archive_eyebrow = esc_html__( 'Capabilities & Solutions', 'kataskevi' );
+} elseif ( is_category() ) {
+	$archive_eyebrow = esc_html__( 'Topic', 'kataskevi' );
+} elseif ( is_tag() ) {
+	$archive_eyebrow = esc_html__( 'Tag', 'kataskevi' );
+} elseif ( is_tax() ) {
+	$archive_eyebrow = esc_html__( 'Industry Sector', 'kataskevi' );
+} else {
+	$archive_eyebrow = esc_html__( 'Case Studies', 'kataskevi' );
+}
+?>
+
 <main id="primary" class="site-main">
 	<section class="section-page-hero">
 		<div class="container-editorial">
-			<p class="eyebrow"><?php esc_html_e( 'Archive', 'kataskevi' ); ?></p>
+			<p class="eyebrow"><?php echo esc_html( $archive_eyebrow ); ?></p>
 			<h1 class="page-hero-title"><?php the_archive_title(); ?></h1>
 			<?php if ( get_the_archive_description() ) : ?>
 				<div class="page-hero-desc">
