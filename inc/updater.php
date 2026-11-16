@@ -11,7 +11,7 @@
  * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
  *
  * @package Kataskevi
- * @version 2.1.2
+ * @version 2.1.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -564,15 +564,47 @@ function kataskevi_render_updater_page() {
 				</div>
 
 				<?php if ( ! $diag_results['api_accessible'] ) : ?>
-					<?php if ( false !== stripos( $diag_results['error_message'], 'registered email' ) ) : ?>
-						<div style="margin-top: 12px; padding: 12px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; color: #92400e; font-size: 0.92rem;">
-							<strong style="display: block; margin-bottom: 4px; font-size: 1rem;">💡 Immediate Action Required:</strong>
-							<span><?php esc_html_e( 'Your token is an Atlassian API Token. In the "Bitbucket Username or Atlassian Email" field below, enter your Atlassian registered email address (the email you log into Bitbucket with) instead of "unionolivia", then click "Save Repository Settings".', 'kataskevi' ); ?></span>
+					<?php if ( 401 === (int) $diag_results['http_code'] && false !== stripos( $diag_results['error_message'], 'registered email' ) ) : ?>
+						<div style="margin-top: 14px; padding: 16px 20px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; color: #92400e; font-size: 0.92rem; line-height: 1.6;">
+							<strong style="display: block; margin-bottom: 6px; font-size: 1.05rem; color: #b45309;">⚠️ Atlassian API Token Detected (HTTP 401)</strong>
+							<p style="margin: 0 0 10px 0;">
+								<?php esc_html_e( 'Bitbucket detected that this is an Atlassian API Token. Atlassian API Tokens must be paired with your Atlassian registered email address in the Username field.', 'kataskevi' ); ?>
+							</p>
+							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fef3c7; border-radius: 6px; margin-bottom: 10px;">
+								<strong style="color: #0f766e; display: block; margin-bottom: 4px;">👉 To resolve this:</strong>
+								<ol style="margin: 0 0 0 18px; padding: 0; font-size: 0.88rem; color: #334155;">
+									<li>In the <strong>Atlassian Email or Bitbucket Username</strong> field below, enter your registered email (e.g. <code>olawalemichael335@gmail.com</code>).</li>
+									<li><strong>Important:</strong> If saving with your email then gives a <em>"403 — credentials lack required privilege scopes"</em> error, your token was created without Bitbucket scopes. You must generate a new scoped token at <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer"><strong>Atlassian Security &rarr;</strong></a> by clicking <strong>Create API token with scopes</strong> &rarr; Select <strong>Bitbucket</strong> &rarr; check <strong>Repositories: Read</strong>.</li>
+								</ol>
+							</div>
+						</div>
+					<?php elseif ( 403 === (int) $diag_results['http_code'] || false !== stripos( $diag_results['error_message'], 'privilege scopes' ) || false !== stripos( $diag_results['error_message'], 'forbidden' ) ) : ?>
+						<div style="margin-top: 14px; padding: 16px 20px; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 8px; color: #7f1d1d; font-size: 0.92rem; line-height: 1.6;">
+							<strong style="display: block; margin-bottom: 8px; font-size: 1.05rem; color: #991b1b;">🚫 Missing Privilege Scopes (HTTP 403)</strong>
+							<p style="margin: 0 0 10px 0;">
+								<?php esc_html_e( 'Bitbucket recognized your email and token, but rejected access because the token was not granted the "Repositories: Read" scope.', 'kataskevi' ); ?>
+							</p>
+							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fed7d7; border-radius: 6px; margin-bottom: 12px;">
+								<strong style="color: #0369a1; display: block; margin-bottom: 4px;">🏆 Fix: Create a Scoped Atlassian Token (2 minutes)</strong>
+								<ol style="margin: 0 0 0 18px; padding: 0; font-size: 0.88rem; color: #334155;">
+									<li>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer"><strong>Atlassian Account Security &rarr; API Tokens</strong></a>.</li>
+									<li>Click <strong>Create API token with scopes</strong> (do not click the standard unscoped button).</li>
+									<li>Select <strong>Bitbucket</strong> as the application.</li>
+									<li>Check <strong>Repositories: Read</strong> (<code>read:repository:bitbucket</code>) and <strong>Account: Read</strong> (<code>read:user:bitbucket</code>).</li>
+									<li>Copy the new token, paste it below, ensure your registered email is in the Username field, and save.</li>
+								</ol>
+							</div>
+							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fed7d7; border-radius: 6px;">
+								<strong style="color: #0369a1; display: block; margin-bottom: 4px;">⚡ Alternative (Repository Access Token):</strong>
+								<p style="margin: 0; font-size: 0.88rem; color: #334155;">
+									If the repo owner (<code>unionolivia</code>) generates a <a href="https://bitbucket.org/unionolivia/kataskevi/admin/access-tokens" target="_blank" rel="noopener noreferrer"><strong>Repository Access Token</strong></a> with <strong>Repositories: Read</strong>, you can simply enter Username: <code>x-token-auth</code> and paste that token.
+								</p>
+							</div>
 						</div>
 					<?php else : ?>
-						<div style="margin-top: 12px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
+						<div style="margin-top: 12px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
 							<strong><?php esc_html_e( 'Attention:', 'kataskevi' ); ?></strong>
-							<?php esc_html_e( 'Bitbucket returned HTTP 404/401. Because the repository is private, you must provide your Bitbucket Username (or Atlassian Email) and an App Password with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
+							<?php esc_html_e( 'Bitbucket returned HTTP ' . intval( $diag_results['http_code'] ) . '. Because the repository is private, you must provide valid Bitbucket credentials with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
 						</div>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -630,10 +662,10 @@ function kataskevi_render_updater_page() {
 							</td>
 						</tr>
 
-						<!-- Bitbucket Username -->
+						<!-- Bitbucket Username or Atlassian Email -->
 						<tr>
 							<th scope="row">
-								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Bitbucket Username', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
+								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Atlassian Email or Bitbucket Username', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
 							</th>
 							<td>
 								<input 
@@ -643,7 +675,7 @@ function kataskevi_render_updater_page() {
 									value="<?php echo esc_attr( $saved_user ); ?>" 
 									class="regular-text" 
 									autocomplete="off"
-									placeholder="<?php esc_attr_e( 'unionolivia (or x-token-auth for Access Tokens)', 'kataskevi' ); ?>"
+									placeholder="<?php esc_attr_e( 'e.g. olawalemichael335@gmail.com or x-token-auth', 'kataskevi' ); ?>"
 									style="width: 100%; max-width: 480px;"
 									<?php echo $has_const_user ? 'disabled' : ''; ?>
 								>
@@ -653,7 +685,9 @@ function kataskevi_render_updater_page() {
 									</p>
 								<?php else : ?>
 									<p class="description">
-										<?php esc_html_e( 'Enter "unionolivia" for a Bitbucket App Password, or "x-token-auth" if using a Repository Access Token.', 'kataskevi' ); ?>
+										&bull; <strong><?php esc_html_e( 'Atlassian API Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter your registered email address (e.g. olawalemichael335@gmail.com).', 'kataskevi' ); ?><br>
+										&bull; <strong><?php esc_html_e( 'Repository Access Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter "x-token-auth".', 'kataskevi' ); ?><br>
+										&bull; <strong><?php esc_html_e( 'Bitbucket App Password:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter your Bitbucket account username.', 'kataskevi' ); ?>
 									</p>
 								<?php endif; ?>
 							</td>

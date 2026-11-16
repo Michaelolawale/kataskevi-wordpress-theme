@@ -260,6 +260,24 @@ function kataskevi_customize_register( $wp_customize ) {
 		)
 	);
 
+	// Footer About Title.
+	$wp_customize->add_setting(
+		'kataskevi_footer_about_title',
+		array(
+			'default'           => 'About Company',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_footer_about_title',
+		array(
+			'label'   => esc_html__( 'Footer About Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_header_footer',
+			'type'    => 'text',
+		)
+	);
+
 	// Footer Brand Description.
 	$wp_customize->add_setting(
 		'kataskevi_footer_brand_desc',

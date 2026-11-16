@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (serviceParam) {
       for (let i = 0; i < serviceSelect.options.length; i++) {
         if (serviceSelect.options[i].value.toLowerCase().includes(serviceParam.toLowerCase()) ||
-            serviceParam.toLowerCase().includes(serviceSelect.options[i].value.toLowerCase())) {
+          serviceParam.toLowerCase().includes(serviceSelect.options[i].value.toLowerCase())) {
           serviceSelect.selectedIndex = i;
           break;
         }
@@ -326,5 +326,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initial state
     updateControls();
+  }
+
+  // 6. About Page Accordion
+  const accordionTriggers = document.querySelectorAll('.about-accordion-trigger');
+  if (accordionTriggers.length > 0) {
+    accordionTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', function () {
+        const item = this.closest('.about-accordion-item');
+        if (!item) return;
+
+        const isOpen = item.classList.contains('is-open');
+        const icon = item.querySelector('.about-accordion-icon');
+        const card = item.closest('.about-accordion-card');
+
+        // Close other items in the same accordion card
+        if (card) {
+          card.querySelectorAll('.about-accordion-item').forEach((sibling) => {
+            if (sibling !== item && sibling.classList.contains('is-open')) {
+              sibling.classList.remove('is-open');
+              const sibBtn = sibling.querySelector('.about-accordion-trigger');
+              if (sibBtn) sibBtn.setAttribute('aria-expanded', 'false');
+              const sibIcon = sibling.querySelector('.about-accordion-icon');
+              if (sibIcon) sibIcon.textContent = '+';
+            }
+          });
+        }
+
+        if (isOpen) {
+          item.classList.remove('is-open');
+          this.setAttribute('aria-expanded', 'false');
+          if (icon) icon.textContent = '+';
+        } else {
+          item.classList.add('is-open');
+          this.setAttribute('aria-expanded', 'true');
+          if (icon) icon.textContent = '−';
+        }
+      });
+    });
   }
 });

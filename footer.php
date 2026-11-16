@@ -26,8 +26,9 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 $main_services = kataskevi_get_main_services();
 $socials       = kataskevi_get_social_links();
 
-$footer_desc    = kataskevi_get_mod( 'kataskevi_footer_brand_desc', 'Engineering, Safety, Information Technology and Telecommunications support services — design, supply, installation and maintenance, end to end.' );
-$footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supply · Install · Maintain' );
+$footer_about_title = kataskevi_get_mod( 'kataskevi_footer_about_title', esc_html__( 'About Company', 'kataskevi' ) );
+$footer_desc        = kataskevi_get_mod( 'kataskevi_footer_brand_desc', 'Engineering, Safety, Information Technology and Telecommunications support services — design, supply, installation and maintenance, end to end.' );
+$footer_tagline     = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supply · Install · Maintain' );
 ?>
 
 	<!-- MAIN SITE FOOTER -->
@@ -37,25 +38,7 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 				
 				<!-- Col 1: Brand & Bio -->
 				<div class="footer-col-brand">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand-link" rel="home">
-						<?php
-						$header_logo = kataskevi_get_mod( 'kataskevi_header_logo', '' );
-						if ( ! empty( $header_logo ) ) :
-							?>
-							<img src="<?php echo esc_url( $header_logo ); ?>" alt="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>" class="footer-custom-logo" />
-							<?php
-						elseif ( has_custom_logo() ) :
-							$custom_logo_id = get_theme_mod( 'custom_logo' );
-							$logo_src       = wp_get_attachment_image_src( $custom_logo_id, 'full' );
-							if ( ! empty( $logo_src[0] ) ) :
-								?>
-								<img src="<?php echo esc_url( $logo_src[0] ); ?>" alt="<?php echo esc_attr( kataskevi_get_brand_name() ); ?>" class="footer-custom-logo" />
-								<?php
-							endif;
-						endif;
-						?>
-						<span class="footer-brand-title"><?php echo esc_html( kataskevi_get_brand_name() ); ?></span>
-					</a>
+					<span class="footer-brand-title"><?php echo esc_html( $footer_about_title ); ?></span>
 					<?php if ( ! empty( $footer_desc ) ) : ?>
 						<p class="footer-brand-desc">
 							<?php echo esc_html( $footer_desc ); ?>
@@ -139,9 +122,6 @@ $footer_tagline = kataskevi_get_mod( 'kataskevi_footer_tagline', 'Design · Supp
 							<?php endif; ?>
 						</ul>
 					<?php endif; ?>
-					<a href="<?php echo esc_url( $contact_url ); ?>" class="btn-pill btn-pill-outline btn-sm footer-quote-btn">
-						<?php esc_html_e( 'Request a Quote', 'kataskevi' ); ?>
-					</a>
 				</div>
 
 			</div>

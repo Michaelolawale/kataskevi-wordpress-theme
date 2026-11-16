@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.2' );
+define( 'KATASKEVI_VERSION', '2.1.4' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -390,11 +390,12 @@ function kataskevi_scripts_styles() {
 	);
 
 	// Main Theme Stylesheet
+	$css_ver = file_exists( KATASKEVI_DIR . '/assets/css/main.css' ) ? (string) filemtime( KATASKEVI_DIR . '/assets/css/main.css' ) : KATASKEVI_VERSION;
 	wp_enqueue_style(
 		'kataskevi-main-style',
 		KATASKEVI_URI . '/assets/css/main.css',
 		array(),
-		KATASKEVI_VERSION
+		$css_ver
 	);
 
 	// Parent fallback / header style
@@ -402,15 +403,16 @@ function kataskevi_scripts_styles() {
 		'kataskevi-style',
 		get_stylesheet_uri(),
 		array( 'kataskevi-main-style' ),
-		KATASKEVI_VERSION
+		$css_ver
 	);
 
 	// Main interactive JavaScript
+	$js_ver = file_exists( KATASKEVI_DIR . '/assets/js/main.js' ) ? (string) filemtime( KATASKEVI_DIR . '/assets/js/main.js' ) : KATASKEVI_VERSION;
 	wp_enqueue_script(
 		'kataskevi-main-js',
 		KATASKEVI_URI . '/assets/js/main.js',
 		array(),
-		KATASKEVI_VERSION,
+		$js_ver,
 		true
 	);
 

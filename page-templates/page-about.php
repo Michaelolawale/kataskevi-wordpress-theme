@@ -34,6 +34,46 @@ $who_eyebrow = kataskevi_get_mod( 'kataskevi_about_who_eyebrow', 'Who we serve' 
 $who_title   = kataskevi_get_mod( 'kataskevi_about_who_title', 'Different industries, one standard' );
 $who_desc    = kataskevi_get_mod( 'kataskevi_about_who_desc', 'Systems that work when they\'re needed most.' );
 $who_btn     = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility' );
+
+// Accordion Customizer Descriptions.
+$vision_desc  = kataskevi_get_mod( 'kataskevi_about_vision_desc', 'To be the premier engineering, safety, and infrastructure solutions partner across West Africa — recognized for technical distinction, uncompromised safety integrity, and long-term client value.' );
+$mission_desc = kataskevi_get_mod( 'kataskevi_about_mission_desc', 'To protect lives, mission-critical assets, and operational continuity by delivering world-class engineering, fire suppression, electronic security, and IT/telecommunications services through certified technical expertise and responsive lifecycle maintenance.' );
+$hse_desc     = kataskevi_get_mod( 'kataskevi_about_hse_desc', 'We operate under an uncompromising "Zero Harm, Zero Incident" policy. Every project engagement adheres strictly to OSHA, NFPA, and ISO-aligned protocols to ensure the absolute safety of our workforce, client infrastructure, and the surrounding environment.' );
+$support_desc = kataskevi_get_mod( 'kataskevi_about_support_desc', 'Our dedicated technical support desk and mobile field engineers provide 24/7/365 coverage, offering rapid emergency dispatch, proactive SLA monitoring, and scheduled preventive maintenance routines to guarantee zero facility downtime.' );
+$staff_desc   = kataskevi_get_mod( 'kataskevi_about_staff_desc', 'Our multidisciplinary engineering roster consists of certified fire protection specialists, OEM-trained instrumentation technicians, certified fiber optic engineers, and licensed industrial safety consultants with decades of combined hands-on industrial field experience.' );
+
+$accordion_items = array(
+	array(
+		'id'      => 'vision',
+		'title'   => esc_html__( 'Vision', 'kataskevi' ),
+		'desc'    => $vision_desc,
+		'is_open' => false,
+	),
+	array(
+		'id'      => 'mission',
+		'title'   => esc_html__( 'Mission', 'kataskevi' ),
+		'desc'    => $mission_desc,
+		'is_open' => false,
+	),
+	array(
+		'id'      => 'hse-policy',
+		'title'   => esc_html__( 'HSE Policy', 'kataskevi' ),
+		'desc'    => $hse_desc,
+		'is_open' => false,
+	),
+	array(
+		'id'      => 'customer-support',
+		'title'   => esc_html__( 'Experienced Customer Support', 'kataskevi' ),
+		'desc'    => $support_desc,
+		'is_open' => false,
+	),
+	array(
+		'id'      => 'technical-staff',
+		'title'   => esc_html__( 'Professional Technical Staff', 'kataskevi' ),
+		'desc'    => $staff_desc,
+		'is_open' => true,
+	),
+);
 ?>
 
 <main id="primary" class="site-main">
@@ -114,6 +154,50 @@ $who_btn     = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facil
 		</div>
 	</section>
 
+	<!-- CORPORATE VALUES & POLICIES ACCORDION -->
+	<section class="section-about-accordion py-16 border-t border-border">
+		<div class="container-editorial">
+			<div class="why-split-grid">
+				<div>
+					<p class="eyebrow"><?php esc_html_e( 'Corporate Framework', 'kataskevi' ); ?></p>
+					<h2 class="section-title"><?php esc_html_e( 'Vision, Mission & Operational Standards', 'kataskevi' ); ?></h2>
+					<p class="text-muted-foreground mt-4" style="line-height: 1.7;">
+						<?php esc_html_e( 'The foundational principles, certified safety protocols, and technical competencies guiding every engineering engagement across modern facilities.', 'kataskevi' ); ?>
+					</p>
+				</div>
+				<div>
+					<div class="about-accordion-card" role="region" aria-label="<?php esc_attr_e( 'Company Corporate Framework and Policies', 'kataskevi' ); ?>">
+						<?php foreach ( $accordion_items as $item ) : ?>
+							<div class="about-accordion-item <?php echo $item['is_open'] ? 'is-open' : ''; ?>" id="accordion-item-<?php echo esc_attr( $item['id'] ); ?>">
+								<button 
+									type="button" 
+									class="about-accordion-trigger" 
+									aria-expanded="<?php echo $item['is_open'] ? 'true' : 'false'; ?>"
+									aria-controls="accordion-body-<?php echo esc_attr( $item['id'] ); ?>"
+								>
+									<span class="about-accordion-icon" aria-hidden="true">
+										<?php echo $item['is_open'] ? '−' : '+'; ?>
+									</span>
+									<span class="about-accordion-label"><?php echo esc_html( $item['title'] ); ?></span>
+								</button>
+								<div 
+									id="accordion-body-<?php echo esc_attr( $item['id'] ); ?>" 
+									class="about-accordion-body" 
+									role="region"
+									aria-labelledby="accordion-item-<?php echo esc_attr( $item['id'] ); ?>"
+								>
+									<div class="about-accordion-content">
+										<p><?php echo esc_html( $item['desc'] ); ?></p>
+									</div>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
 	<!-- 4 PILLARS (2x2 GRID WITH BORDERS) -->
 	<section class="section-pillars border-y border-border">
 		<div class="container-editorial">
@@ -164,6 +248,130 @@ $who_btn     = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facil
 			<?php endif; ?>
 		</div>
 	</section>
+
+	<style>
+		/* About Accordion Component Styles */
+		.section-about-accordion {
+			padding-top: 4rem;
+			padding-bottom: 4rem;
+		}
+		.about-accordion-card {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			overflow: hidden;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+		}
+		.about-accordion-item {
+			border-bottom: 1px solid #edf2f7;
+			transition: background-color 0.15s ease;
+		}
+		.about-accordion-item:last-child {
+			border-bottom: none;
+		}
+		.about-accordion-trigger {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 0.875rem;
+			padding: 1.15rem 1.35rem;
+			background: transparent;
+			border: none;
+			cursor: pointer;
+			text-align: left;
+			font-family: inherit;
+			font-size: 1.05rem;
+			font-weight: 500;
+			color: #334155;
+			transition: background-color 0.15s ease, color 0.15s ease;
+		}
+		.about-accordion-trigger:hover {
+			background-color: #f8fafc;
+			color: #0f172a;
+		}
+		.about-accordion-item.is-open {
+			background-color: #fafbfc;
+		}
+		.about-accordion-item.is-open .about-accordion-trigger {
+			background-color: #f1f5f9;
+			color: #0f172a;
+			font-weight: 600;
+		}
+		.about-accordion-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 18px;
+			height: 18px;
+			font-size: 1.35rem;
+			font-weight: 400;
+			line-height: 1;
+			color: #475569;
+			user-select: none;
+			flex-shrink: 0;
+		}
+		.about-accordion-item.is-open .about-accordion-icon {
+			color: #0284c7;
+			font-weight: 700;
+		}
+		.about-accordion-label {
+			flex: 1;
+			letter-spacing: -0.01em;
+		}
+		.about-accordion-body {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #ffffff;
+		}
+		.about-accordion-item.is-open .about-accordion-body {
+			max-height: 300px;
+		}
+		.about-accordion-content {
+			padding: 0.75rem 1.35rem 1.25rem 3rem;
+			font-size: 0.9375rem;
+			line-height: 1.65;
+			color: #475569;
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var triggers = document.querySelectorAll('.about-accordion-trigger');
+			triggers.forEach(function (trigger) {
+				trigger.addEventListener('click', function () {
+					var item = this.closest('.about-accordion-item');
+					if (!item) return;
+					var card = item.closest('.about-accordion-card');
+					var isOpen = item.classList.contains('is-open');
+
+					if (card) {
+						card.querySelectorAll('.about-accordion-item').forEach(function (sib) {
+							if (sib !== item && sib.classList.contains('is-open')) {
+								sib.classList.remove('is-open');
+								var sibBtn = sib.querySelector('.about-accordion-trigger');
+								if (sibBtn) sibBtn.setAttribute('aria-expanded', 'false');
+								var sibIcon = sib.querySelector('.about-accordion-icon');
+								if (sibIcon) sibIcon.textContent = '+';
+							}
+						});
+					}
+
+					if (isOpen) {
+						item.classList.remove('is-open');
+						this.setAttribute('aria-expanded', 'false');
+						var icon = item.querySelector('.about-accordion-icon');
+						if (icon) icon.textContent = '+';
+					} else {
+						item.classList.add('is-open');
+						this.setAttribute('aria-expanded', 'true');
+						var icon = item.querySelector('.about-accordion-icon');
+						if (icon) icon.textContent = '−';
+					}
+				});
+			});
+		});
+	</script>
 
 </main>
 
