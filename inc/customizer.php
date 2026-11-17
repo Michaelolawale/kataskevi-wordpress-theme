@@ -2273,7 +2273,7 @@ function kataskevi_customize_register( $wp_customize ) {
 		'kataskevi_contact_map_embed',
 		array(
 			'default'           => '',
-			'sanitize_callback' => 'wp_kses_post',
+			'sanitize_callback' => 'kataskevi_sanitize_map_embed',
 			'transport'         => 'refresh',
 		)
 	);
@@ -2329,6 +2329,43 @@ function kataskevi_sanitize_hex_color( $color, $setting = null ) {
 		return $setting->default;
 	}
 	return '';
+}
+
+/**
+ * Sanitize Google Map iframe embed code or raw embed URL.
+ *
+ * @param string $input Raw iframe embed code or map URL.
+ * @return string Sanitized iframe or URL string.
+ */
+function kataskevi_sanitize_map_embed( $input ) {
+	if ( empty( $input ) ) {
+		return '';
+	}
+
+	$trimmed = trim( $input );
+
+	// If a raw Google Maps URL is provided instead of an iframe tag.
+	if ( 0 === strpos( $trimmed, 'http://' ) || 0 === strpos( $trimmed, 'https://' ) ) {
+		return esc_url_raw( $trimmed );
+	}
+
+	$allowed_html = array(
+		'iframe' => array(
+			'src'             => true,
+			'width'           => true,
+			'height'          => true,
+			'style'           => true,
+			'allowfullscreen' => true,
+			'loading'         => true,
+			'referrerpolicy'  => true,
+			'title'           => true,
+			'frameborder'     => true,
+			'aria-hidden'     => true,
+			'tabindex'        => true,
+		),
+	);
+
+	return wp_kses( $trimmed, $allowed_html );
 }
 
 /**

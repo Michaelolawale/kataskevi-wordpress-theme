@@ -203,7 +203,42 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 
 				<div class="contact-map-frame">
 					<?php if ( ! empty( $map_embed ) ) : ?>
-						<?php echo wp_kses( $map_embed, array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'style' => true, 'allowfullscreen' => true, 'loading' => true, 'referrerpolicy' => true, 'title' => true, 'frameborder' => true ) ) ); ?>
+						<?php
+						$trimmed_map = trim( $map_embed );
+						if ( 0 === strpos( $trimmed_map, 'http://' ) || 0 === strpos( $trimmed_map, 'https://' ) ) :
+						?>
+							<iframe 
+								src="<?php echo esc_url( $trimmed_map ); ?>" 
+								width="100%" 
+								height="450" 
+								style="border:0;" 
+								allowfullscreen="" 
+								loading="lazy" 
+								referrerpolicy="no-referrer-when-downgrade"
+								title="<?php esc_attr_e( 'Office Location Map', 'kataskevi' ); ?>"
+							></iframe>
+						<?php else : ?>
+							<?php
+							echo wp_kses(
+								$trimmed_map,
+								array(
+									'iframe' => array(
+										'src'             => true,
+										'width'           => true,
+										'height'          => true,
+										'style'           => true,
+										'allowfullscreen' => true,
+										'loading'         => true,
+										'referrerpolicy'  => true,
+										'title'           => true,
+										'frameborder'     => true,
+										'aria-hidden'     => true,
+										'tabindex'        => true,
+									),
+								)
+							);
+							?>
+						<?php endif; ?>
 					<?php else : ?>
 						<iframe 
 							src="https://maps.google.com/maps?q=<?php echo rawurlencode( $address ); ?>&t=&z=15&ie=UTF8&iwloc=&output=embed" 
