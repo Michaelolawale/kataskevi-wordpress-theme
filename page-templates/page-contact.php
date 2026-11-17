@@ -178,6 +178,49 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 		</div>
 	</section>
 
+	<!-- OFFICE LOCATION MAP -->
+	<?php
+	$show_map    = kataskevi_get_mod( 'kataskevi_contact_show_map', true );
+	$map_eyebrow = kataskevi_get_mod( 'kataskevi_contact_map_eyebrow', 'Visit Our Office' );
+	$map_title   = kataskevi_get_mod( 'kataskevi_contact_map_title', 'Engineering Headquarters & Consultation Hub' );
+	$map_desc    = kataskevi_get_mod( 'kataskevi_contact_map_desc', 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.' );
+	$map_embed   = kataskevi_get_mod( 'kataskevi_contact_map_embed', '' );
+	?>
+	<?php if ( $show_map ) : ?>
+		<section class="section-contact-map">
+			<div class="container-editorial">
+				<div class="contact-map-header text-center">
+					<?php if ( ! empty( $map_eyebrow ) ) : ?>
+						<p class="eyebrow"><?php echo esc_html( $map_eyebrow ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $map_title ) ) : ?>
+						<h2 class="contact-map-title"><?php echo esc_html( $map_title ); ?></h2>
+					<?php endif; ?>
+					<?php if ( ! empty( $map_desc ) ) : ?>
+						<p class="contact-map-desc"><?php echo esc_html( $map_desc ); ?></p>
+					<?php endif; ?>
+				</div>
+
+				<div class="contact-map-frame">
+					<?php if ( ! empty( $map_embed ) ) : ?>
+						<?php echo wp_kses( $map_embed, array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'style' => true, 'allowfullscreen' => true, 'loading' => true, 'referrerpolicy' => true, 'title' => true, 'frameborder' => true ) ) ); ?>
+					<?php else : ?>
+						<iframe 
+							src="https://maps.google.com/maps?q=<?php echo rawurlencode( $address ); ?>&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+							width="100%" 
+							height="450" 
+							style="border:0;" 
+							allowfullscreen="" 
+							loading="lazy" 
+							referrerpolicy="no-referrer-when-downgrade"
+							title="<?php esc_attr_e( 'Headquarters Location Map', 'kataskevi' ); ?>"
+						></iframe>
+					<?php endif; ?>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
+
 </main>
 
 <?php

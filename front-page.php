@@ -56,8 +56,8 @@ $hero_btn2    = kataskevi_get_mod( 'kataskevi_hero_btn2_text', 'Request a Quote'
 $hero_image   = kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' );
 
 $works_eyebrow = kataskevi_get_mod( 'kataskevi_home_works_eyebrow', 'Proven in the field' );
-$works_title   = kataskevi_get_mod( 'kataskevi_home_works_title', 'Featured works' );
-$works_desc    = kataskevi_get_mod( 'kataskevi_home_works_desc', 'A cross-section of recent installations where life safety, mission-critical uptime, and rigorous engineering were non-negotiable.' );
+$works_title   = kataskevi_get_mod( 'kataskevi_home_works_title', 'Featured Engineering Projects' );
+$works_desc    = kataskevi_get_mod( 'kataskevi_home_works_desc', 'Explore our core installations across Fire Hydrants & Hose Reels, Intelligent Alarms, Biometric Access Control, and 4K CCTV Video Surveillance.' );
 
 $lifecycle_image   = kataskevi_get_mod( 'kataskevi_lifecycle_image', get_template_directory_uri() . '/assets/images/band.jpg' );
 $lifecycle_eyebrow = kataskevi_get_mod( 'kataskevi_lifecycle_eyebrow', 'Core Services' );
@@ -216,22 +216,37 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 			<div class="works-carousel-wrapper">
 				<div class="works-carousel-track" id="works-carousel-track" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Featured projects carousel', 'kataskevi' ); ?>">
 					<?php foreach ( $featured_projects as $proj ) : ?>
+						<?php 
+						$gallery = ! empty( $proj['gallery'] ) && is_array( $proj['gallery'] ) ? $proj['gallery'] : array( $proj['image'] );
+						$has_card_slider = count( $gallery ) > 1;
+						?>
 						<article class="featured-work-card works-carousel-slide group">
-							<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="featured-work-media-link" aria-label="<?php echo esc_attr( $proj['title'] ); ?>">
-								<div class="featured-work-media">
-									<img 
-										src="<?php echo esc_url( $proj['image'] ); ?>" 
-										alt="<?php echo esc_attr( $proj['title'] ); ?>" 
-										width="800" 
-										height="500" 
-										loading="lazy" 
-										class="featured-work-img"
-									>
-									<div class="featured-work-badge-strip">
-										<span class="sector-pill"><?php echo esc_html( $proj['sector'] ); ?></span>
-									</div>
+							<div class="featured-work-media card-image-slider" data-current-slide="0">
+								<div class="card-slider-track">
+									<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
+										<div class="card-slider-slide <?php echo 0 === $g_idx ? 'is-active' : ''; ?>">
+											<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="card-slider-img-link" aria-label="<?php echo esc_attr( $proj['title'] ); ?>">
+												<img 
+													src="<?php echo esc_url( $g_img ); ?>" 
+													alt="<?php echo esc_attr( $proj['title'] . ( $has_card_slider ? ' - ' . ( $g_idx + 1 ) : '' ) ); ?>" 
+													width="800" 
+													height="500" 
+													loading="lazy" 
+													class="featured-work-img"
+												>
+											</a>
+										</div>
+									<?php endforeach; ?>
 								</div>
-							</a>
+
+								<?php if ( $has_card_slider ) : ?>
+									<div class="card-slider-dots">
+										<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
+											<button type="button" class="card-slider-dot <?php echo 0 === $g_idx ? 'is-active' : ''; ?>" data-slide="<?php echo esc_attr( $g_idx ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Image %d', 'kataskevi' ), $g_idx + 1 ) ); ?>"></button>
+										<?php endforeach; ?>
+									</div>
+								<?php endif; ?>
+							</div>
 
 							<div class="featured-work-body">
 								<h3 class="featured-work-title">
@@ -245,14 +260,13 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 								if ( ! empty( $card_desc ) ) :
 								?>
 									<p class="featured-work-desc">
-										<?php echo esc_html( wp_trim_words( $card_desc, 18 ) ); ?>
+										<?php echo esc_html( wp_trim_words( $card_desc, 20 ) ); ?>
 									</p>
 								<?php endif; ?>
 
 								<div class="featured-work-action mt-auto">
-									<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm">
-										<span><?php esc_html_e( 'Read More', 'kataskevi' ); ?></span>
-										<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+									<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm work-card-btn">
+										<span><?php esc_html_e( 'View Project', 'kataskevi' ); ?></span>
 									</a>
 								</div>
 							</div>

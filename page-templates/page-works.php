@@ -21,24 +21,25 @@ $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 $projects     = kataskevi_get_projects( -1 );
 
 $sectors = array(
-	'all'         => esc_html__( 'All Projects', 'kataskevi' ),
-	'datacenter'  => esc_html__( 'Data Centers & Telecoms', 'kataskevi' ),
-	'logistics'   => esc_html__( 'Logistics & Freight', 'kataskevi' ),
-	'commercial'  => esc_html__( 'Commercial & Corporate', 'kataskevi' ),
-	'industrial'  => esc_html__( 'Industrial & Energy', 'kataskevi' ),
-	'hospitality' => esc_html__( 'Hospitality & Leisure', 'kataskevi' ),
-	'healthcare'  => esc_html__( 'Healthcare', 'kataskevi' ),
+	'all'            => esc_html__( 'All Projects', 'kataskevi' ),
+	'fire-hydrant'   => esc_html__( 'Fire Hydrant & Hose Reel', 'kataskevi' ),
+	'alarm-systems'  => esc_html__( 'Alarm Systems', 'kataskevi' ),
+	'access-control' => esc_html__( 'Access Control Systems', 'kataskevi' ),
+	'cctv-cameras'   => esc_html__( 'CCTV Cameras', 'kataskevi' ),
 );
 
 // Customizer Theme Options.
 $brand_name    = kataskevi_get_brand_name();
-$works_eyebrow = kataskevi_get_mod( 'kataskevi_works_page_eyebrow', 'Case Studies & Delivered Systems' );
-$works_title   = kataskevi_get_mod( 'kataskevi_works_page_title', 'Engineered reliability, <em class="text-primary italic">proven in the field.</em>' );
+$works_eyebrow = kataskevi_get_mod( 'kataskevi_works_page_eyebrow', 'Our Works' );
+if ( empty( $works_eyebrow ) || in_array( $works_eyebrow, array( 'Delivered Systems & Case Studies', 'Case Studies & Delivered Systems' ), true ) ) {
+	$works_eyebrow = esc_html__( 'Our Works', 'kataskevi' );
+}
+$works_title   = kataskevi_get_mod( 'kataskevi_works_page_title', 'Engineered protection, <em class="text-primary italic">proven in the field.</em>' );
 $works_desc    = kataskevi_get_mod(
 	'kataskevi_works_page_desc',
 	sprintf(
 		/* translators: %s: Company / Brand Name */
-		esc_html__( 'From mission-critical colocation suites and high-throughput corporate towers to petrochemical terminals, explore how %s delivers turnkey safety, security, and IT infrastructure.', 'kataskevi' ),
+		esc_html__( 'Explore flagship turnkey engineering projects by %s — including high-pressure Fire Hydrant and Hose Reel reticulation, Intelligent Alarm Systems, Biometric Access Control, and 4K CCTV Video Surveillance.', 'kataskevi' ),
 		$brand_name
 	)
 );
@@ -90,34 +91,45 @@ $cta_btn2    = kataskevi_get_mod( 'kataskevi_works_cta_btn2', 'View Capabilities
 		<div class="container-editorial">
 			<div id="works-grid-container" class="works-projects-grid">
 				<?php foreach ( $projects as $proj ) : ?>
+					<?php 
+					$gallery = ! empty( $proj['gallery'] ) && is_array( $proj['gallery'] ) ? $proj['gallery'] : array( $proj['image'] );
+					$has_slider = count( $gallery ) > 1;
+					?>
 					<article 
 						class="work-card group" 
 						data-sector="<?php echo esc_attr( $proj['sector_slug'] ); ?>"
 					>
+						<!-- Clean Card Media with Multi-Image Slider -->
 						<div class="work-card-media-wrapper">
-							<a href="<?php echo esc_url( $proj['permalink'] ); ?>" tabindex="-1" aria-hidden="true">
-								<img 
-									src="<?php echo esc_url( $proj['image'] ); ?>" 
-									alt="<?php echo esc_attr( $proj['title'] ); ?>" 
-									width="800" 
-									height="500" 
-									loading="lazy" 
-									class="work-card-media-img"
-								>
-							</a>
-							<div class="work-card-badge-row">
-								<span class="sector-pill"><?php echo esc_html( $proj['sector'] ); ?></span>
-								<span class="year-pill"><?php echo esc_html( $proj['year'] ); ?></span>
+							<div class="card-image-slider" data-current-slide="0">
+								<div class="card-slider-track">
+									<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
+										<div class="card-slider-slide <?php echo 0 === $g_idx ? 'is-active' : ''; ?>">
+											<a href="<?php echo esc_url( $proj['permalink'] ); ?>" tabindex="-1" aria-hidden="true" class="card-slider-img-link">
+												<img 
+													src="<?php echo esc_url( $g_img ); ?>" 
+													alt="<?php echo esc_attr( $proj['title'] . ( $has_slider ? ' - ' . ( $g_idx + 1 ) : '' ) ); ?>" 
+													width="800" 
+													height="500" 
+													loading="lazy" 
+													class="work-card-media-img"
+												>
+											</a>
+										</div>
+									<?php endforeach; ?>
+								</div>
+
+								<?php if ( $has_slider ) : ?>
+									<div class="card-slider-dots">
+										<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
+											<button type="button" class="card-slider-dot <?php echo 0 === $g_idx ? 'is-active' : ''; ?>" data-slide="<?php echo esc_attr( $g_idx ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Image %d', 'kataskevi' ), $g_idx + 1 ) ); ?>"></button>
+										<?php endforeach; ?>
+									</div>
+								<?php endif; ?>
 							</div>
 						</div>
 
 						<div class="work-card-content">
-							<div class="work-card-meta">
-								<span class="meta-client"><?php echo esc_html( $proj['client'] ); ?></span>
-								<span class="meta-sep" aria-hidden="true">·</span>
-								<span class="meta-loc"><?php echo esc_html( $proj['location'] ); ?></span>
-							</div>
-
 							<h2 class="work-card-title">
 								<a href="<?php echo esc_url( $proj['permalink'] ); ?>">
 									<?php echo esc_html( $proj['title'] ); ?>
@@ -125,20 +137,12 @@ $cta_btn2    = kataskevi_get_mod( 'kataskevi_works_cta_btn2', 'View Capabilities
 							</h2>
 
 							<p class="work-card-excerpt">
-								<?php echo esc_html( $proj['summary'] ); ?>
+								<?php echo esc_html( $proj['summary'] ?? $proj['short_desc'] ?? '' ); ?>
 							</p>
 
-							<?php if ( ! empty( $proj['metric_value'] ) ) : ?>
-								<div class="work-card-metric-block">
-									<span class="metric-number"><?php echo esc_html( $proj['metric_value'] ); ?></span>
-									<span class="metric-caption"><?php echo esc_html( $proj['metric_label'] ); ?></span>
-								</div>
-							<?php endif; ?>
-
 							<div class="work-card-bottom">
-								<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="read-more-link">
-									<span><?php esc_html_e( 'Explore case study', 'kataskevi' ); ?></span>
-									<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+								<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm work-card-btn">
+									<span><?php esc_html_e( 'View Project', 'kataskevi' ); ?></span>
 								</a>
 							</div>
 						</div>

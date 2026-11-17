@@ -18,20 +18,46 @@ $works_url    = kataskevi_get_page_url( 'works', 'Our Works' );
 $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $contact_url  = kataskevi_get_page_url( 'contact', 'Contact' );
 
-// Retrieve project data.
-$project_slug = get_post_field( 'post_name', get_the_ID() );
+// Retrieve project data with resilient multi-channel resolution.
+$project_slug = get_query_var( 'project' ) ?: get_query_var( 'project_slug' );
+
 if ( empty( $project_slug ) && isset( $_GET['project'] ) ) {
 	$project_slug = sanitize_text_field( wp_unslash( $_GET['project'] ) );
 }
+if ( empty( $project_slug ) && isset( $_GET['project_slug'] ) ) {
+	$project_slug = sanitize_text_field( wp_unslash( $_GET['project_slug'] ) );
+}
 
-$proj = kataskevi_get_project_by_slug( $project_slug );
+if ( empty( $project_slug ) ) {
+	$queried_obj = get_queried_object();
+	if ( $queried_obj instanceof WP_Post && 'project' === $queried_obj->post_type ) {
+		$project_slug = $queried_obj->post_name;
+	}
+}
+
+if ( empty( $project_slug ) ) {
+	$req   = trim( (string) parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+	$parts = explode( '/', $req );
+	$defaults = kataskevi_get_default_projects();
+	for ( $i = count( $parts ) - 1; $i >= 0; $i-- ) {
+		$segment = $parts[ $i ];
+		if ( isset( $defaults[ $segment ] ) || in_array( $segment, array( 'fire-hydrant', 'alarm', 'access-control', 'cctv' ), true ) ) {
+			$project_slug = $segment;
+			break;
+		}
+	}
+}
+
+$proj = ! empty( $project_slug ) ? kataskevi_get_project_by_slug( $project_slug ) : null;
 if ( ! $proj ) {
-	// Fallback to first project if not matched.
 	$all_projects = kataskevi_get_default_projects();
 	$proj         = reset( $all_projects );
 }
 
-$all_projects = kataskevi_get_projects( 3 );
+$gallery     = ! empty( $proj['gallery'] ) && is_array( $proj['gallery'] ) ? $proj['gallery'] : array( $proj['image'] );
+$has_gallery = count( $gallery ) > 1;
+
+$all_projects = kataskevi_get_projects( 4 );
 $related      = array();
 foreach ( $all_projects as $k => $item ) {
 	if ( $item['slug'] !== $proj['slug'] ) {
@@ -66,7 +92,7 @@ foreach ( $all_projects as $k => $item ) {
 			</h1>
 
 			<p class="case-lead-summary">
-				<?php echo esc_html( $proj['short_desc'] ); ?>
+				<?php echo esc_html( $proj['short_desc'] ?? $proj['summary'] ?? '' ); ?>
 			</p>
 		</div>
 	</header>
@@ -153,6 +179,25 @@ foreach ( $all_projects as $k => $item ) {
 									</li>
 								<?php endforeach; ?>
 							</ul>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( $has_gallery ) : ?>
+						<!-- Project Image Gallery -->
+						<div class="case-block case-gallery-block">
+							<h2 class="case-subheading"><?php esc_html_e( 'Project Visuals & Installation Gallery', 'kataskevi' ); ?></h2>
+							<div class="case-gallery-grid">
+								<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
+									<div class="case-gallery-item">
+										<img 
+											src="<?php echo esc_url( $g_img ); ?>" 
+											alt="<?php echo esc_attr( $proj['title'] . ' - Photo ' . ( $g_idx + 1 ) ); ?>" 
+											loading="lazy" 
+											class="case-gallery-img"
+										>
+									</div>
+								<?php endforeach; ?>
+							</div>
 						</div>
 					<?php endif; ?>
 
@@ -270,9 +315,6 @@ foreach ( $all_projects as $k => $item ) {
 										loading="lazy" 
 										class="featured-work-img"
 									>
-									<div class="featured-work-badge-strip">
-										<span class="sector-pill"><?php echo esc_html( $rel['sector'] ); ?></span>
-									</div>
 								</div>
 							</a>
 							<div class="featured-work-body">
@@ -282,9 +324,8 @@ foreach ( $all_projects as $k => $item ) {
 									</a>
 								</h3>
 								<div class="featured-work-action">
-									<a href="<?php echo esc_url( $rel['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm">
-										<span><?php esc_html_e( 'Read More', 'kataskevi' ); ?></span>
-										<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+									<a href="<?php echo esc_url( $rel['permalink'] ); ?>" class="btn-pill btn-pill-outline btn-sm work-card-btn">
+										<span><?php esc_html_e( 'View Project', 'kataskevi' ); ?></span>
 									</a>
 								</div>
 							</div>

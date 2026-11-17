@@ -186,13 +186,122 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 2: SOCIAL CHANNELS
+	 * SECTION 2: COLOR THEME & PALETTE
+	 * =========================================================================
+	 */
+	$wp_customize->add_section(
+		'kataskevi_sec_colors',
+		array(
+			'title'       => esc_html__( '2. Color Theme & Palette', 'kataskevi' ),
+			'panel'       => 'kataskevi_options_panel',
+			'priority'    => 15,
+			'description' => esc_html__( 'Configure your theme brand colors. You can pick colors visually using the color picker or input exact hexadecimal color codes (e.g., #3f75a1).', 'kataskevi' ),
+		)
+	);
+
+	$color_settings = array(
+		'kataskevi_color_primary'          => array(
+			'label'       => esc_html__( 'Primary Brand Color', 'kataskevi' ),
+			'description' => esc_html__( 'Main brand color for primary buttons, active links, badge pills, and highlights (Hex code e.g. #3f75a1).', 'kataskevi' ),
+			'default'     => '#3f75a1',
+			'priority'    => 10,
+		),
+		'kataskevi_color_primary_hover'    => array(
+			'label'       => esc_html__( 'Primary Hover Color', 'kataskevi' ),
+			'description' => esc_html__( 'Color for primary buttons and interactive elements on hover or focus (Hex code e.g. #346389).', 'kataskevi' ),
+			'default'     => '#346389',
+			'priority'    => 20,
+		),
+		'kataskevi_color_secondary'        => array(
+			'label'       => esc_html__( 'Secondary Surface / Subtle Accent Color', 'kataskevi' ),
+			'description' => esc_html__( 'Subtle background color for secondary cards, client logo marks, and badge accents (Hex code e.g. #f1f5f9).', 'kataskevi' ),
+			'default'     => '#f1f5f9',
+			'priority'    => 30,
+		),
+		'kataskevi_color_secondary_hover'  => array(
+			'label'       => esc_html__( 'Secondary Hover Color', 'kataskevi' ),
+			'description' => esc_html__( 'Color for secondary buttons and tags on hover (Hex code e.g. #e2e8f0).', 'kataskevi' ),
+			'default'     => '#e2e8f0',
+			'priority'    => 40,
+		),
+		'kataskevi_color_dark_bg'          => array(
+			'label'       => esc_html__( 'Dark Section Background', 'kataskevi' ),
+			'description' => esc_html__( 'Background for dark CTA sections and high-contrast callouts (Hex code e.g. #171f27).', 'kataskevi' ),
+			'default'     => '#171f27',
+			'priority'    => 50,
+		),
+		'kataskevi_color_dark_text'        => array(
+			'label'       => esc_html__( 'Dark Section Text Color', 'kataskevi' ),
+			'description' => esc_html__( 'Text and heading color inside dark callout sections (Hex code e.g. #ffffff).', 'kataskevi' ),
+			'default'     => '#ffffff',
+			'priority'    => 60,
+		),
+		'kataskevi_color_background'       => array(
+			'label'       => esc_html__( 'Page Background Color', 'kataskevi' ),
+			'description' => esc_html__( 'Overall site body and canvas background (Hex code e.g. #f8fafc).', 'kataskevi' ),
+			'default'     => '#f8fafc',
+			'priority'    => 70,
+		),
+		'kataskevi_color_foreground'       => array(
+			'label'       => esc_html__( 'Headings & Main Text Color', 'kataskevi' ),
+			'description' => esc_html__( 'Color for headings, titles, and primary body copy (Hex code e.g. #171f27).', 'kataskevi' ),
+			'default'     => '#171f27',
+			'priority'    => 80,
+		),
+		'kataskevi_color_muted_foreground' => array(
+			'label'       => esc_html__( 'Muted / Subtitle Text Color', 'kataskevi' ),
+			'description' => esc_html__( 'Color for subtitles, metadata, dates, and secondary text (Hex code e.g. #60676f).', 'kataskevi' ),
+			'default'     => '#60676f',
+			'priority'    => 90,
+		),
+		'kataskevi_color_card'             => array(
+			'label'       => esc_html__( 'Card & Surface Background', 'kataskevi' ),
+			'description' => esc_html__( 'Background for cards, white boxes, and footer area (Hex code e.g. #ffffff).', 'kataskevi' ),
+			'default'     => '#ffffff',
+			'priority'    => 100,
+		),
+		'kataskevi_color_border'           => array(
+			'label'       => esc_html__( 'Border & Divider Color', 'kataskevi' ),
+			'description' => esc_html__( 'Color for borders, divider lines, and form input outlines (Hex code e.g. #dbdee2).', 'kataskevi' ),
+			'default'     => '#dbdee2',
+			'priority'    => 110,
+		),
+	);
+
+	foreach ( $color_settings as $setting_id => $data ) {
+		$wp_customize->add_setting(
+			$setting_id,
+			array(
+				'default'           => $data['default'],
+				'sanitize_callback' => 'kataskevi_sanitize_hex_color',
+				'transport'         => 'postMessage',
+			)
+		);
+
+		$wp_customize->add_control(
+			new WP_Customize_Color_Control(
+				$wp_customize,
+				$setting_id,
+				array(
+					'label'       => $data['label'],
+					'description' => $data['description'],
+					'section'     => 'kataskevi_sec_colors',
+					'settings'    => $setting_id,
+					'priority'    => $data['priority'],
+				)
+			)
+		);
+	}
+
+	/*
+	 * =========================================================================
+	 * SECTION 3: SOCIAL CHANNELS
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_social',
 		array(
-			'title'       => esc_html__( '2. Social Channels', 'kataskevi' ),
+			'title'       => esc_html__( '3. Social Channels', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 20,
 			'description' => esc_html__( 'Configure links for corporate social profiles displayed in the footer and contact sections.', 'kataskevi' ),
@@ -1312,7 +1421,7 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'kataskevi_works_page_eyebrow',
 		array(
-			'default'           => 'Case Studies & Delivered Systems',
+			'default'           => 'Our Works',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
@@ -1620,6 +1729,97 @@ function kataskevi_customize_register( $wp_customize ) {
 			'type'    => 'textarea',
 		)
 	);
+
+	// Map: Show Map Toggle.
+	$wp_customize->add_setting(
+		'kataskevi_contact_show_map',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'kataskevi_sanitize_checkbox',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_show_map',
+		array(
+			'label'       => esc_html__( 'Display Office Map Section', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_page_contact',
+			'type'        => 'checkbox',
+		)
+	);
+
+	// Map Eyebrow.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_eyebrow',
+		array(
+			'default'           => 'Visit Our Office',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_eyebrow',
+		array(
+			'label'   => esc_html__( 'Map Section Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'text',
+		)
+	);
+
+	// Map Title.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_title',
+		array(
+			'default'           => 'Engineering Headquarters & Consultation Hub',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_title',
+		array(
+			'label'   => esc_html__( 'Map Section Headline', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'text',
+		)
+	);
+
+	// Map Description.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_desc',
+		array(
+			'default'           => 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_desc',
+		array(
+			'label'   => esc_html__( 'Map Section Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Map Custom Embed Code / URL.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_embed',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'wp_kses_post',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_embed',
+		array(
+			'label'       => esc_html__( 'Custom Google Map Embed Code (Optional)', 'kataskevi' ),
+			'description' => esc_html__( 'Paste an iframe embed code from Google Maps. Leave empty to automatically use your company address.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_page_contact',
+			'type'        => 'textarea',
+		)
+	);
 }
 add_action( 'customize_register', 'kataskevi_customize_register' );
 
@@ -1645,5 +1845,122 @@ function kataskevi_get_mod( $key, $default = '' ) {
 	}
 
 	return $value;
+}
+
+/**
+ * Sanitize hex color with fallback to default if invalid.
+ *
+ * @param string                            $color   The user input color.
+ * @param WP_Customize_Setting|object|null  $setting The setting instance.
+ * @return string Sanitized hex color string.
+ */
+function kataskevi_sanitize_hex_color( $color, $setting = null ) {
+	$sanitized = sanitize_hex_color( $color );
+	if ( $sanitized ) {
+		return $sanitized;
+	}
+	if ( is_object( $setting ) && isset( $setting->default ) ) {
+		return $setting->default;
+	}
+	return '';
+}
+
+/**
+ * Convert a hex color string to rgba format with specified alpha opacity.
+ *
+ * @param string $hex   Hex color string (e.g. #3f75a1 or 3f75a1).
+ * @param float  $alpha Opacity value between 0 and 1.
+ * @return string RGBA color string.
+ */
+function kataskevi_hex_to_rgba( $hex, $alpha = 0.08 ) {
+	$hex = ltrim( (string) $hex, '#' );
+	if ( 3 === strlen( $hex ) ) {
+		$r = hexdec( substr( $hex, 0, 1 ) . substr( $hex, 0, 1 ) );
+		$g = hexdec( substr( $hex, 1, 1 ) . substr( $hex, 1, 1 ) );
+		$b = hexdec( substr( $hex, 2, 1 ) . substr( $hex, 2, 1 ) );
+	} elseif ( 6 === strlen( $hex ) ) {
+		$r = hexdec( substr( $hex, 0, 2 ) );
+		$g = hexdec( substr( $hex, 2, 2 ) );
+		$b = hexdec( substr( $hex, 4, 2 ) );
+	} else {
+		return sprintf( 'rgba(63, 117, 161, %F)', (float) $alpha );
+	}
+	return sprintf( 'rgba(%d, %d, %d, %F)', $r, $g, $b, (float) $alpha );
+}
+
+/**
+ * Generate dynamic CSS for customized colors.
+ *
+ * @return string Inline CSS.
+ */
+function kataskevi_get_customizer_css() {
+	$primary          = kataskevi_get_mod( 'kataskevi_color_primary', '#3f75a1' );
+	$primary_hover    = kataskevi_get_mod( 'kataskevi_color_primary_hover', '#346389' );
+	$secondary        = kataskevi_get_mod( 'kataskevi_color_secondary', '#f1f5f9' );
+	$secondary_hover  = kataskevi_get_mod( 'kataskevi_color_secondary_hover', '#e2e8f0' );
+	$dark_bg          = kataskevi_get_mod( 'kataskevi_color_dark_bg', '#171f27' );
+	$dark_text        = kataskevi_get_mod( 'kataskevi_color_dark_text', '#ffffff' );
+	$background       = kataskevi_get_mod( 'kataskevi_color_background', '#f8fafc' );
+	$foreground       = kataskevi_get_mod( 'kataskevi_color_foreground', '#171f27' );
+	$muted_foreground = kataskevi_get_mod( 'kataskevi_color_muted_foreground', '#60676f' );
+	$card             = kataskevi_get_mod( 'kataskevi_color_card', '#ffffff' );
+	$border           = kataskevi_get_mod( 'kataskevi_color_border', '#dbdee2' );
+
+	$primary_subtle = kataskevi_hex_to_rgba( $primary, 0.08 );
+
+	$css = ":root {
+	--primary: {$primary};
+	--primary-hover: {$primary_hover};
+	--primary-subtle: {$primary_subtle};
+	--primary-glow: {$primary};
+	--secondary: {$secondary};
+	--secondary-hover: {$secondary_hover};
+	--secondary-foreground: #171f27;
+	--background: {$background};
+	--foreground: {$foreground};
+	--card: {$card};
+	--card-foreground: {$foreground};
+	--muted-foreground: {$muted_foreground};
+	--border: {$border};
+	--border-focus: {$primary};
+	--dark-section-bg: {$dark_bg};
+	--dark-section-text: {$dark_text};
+}
+body {
+	background-color: var(--background);
+	color: var(--foreground);
+}
+.section-dark-cta {
+	background-color: var(--dark-section-bg) !important;
+	color: var(--dark-section-text) !important;
+}
+.section-dark-cta h2,
+.section-dark-cta p,
+.section-dark-cta .dark-cta-title,
+.section-dark-cta .dark-cta-desc,
+.section-dark-cta .dark-cta-lead,
+.section-dark-cta .dark-cta-eyebrow,
+.section-dark-cta .badge-pill-dark {
+	color: var(--dark-section-text);
+}
+.section-dark-cta .btn-pill-light,
+.section-dark-cta .btn-pill-light span,
+.section-dark-cta .btn-pill-light .icon {
+	background-color: #ffffff !important;
+	color: #171f27 !important;
+}
+.section-dark-cta .btn-pill-light:hover,
+.section-dark-cta .btn-pill-light:hover span,
+.section-dark-cta .btn-pill-light:hover .icon {
+	background-color: #f1f5f9 !important;
+	color: #0f172a !important;
+}
+.section-dark-cta .btn-pill-outline-light {
+	color: #ffffff !important;
+	border-color: rgba(255, 255, 255, 0.4) !important;
+}
+";
+
+	return $css;
 }
 

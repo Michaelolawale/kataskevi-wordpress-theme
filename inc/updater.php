@@ -11,7 +11,7 @@
  * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
  *
  * @package Kataskevi
- * @version 2.1.5
+ * @version 2.1.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

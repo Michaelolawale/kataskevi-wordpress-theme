@@ -214,6 +214,85 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // 4b. Multi-Image Slider for Project Card Previews & Single Project Banner
+  const initCardImageSliders = () => {
+    const cardSliders = document.querySelectorAll('.card-image-slider');
+    cardSliders.forEach((slider) => {
+      if (slider.hasAttribute('data-slider-initialized')) return;
+      slider.setAttribute('data-slider-initialized', 'true');
+
+      const track = slider.querySelector('.card-slider-track');
+      const slides = slider.querySelectorAll('.card-slider-slide');
+      const prevBtn = slider.querySelector('.card-slider-prev');
+      const nextBtn = slider.querySelector('.card-slider-next');
+      const dots = slider.querySelectorAll('.card-slider-dot');
+
+      if (!track || slides.length <= 1) return;
+
+      let currentIndex = 0;
+      const totalSlides = slides.length;
+
+      const goToSlide = (index) => {
+        currentIndex = (index + totalSlides) % totalSlides;
+        track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+
+        slides.forEach((slide, idx) => {
+          slide.classList.toggle('is-active', idx === currentIndex);
+        });
+
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle('is-active', idx === currentIndex);
+        });
+      };
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToSlide(currentIndex - 1);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToSlide(currentIndex + 1);
+        });
+      }
+
+      dots.forEach((dot, idx) => {
+        dot.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToSlide(idx);
+        });
+      });
+
+      // Touch swipe support
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      slider.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      slider.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) {
+            goToSlide(currentIndex + 1);
+          } else {
+            goToSlide(currentIndex - 1);
+          }
+        }
+      }, { passive: true });
+    });
+  };
+
+  initCardImageSliders();
+
   // 5. Featured Works Carousel Slider
   const carouselTrack = document.getElementById('works-carousel-track');
   const prevBtn = document.getElementById('works-carousel-prev');

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.5' );
+define( 'KATASKEVI_VERSION', '2.1.6' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -406,6 +406,14 @@ function kataskevi_scripts_styles() {
 		$css_ver
 	);
 
+	// Dynamic Theme Customizer Color Palette
+	if ( function_exists( 'kataskevi_get_customizer_css' ) ) {
+		$custom_colors_css = kataskevi_get_customizer_css();
+		if ( ! empty( $custom_colors_css ) ) {
+			wp_add_inline_style( 'kataskevi-main-style', $custom_colors_css );
+		}
+	}
+
 	// Main interactive JavaScript
 	$js_ver = file_exists( KATASKEVI_DIR . '/assets/js/main.js' ) ? (string) filemtime( KATASKEVI_DIR . '/assets/js/main.js' ) : KATASKEVI_VERSION;
 	wp_enqueue_script(
@@ -437,6 +445,21 @@ add_action( 'wp_enqueue_scripts', 'kataskevi_scripts_styles' );
  * Load Theme Customizer settings and controls.
  */
 require_once KATASKEVI_DIR . '/inc/customizer.php';
+
+/**
+ * Binds JS handlers to make Theme Customizer live preview reload changes instantly.
+ */
+function kataskevi_customize_preview_js() {
+	$preview_ver = file_exists( KATASKEVI_DIR . '/assets/js/customizer-preview.js' ) ? (string) filemtime( KATASKEVI_DIR . '/assets/js/customizer-preview.js' ) : KATASKEVI_VERSION;
+	wp_enqueue_script(
+		'kataskevi-customizer-preview',
+		KATASKEVI_URI . '/assets/js/customizer-preview.js',
+		array( 'customize-preview', 'jquery' ),
+		$preview_ver,
+		true
+	);
+}
+add_action( 'customize_preview_init', 'kataskevi_customize_preview_js' );
 
 /**
  * Load Plugin Update Checker (PUC) for automatic theme updates from Bitbucket.
@@ -960,6 +983,80 @@ function kataskevi_service_template_include( $template ) {
 add_filter( 'template_include', 'kataskevi_service_template_include' );
 
 /**
+ * Register project query vars
+ */
+function kataskevi_project_query_vars( $vars ) {
+	$vars[] = 'project';
+	$vars[] = 'project_slug';
+	return $vars;
+}
+add_filter( 'query_vars', 'kataskevi_project_query_vars' );
+
+/**
+ * Register project rewrite rules for seamless routing
+ */
+function kataskevi_project_rewrite_rules() {
+	add_rewrite_rule( '^works/([^/]+)/?$', 'index.php?project=$matches[1]', 'top' );
+	add_rewrite_rule( '^project/([^/]+)/?$', 'index.php?project=$matches[1]', 'top' );
+	add_rewrite_rule( '^projects/([^/]+)/?$', 'index.php?project=$matches[1]', 'top' );
+}
+add_action( 'init', 'kataskevi_project_rewrite_rules' );
+
+/**
+ * Template include filter to ensure single-project.php is served reliably for any project URL
+ */
+function kataskevi_project_template_include( $template ) {
+	if ( is_singular( 'project' ) ) {
+		$new_template = locate_template( array( 'single-project.php' ) );
+		if ( ! empty( $new_template ) ) {
+			return $new_template;
+		}
+	}
+
+	$valid_slugs = array(
+		'fire-hydrant-and-hose-reel',
+		'alarm-systems',
+		'access-control-systems',
+		'cctv-cameras',
+		'fire-hydrant',
+		'access-control',
+		'cctv',
+	);
+
+	$project_slug = get_query_var( 'project' );
+	if ( empty( $project_slug ) ) {
+		$project_slug = get_query_var( 'project_slug' );
+	}
+	if ( empty( $project_slug ) && isset( $_GET['project'] ) ) {
+		$project_slug = sanitize_text_field( wp_unslash( $_GET['project'] ) );
+	}
+	if ( empty( $project_slug ) && isset( $_GET['project_slug'] ) ) {
+		$project_slug = sanitize_text_field( wp_unslash( $_GET['project_slug'] ) );
+	}
+
+	if ( empty( $project_slug ) ) {
+		$req   = trim( (string) parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' );
+		$parts = explode( '/', $req );
+		$last  = end( $parts );
+		if ( in_array( $last, $valid_slugs, true ) ) {
+			$project_slug = $last;
+		} elseif ( count( $parts ) >= 2 && in_array( $parts[1], $valid_slugs, true ) ) {
+			$project_slug = $parts[1];
+		}
+	}
+
+	if ( ! empty( $project_slug ) && in_array( $project_slug, $valid_slugs, true ) ) {
+		$project_tpl = locate_template( array( 'single-project.php' ) );
+		if ( ! empty( $project_tpl ) ) {
+			return $project_tpl;
+		}
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'kataskevi_project_template_include' );
+
+/**
  * Remove standard 'Archives:' prefix from all archive titles.
  */
 add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
@@ -1355,179 +1452,155 @@ function kataskevi_render_icon( $name, $class = 'icon' ) {
 }
 
 /**
- * Data provider: Default Seeded Projects & Case Studies
+ * Data provider: Default Seeded Projects & Case Studies (The 4 Core Systems)
  */
 function kataskevi_get_default_projects() {
-	$img_base = get_template_directory_uri() . '/assets/images/projects/';
+	$img_base   = get_template_directory_uri() . '/assets/images/projects/';
+	$theme_base = get_template_directory_uri() . '/assets/images/';
 
 	return array(
-		'apex-tower-data-center' => array(
+		'fire-hydrant-and-hose-reel' => array(
 			'id'           => 1,
-			'slug'         => 'apex-tower-data-center',
-			'title'        => 'Apex Tier III Data Center Infrastructure',
-			'client'       => 'Apex Cloud & Colocation Services',
+			'slug'         => 'fire-hydrant-and-hose-reel',
+			'title'        => 'Fire Hydrant & Hose Reel',
+			'client'       => 'Industrial Facilities & Commercial Compounds',
+			'location'     => 'Lekki Free Zone, Lagos',
+			'year'         => '2025',
+			'sector'       => 'Fire Protection & Suppression',
+			'sector_slug'  => 'fire-hydrant',
+			'featured'     => true,
+			'metric'       => '16 Bar Rated',
+			'metric_label' => 'Ring Main Hydraulic Pressure',
+			'stat_2'       => '64 Outlets',
+			'stat_2_label' => 'Hydrant Pillars & Hose Reels',
+			'stat_3'       => '100% NFPA',
+			'stat_3_label' => 'BS 5306 & NFPA 14 Standard',
+			'image'        => $img_base . 'industrial.jpg',
+			'gallery'      => array(
+				$img_base . 'industrial.jpg',
+				$img_base . 'healthcare.jpg',
+				$theme_base . 'hero.jpg',
+				$theme_base . 'band.jpg',
+			),
+			'short_desc'   => 'Complete turnkey design, pressurized ring-main piping reticulation, automated diesel and electric booster pump sets, and heavy-duty fire hydrant pillars with swinging hose reels.',
+			'summary'      => 'Complete turnkey design, pressurized ring-main piping reticulation, automated diesel and electric booster pump sets, and heavy-duty fire hydrant pillars with swinging hose reels.',
+			'scope'        => 'Turnkey Hydraulic Fire Ring Main & Automated Hose Reel Reticulation',
+			'challenge'    => 'Expansive industrial processing zones with volatile materials required instantaneous, high-pressure water delivery capable of sustaining dual-stream operation without pressure drops, compliant with strict factory life-safety regulations.',
+			'solution'     => 'Engineered an automated pressurized ring-main network featuring duty and standby diesel booster pumps, synchronized jockey pumps, underground anti-corrosive ductile iron pipework, dual-outlet pillar hydrants, and wall-mounted swinging hose reels across all critical plant sectors.',
+			'deliverables' => array(
+				'High-pressure underground fire ring-main piping reticulation',
+				'Automated diesel and electric fire booster pump sets with jockey synchronization',
+				'Heavy-duty swivel-arm 30m high-pressure fire hose reel drums with jet/spray nozzles',
+				'Pillar hydrants with dual instantaneous landing valves and suction inlets',
+				'Quarterly hydrostatic flow tests, pressure gauge certification, and maintenance SLA',
+			),
+		),
+		'alarm-systems' => array(
+			'id'           => 2,
+			'slug'         => 'alarm-systems',
+			'title'        => 'Alarm Systems',
+			'client'       => 'Enterprise Banking & Corporate Towers',
 			'location'     => 'Victoria Island, Lagos',
 			'year'         => '2025',
-			'sector'       => 'Data Centers & Telecoms',
-			'sector_slug'  => 'datacenter',
+			'sector'       => 'Life Safety & Detection',
+			'sector_slug'  => 'alarm-systems',
 			'featured'     => true,
-			'metric'       => '99.999% Uptime',
-			'metric_label' => 'Life-Safety Protection',
-			'stat_2'       => '1,400 m²',
-			'stat_2_label' => 'Clean Agent Zone',
-			'stat_3'       => '0.8s',
-			'stat_3_label' => 'Discharge Response',
+			'metric'       => 'Addressable',
+			'metric_label' => 'Multi-Loop Interactive Matrix',
+			'stat_2'       => 'Sub-Second',
+			'stat_2_label' => 'Alarm Trigger Response',
+			'stat_3'       => '100% Coverage',
+			'stat_3_label' => 'Multi-Zone Evacuation Sync',
 			'image'        => $img_base . 'datacenter.jpg',
-			'short_desc'   => 'Turnkey delivery of FM-200 clean-agent suppression, anti-static raised flooring, and high-sensitivity VESDA smoke detection across four mission-critical halls.',
-			'scope'        => 'Turnkey Data Hall Protection & Site Preparation',
-			'challenge'    => 'The high-density colocation facility required zero-tolerance fire risk management. Standard water sprinkler systems were completely impermissible due to irreparable equipment damage, and the facility demanded 120-minute physical fire containment without disrupting live tenant feeds.',
-			'solution'     => 'Our engineering team deployed an integrated FM-200 clean-gas suppression matrix with dual-action solenoid actuators, VESDA laser aspirating smoke detectors, and fire-resistant raised airflow access floors. We established sub-floor acoustic dampening, automated damper shutdown, and full BMS integration.',
+			'gallery'      => array(
+				$img_base . 'datacenter.jpg',
+				$theme_base . 'band.jpg',
+				$theme_base . 'about.jpg',
+				$img_base . 'commercial.jpg',
+			),
+			'short_desc'   => 'Intelligent multi-loop addressable fire detection, aspirating smoke sensing, and perimeter intrusion alarm matrices unified with automated voice evacuation.',
+			'summary'      => 'Intelligent multi-loop addressable fire detection, aspirating smoke sensing, and perimeter intrusion alarm matrices unified with automated voice evacuation.',
+			'scope'        => 'Integrated Addressable Fire Detection, Voice Evacuation & Intrusion Alarms',
+			'challenge'    => 'Complex multi-storey commercial towers demanded zero false alarms, continuous system diagnostics, and synchronized floor-by-floor phased voice evacuation to prevent corridor stampedes while directly notifying facility managers and emergency services.',
+			'solution'     => 'Installed advanced multi-loop addressable fire alarm control panels connected to optical-smoke, heat, and beam detectors. Integrated automated HVAC damper shutdown, emergency voice evacuation broadcasting, break-glass call points, and perimeter anti-intrusion tripwires.',
 			'deliverables' => array(
-				'Synchronized FM-200 gaseous clean agent cylinder arrays',
-				'VESDA laser air-sampling smoke detection with sub-second alert',
-				'600mm heavy-duty anti-static raised access floor panels',
-				'Fire-rated wall cladding and thermal barrier ceiling system',
-				'Integrated Building Management System (BMS) telemetry'
+				'Multi-loop intelligent addressable fire alarm control panels (FACP) with touchscreen annunciators',
+				'High-sensitivity optical, thermal, and multi-criteria smoke detectors with self-diagnostics',
+				'Emergency break-glass call points and high-candela strobe sounders',
+				'Automated HVAC ventilation shutdown and smoke damper actuators',
+				'Direct municipal emergency dialer, BMS integration, and perimeter intrusion beams',
 			),
 		),
-		'meridian-logistics-hub' => array(
-			'id'           => 2,
-			'slug'         => 'meridian-logistics-hub',
-			'title'        => 'Meridian Automated Logistics Hub',
-			'client'       => 'Meridian Trans-African Freight Ltd',
-			'location'     => 'Ikeja Industrial Zone, Lagos',
-			'year'         => '2025',
-			'sector'       => 'Logistics & Warehousing',
-			'sector_slug'  => 'logistics',
-			'featured'     => true,
-			'metric'       => '240 Nodes',
-			'metric_label' => 'Integrated CCTV & ANPR',
-			'stat_2'       => '35,000 m²',
-			'stat_2_label' => 'Compound Covered',
-			'stat_3'       => '100%',
-			'stat_3_label' => 'Perimeter Coverage',
-			'image'        => $img_base . 'logistics.jpg',
-			'short_desc'   => 'Site-wide IP electronic surveillance, automated license plate recognition (ANPR) at cargo gates, and full-perimeter infrared tripwire beam detection.',
-			'challenge'    => 'A 35,000 m² high-turnover cargo depot suffered from freight processing congestion and surveillance blind spots. The client needed automated truck gate entry verification and unified video coverage of dispatch docks without cargo delay.',
-			'solution'     => 'We deployed a high-capacity fiber-optic network supporting 240 4K IP cameras with motorized zoom, dual-lane ANPR readers connected to hydraulic road blockers, and perimeter intrusion beams with AI false-alarm suppression.',
-			'deliverables' => array(
-				'240 Ultra-HD IP security cameras with long-range night vision',
-				'Automatic Number Plate Recognition (ANPR) barrier controls',
-				'Multi-gigabit fiber backbone linking 6 guard outposts to central SOC',
-				'Active infrared perimeter tripwires with zero-nuisance filtering',
-				'24/7 technical dispatch and quarterly maintenance SLA'
-			),
-		),
-		'centennial-financial-hq' => array(
+		'access-control-systems' => array(
 			'id'           => 3,
-			'slug'         => 'centennial-financial-hq',
-			'title'        => 'Centennial Financial Tower',
-			'client'       => 'Centennial Banking Group',
+			'slug'         => 'access-control-systems',
+			'title'        => 'Access Control Systems',
+			'client'       => 'Financial Headquarters & Multi-Tenant Towers',
 			'location'     => 'Marina CBD, Lagos',
 			'year'         => '2024',
-			'sector'       => 'Commercial & Corporate',
-			'sector_slug'  => 'commercial',
+			'sector'       => 'Electronic Security',
+			'sector_slug'  => 'access-control',
 			'featured'     => true,
-			'metric'       => '1,800 Users',
-			'metric_label' => 'Biometric Verification',
-			'stat_2'       => '18 Floors',
-			'stat_2_label' => 'Addressable Life Safety',
-			'stat_3'       => '0.2s',
-			'stat_3_label' => 'Turnstile Clearance',
+			'metric'       => '0.2s Transit',
+			'metric_label' => 'Optical Speed Gate Clearance',
+			'stat_2'       => '3,500 Users',
+			'stat_2_label' => 'Multi-Factor Biometric Profiles',
+			'stat_3'       => 'Zero Tailgating',
+			'stat_3_label' => 'Anti-Passback Verification',
 			'image'        => $img_base . 'commercial.jpg',
-			'short_desc'   => 'High-throughput optical speed turnstiles, multi-factor biometric access, and multi-zone addressable fire alarms across an 18-storey banking headquarters.',
-			'challenge'    => 'Controlling peak morning transit for over 1,800 personnel while satisfying stringent Central Bank security standards and delivering phased fire evacuation across an 18-floor high-rise.',
-			'solution'     => 'Our technical team installed 14 lanes of optical glass speed turnstiles with dual facial-recognition and encrypted smartcard readers, unified with an addressable multi-loop voice evacuation fire system.',
+			'gallery'      => array(
+				$img_base . 'commercial.jpg',
+				$img_base . 'hospitality.jpg',
+				$theme_base . 'about.jpg',
+				$theme_base . 'hero.jpg',
+			),
+			'short_desc'   => 'Touchless biometric speed turnstiles, encrypted RFID smartcard access, magnetic door interlocks, and automated time & attendance integration.',
+			'summary'      => 'Touchless biometric speed turnstiles, encrypted RFID smartcard access, magnetic door interlocks, and automated time & attendance integration.',
+			'scope'        => 'Enterprise Biometric Access Control & Optical Turnstile Speed Lanes',
+			'challenge'    => 'Managing morning and evening rush-hour transit for over 3,500 staff while preventing unauthorized tailgating, securing executive zones and server rooms, and satisfying stringent Central Bank physical security audit standards.',
+			'solution'     => 'Deployed optical glass speed turnstile lanes equipped with AI facial recognition and NFC credentials, integrated with fail-safe electromagnetic shear locks, server room biometric authorization, and centralized cloud attendance logging.',
 			'deliverables' => array(
-				'14 optical speed turnstile lanes with touchless facial recognition',
-				'Addressable multi-loop fire alarm system with phased voice evacuation',
-				'Enterprise time & attendance platform linked directly to corporate payroll',
-				'Magnetic fire exit lock release certified to life safety standards',
-				'Executive boardroom and cash vault biometric authorization'
+				'Optical glass speed turnstiles with infrared anti-tailgating sensors',
+				'AI touchless facial recognition and multi-frequency RFID smartcard readers',
+				'Fail-safe electromagnetic shear locks and emergency break-glass door release',
+				'Server room and cash vault dual-custody biometric authorization',
+				'Centralized web-based access control management, audit logging, and time & attendance reporting',
 			),
 		),
-		'helios-petrochemical-terminal' => array(
+		'cctv-cameras' => array(
 			'id'           => 4,
-			'slug'         => 'helios-petrochemical-terminal',
-			'title'        => 'Helios Coastal Oil & Gas Terminal',
-			'client'       => 'Helios Energy Global',
-			'location'     => 'Port Harcourt, Rivers State',
+			'slug'         => 'cctv-cameras',
+			'title'        => 'CCTV Cameras',
+			'client'       => 'Logistics Hubs & Industrial Port Terminals',
+			'location'     => 'Apapa & Ikeja Industrial Zones',
 			'year'         => '2024',
-			'sector'       => 'Industrial & Energy',
-			'sector_slug'  => 'industrial',
+			'sector'       => 'Video Surveillance',
+			'sector_slug'  => 'cctv-cameras',
 			'featured'     => true,
-			'metric'       => 'ATEX Zone 1',
-			'metric_label' => 'Explosion-Proof Certified',
-			'stat_2'       => '48 Hydrants',
-			'stat_2_label' => 'High-Pressure Fire Ring',
-			'stat_3'       => '100% PPE',
-			'stat_3_label' => 'Workforce Compliance',
-			'image'        => $img_base . 'industrial.jpg',
-			'short_desc'   => 'Intrinsically safe flame detection, high-pressure foam deluge suppression, and custom industrial PPE provisioning for hazardous petrochemical processing zones.',
-			'challenge'    => 'Corrosive coastal sea atmosphere and volatile hydrocarbon fumes demanded ATEX-certified, intrinsically safe hardware capable of surviving extreme marine operating conditions.',
-			'solution'     => 'Designed and commissioned optical triple-spectrum IR3 flame detectors, automated water-foam deluge monitor cannons, and supplied certified Category 3 PPE and breathing apparatus.',
-			'deliverables' => array(
-				'Triple-spectrum infrared (IR3) explosion-proof flame detectors',
-				'High-pressure automated foam deluge fire suppression systems',
-				'Pressurized industrial fire hydrant ring main with diesel booster pumps',
-				'Certified Category 3 flame-retardant PPE suits and SCBA units',
-				'Hydrostatic cylinder re-testing and bi-annual safety recertification'
+			'metric'       => '4K Ultra-HD',
+			'metric_label' => 'AI Human & Vehicle Analytics',
+			'stat_2'       => '180+ Channels',
+			'stat_2_label' => 'High-Capacity NVR Storage Array',
+			'stat_3'       => '24/7 SOC',
+			'stat_3_label' => 'Real-Time Remote Monitoring',
+			'image'        => $img_base . 'logistics.jpg',
+			'gallery'      => array(
+				$img_base . 'logistics.jpg',
+				$img_base . 'datacenter.jpg',
+				$img_base . 'commercial.jpg',
+				$theme_base . 'hero.jpg',
 			),
-		),
-		'grand-azure-resort' => array(
-			'id'           => 5,
-			'slug'         => 'grand-azure-resort',
-			'title'        => 'Grand Azure Luxury Resort & Suites',
-			'client'       => 'Azure Hospitality Group',
-			'location'     => 'Lekki Coastal Peninsula',
-			'year'         => '2025',
-			'sector'       => 'Hospitality & Leisure',
-			'sector_slug'  => 'hospitality',
-			'featured'     => true,
-			'metric'       => '450 Rooms',
-			'metric_label' => 'RFID Smart Locks',
-			'stat_2'       => 'PMS Sync',
-			'stat_2_label' => 'Opera Cloud Integrated',
-			'stat_3'       => 'Zero Fail',
-			'stat_3_label' => 'Marine Weatherproof',
-			'image'        => $img_base . 'hospitality.jpg',
-			'short_desc'   => 'Marine-grade contactless RFID locking, smart elevator floor dispatch, and architectural public area surveillance integrated with front-office management.',
-			'challenge'    => 'Severe salt-spray corrosion degraded standard lock components. The property required refined architectural finishes (matte graphite) that withstand maritime humidity while integrating with Opera PMS.',
-			'solution'     => 'Supplied and installed 450 IP65 marine-grade contactless RFID door locks with mobile key support, elevator floor controllers, and discreet low-profile corridor dome cameras.',
+			'short_desc'   => 'Ultra-high-definition 4K IP cameras, automatic number plate recognition (ANPR) at cargo gates, long-range night vision, and centralized security operations center (SOC).',
+			'summary'      => 'Ultra-high-definition 4K IP cameras, automatic number plate recognition (ANPR) at cargo gates, long-range night vision, and centralized security operations center (SOC).',
+			'scope'        => 'Turnkey Enterprise IP CCTV Surveillance & Remote Security Monitoring',
+			'challenge'    => 'Vast outdoor logistics depot acreage with heavy cargo vehicle traffic, low-light perimeter sections, and blind spots required real-time perimeter protection and automatic vehicle registration logging without cargo delays.',
+			'solution'     => 'Engineered a dedicated fiber-optic surveillance ring supporting 180+ 4K motorized varifocal bullet and dome IP cameras with smart infrared night vision, automatic license plate recognition (ANPR) at gate barriers, and a central video wall.',
 			'deliverables' => array(
-				'450 marine-grade stainless steel RFID guest door locks',
-				'Direct bi-directional interface with Oracle Opera PMS',
-				'Smart elevator destination control with keycard permissions',
-				'Discreet architectural dome CCTV across lobby and dining areas',
-				'Master-keying plan and 24-hour rapid hardware replacement reserve'
-			),
-		),
-		'st-jude-medical-center' => array(
-			'id'           => 6,
-			'slug'         => 'st-jude-medical-center',
-			'title'        => 'St. Jude Specialty Hospital Complex',
-			'client'       => 'St. Jude Healthcare Foundation',
-			'location'     => 'Central District, Abuja FCT',
-			'year'         => '2024',
-			'sector'       => 'Healthcare',
-			'sector_slug'  => 'healthcare',
-			'featured'     => true,
-			'metric'       => '6 Theatres',
-			'metric_label' => 'Novec 1230 Clean Gas',
-			'stat_2'       => '12 Wards',
-			'stat_2_label' => 'Hygienic Wave Access',
-			'stat_3'       => '100% Clean',
-			'stat_3_label' => 'Zero-Residue Certified',
-			'image'        => $img_base . 'healthcare.jpg',
-			'short_desc'   => 'Residue-free Novec 1230 gas suppression for MRI/CT suites, hygienic touchless wave-to-open access control, and hospital-wide life safety paging.',
-			'challenge'    => 'Protecting expensive medical imaging suites and vulnerable surgical wards where chemical residue or harsh emergency alarms could endanger patients and sensitive instruments.',
-			'solution'     => 'Engineered clean-agent Novec 1230 fire suppression with non-conductive, residue-free discharge. Installed hygienic wave-to-open door sensors and zoned visual life-safety beacons.',
-			'deliverables' => array(
-				'Novec 1230 clean-gas fire suppression for surgical and MRI rooms',
-				'Hygienic touchless wave-to-open sensors for sterile corridors',
-				'Phased visual strobe and acoustic warning system for clinical wards',
-				'Neonatal anti-abduction perimeter security integration',
-				'Emergency 2-hour SLA on-call engineering coverage'
+				'4K Ultra-HD vandal-proof dome and bullet IP cameras with smart infrared night vision',
+				'Automatic Number Plate Recognition (ANPR) cameras linked to barrier gate controllers',
+				'High-capacity RAID enterprise Network Video Recorders (NVR) with 90-day retention',
+				'Central Security Operations Center (SOC) video wall with multi-screen operator stations',
+				'Encrypted mobile remote viewing and perimeter AI intrusion tripwire alerts',
 			),
 		),
 	);
@@ -1537,10 +1610,20 @@ function kataskevi_get_default_projects() {
  * Retrieve projects: checks WordPress CPT posts first; falls back to default projects
  */
 function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_slug = '' ) {
+	$allowed_slugs = array(
+		'fire-hydrant-and-hose-reel',
+		'alarm-systems',
+		'access-control-systems',
+		'cctv-cameras',
+	);
+
+	$defaults = kataskevi_get_default_projects();
+	$projects = array();
+
 	$args = array(
 		'post_type'      => 'project',
 		'post_status'    => 'publish',
-		'posts_per_page' => $limit,
+		'posts_per_page' => -1,
 		'orderby'        => 'menu_order date',
 		'order'          => 'DESC',
 	);
@@ -1566,7 +1649,6 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 	}
 
 	$query = new WP_Query( $args );
-	$projects = array();
 
 	if ( $query->have_posts() ) {
 		while ( $query->have_posts() ) {
@@ -1574,18 +1656,38 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 			$post_id = get_the_ID();
 			$slug    = get_post_field( 'post_name', $post_id );
 
+			// Strictly restrict to the 4 current projects
+			if ( ! in_array( $slug, $allowed_slugs, true ) ) {
+				continue;
+			}
+
 			$img = get_the_post_thumbnail_url( $post_id, 'large' );
 			if ( ! $img ) {
 				$img = get_post_meta( $post_id, '_kataskevi_image', true );
 			}
-			if ( ! $img ) {
-				$img = get_template_directory_uri() . '/assets/images/hero.jpg';
+			if ( ! $img && isset( $defaults[ $slug ]['image'] ) ) {
+				$img = $defaults[ $slug ]['image'];
+			}
+
+			// Gallery multi-images for slider
+			$gallery_raw = get_post_meta( $post_id, '_kataskevi_gallery', true );
+			$gallery     = array();
+			if ( is_array( $gallery_raw ) && ! empty( $gallery_raw ) ) {
+				$gallery = $gallery_raw;
+			} elseif ( is_string( $gallery_raw ) && ! empty( $gallery_raw ) ) {
+				$gallery = array_filter( array_map( 'trim', preg_split( '/[\r\n,]+/', $gallery_raw ) ) );
+			}
+			if ( empty( $gallery ) && isset( $defaults[ $slug ]['gallery'] ) ) {
+				$gallery = $defaults[ $slug ]['gallery'];
+			}
+			if ( empty( $gallery ) && $img ) {
+				$gallery = array( $img );
 			}
 
 			$deliverables_raw = get_post_meta( $post_id, '_kataskevi_deliverables', true );
-			$deliverables = is_array( $deliverables_raw ) ? $deliverables_raw : array_filter( array_map( 'trim', explode( "\n", (string) $deliverables_raw ) ) );
+			$deliverables     = is_array( $deliverables_raw ) ? $deliverables_raw : array_filter( array_map( 'trim', explode( "\n", (string) $deliverables_raw ) ) );
 
-			$scope = get_post_meta( $post_id, '_kataskevi_scope', true ) ?: get_the_title();
+			$scope = get_post_meta( $post_id, '_kataskevi_scope', true ) ?: ( $defaults[ $slug ]['title'] ?? get_the_title() );
 			$short_desc = get_the_excerpt( $post_id );
 			if ( empty( $short_desc ) ) {
 				$content = get_post_field( 'post_content', $post_id );
@@ -1599,73 +1701,129 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 					$short_desc = wp_trim_words( $sol, 22 );
 				}
 			}
-			if ( empty( $short_desc ) ) {
-				$defaults = kataskevi_get_default_projects();
-				if ( isset( $defaults[ $slug ]['short_desc'] ) ) {
-					$short_desc = $defaults[ $slug ]['short_desc'];
-				}
+			if ( empty( $short_desc ) && isset( $defaults[ $slug ]['short_desc'] ) ) {
+				$short_desc = $defaults[ $slug ]['short_desc'];
 			}
 			if ( empty( $short_desc ) ) {
 				$short_desc = $scope;
 			}
 
+			$post_title = get_the_title( $post_id );
+			$title      = ! empty( $post_title ) ? $post_title : ( $defaults[ $slug ]['title'] ?? 'Project' );
+
+			$solution = get_post_meta( $post_id, '_kataskevi_solution', true );
+			if ( empty( $solution ) ) {
+				$raw_content = get_post_field( 'post_content', $post_id );
+				if ( ! empty( $raw_content ) ) {
+					$solution = $raw_content;
+				}
+			}
+			if ( empty( $solution ) && isset( $defaults[ $slug ]['solution'] ) ) {
+				$solution = $defaults[ $slug ]['solution'];
+			}
+
 			$projects[ $slug ] = array(
 				'id'           => $post_id,
 				'slug'         => $slug,
-				'title'        => get_the_title(),
-				'permalink'    => get_permalink( $post_id ),
-				'client'       => get_post_meta( $post_id, '_kataskevi_client', true ) ?: 'Corporate Client',
-				'location'     => get_post_meta( $post_id, '_kataskevi_location', true ) ?: 'Nigeria',
-				'year'         => get_post_meta( $post_id, '_kataskevi_year', true ) ?: gmdate( 'Y' ),
-				'sector'       => get_post_meta( $post_id, '_kataskevi_sector', true ) ?: 'Engineering',
-				'sector_slug'  => get_post_meta( $post_id, '_kataskevi_sector_slug', true ) ?: 'engineering',
-				'featured'     => (bool) get_post_meta( $post_id, '_kataskevi_featured', true ),
-				'metric'       => get_post_meta( $post_id, '_kataskevi_metric', true ) ?: 'Engineered Standard',
-				'metric_label' => get_post_meta( $post_id, '_kataskevi_metric_label', true ) ?: 'Delivered Specification',
-				'stat_2'       => get_post_meta( $post_id, '_kataskevi_stat_2', true ) ?: '',
-				'stat_2_label' => get_post_meta( $post_id, '_kataskevi_stat_2_label', true ) ?: '',
-				'stat_3'       => get_post_meta( $post_id, '_kataskevi_stat_3', true ) ?: '',
-				'stat_3_label' => get_post_meta( $post_id, '_kataskevi_stat_3_label', true ) ?: '',
+				'title'        => $title,
+				'permalink'    => kataskevi_get_project_url( $slug ),
+				'client'       => get_post_meta( $post_id, '_kataskevi_client', true ) ?: ( $defaults[ $slug ]['client'] ?? 'Corporate Client' ),
+				'location'     => get_post_meta( $post_id, '_kataskevi_location', true ) ?: ( $defaults[ $slug ]['location'] ?? 'Nigeria' ),
+				'year'         => get_post_meta( $post_id, '_kataskevi_year', true ) ?: ( $defaults[ $slug ]['year'] ?? gmdate( 'Y' ) ),
+				'sector'       => get_post_meta( $post_id, '_kataskevi_sector', true ) ?: ( $defaults[ $slug ]['sector'] ?? 'Engineering' ),
+				'sector_slug'  => get_post_meta( $post_id, '_kataskevi_sector_slug', true ) ?: ( $defaults[ $slug ]['sector_slug'] ?? 'engineering' ),
+				'featured'     => true,
+				'metric'       => get_post_meta( $post_id, '_kataskevi_metric', true ) ?: ( $defaults[ $slug ]['metric'] ?? 'Engineered Standard' ),
+				'metric_label' => get_post_meta( $post_id, '_kataskevi_metric_label', true ) ?: ( $defaults[ $slug ]['metric_label'] ?? 'Delivered Specification' ),
+				'stat_2'       => get_post_meta( $post_id, '_kataskevi_stat_2', true ) ?: ( $defaults[ $slug ]['stat_2'] ?? '' ),
+				'stat_2_label' => get_post_meta( $post_id, '_kataskevi_stat_2_label', true ) ?: ( $defaults[ $slug ]['stat_2_label'] ?? '' ),
+				'stat_3'       => get_post_meta( $post_id, '_kataskevi_stat_3', true ) ?: ( $defaults[ $slug ]['stat_3'] ?? '' ),
+				'stat_3_label' => get_post_meta( $post_id, '_kataskevi_stat_3_label', true ) ?: ( $defaults[ $slug ]['stat_3_label'] ?? '' ),
 				'image'        => $img,
+				'gallery'      => $gallery,
 				'short_desc'   => $short_desc,
+				'summary'      => $short_desc,
 				'scope'        => $scope,
-				'challenge'    => get_post_meta( $post_id, '_kataskevi_challenge', true ) ?: '',
-				'solution'     => get_post_meta( $post_id, '_kataskevi_solution', true ) ?: get_the_content(),
-				'deliverables' => $deliverables,
+				'challenge'    => get_post_meta( $post_id, '_kataskevi_challenge', true ) ?: ( $defaults[ $slug ]['challenge'] ?? '' ),
+				'solution'     => $solution,
+				'deliverables' => ! empty( $deliverables ) ? $deliverables : ( $defaults[ $slug ]['deliverables'] ?? array() ),
 			);
 		}
 		wp_reset_postdata();
 	}
 
-	// Fallback to default project list if query returned empty
-	if ( empty( $projects ) ) {
-		$defaults = kataskevi_get_default_projects();
-		$projects = array();
-		$count    = 0;
-
+	// Fallback/fill-in for default projects to guarantee all 4 are always present
+	if ( empty( $projects ) || count( $projects ) < 4 ) {
 		foreach ( $defaults as $k => $item ) {
-			if ( $featured_only && empty( $item['featured'] ) ) {
+			if ( ! in_array( $k, $allowed_slugs, true ) ) {
 				continue;
 			}
-			if ( ! empty( $sector_slug ) && 'all' !== $sector_slug && $item['sector_slug'] !== $sector_slug ) {
-				continue;
-			}
-			$item['permalink'] = home_url( '/works/' . $item['slug'] . '/' );
-			$projects[ $k ] = $item;
-			$count++;
-			if ( $limit > 0 && $count >= $limit ) {
-				break;
+			if ( ! isset( $projects[ $k ] ) ) {
+				if ( ! empty( $sector_slug ) && 'all' !== $sector_slug && $item['sector_slug'] !== $sector_slug ) {
+					continue;
+				}
+				$item['permalink'] = kataskevi_get_project_url( $item['slug'] );
+				$projects[ $k ]    = $item;
 			}
 		}
+	}
+
+	// Filter by sector slug if requested
+	if ( ! empty( $sector_slug ) && 'all' !== $sector_slug ) {
+		$filtered = array();
+		foreach ( $projects as $k => $item ) {
+			if ( $item['sector_slug'] === $sector_slug ) {
+				$filtered[ $k ] = $item;
+			}
+		}
+		$projects = $filtered;
+	}
+
+	// Limit count if requested
+	if ( $limit > 0 && count( $projects ) > $limit ) {
+		$projects = array_slice( $projects, 0, $limit, true );
 	}
 
 	return $projects;
 }
 
 /**
+ * Helper to get reliable permalink for a project
+ */
+function kataskevi_get_project_url( $slug ) {
+	$slug_map = array(
+		'fire-hydrant'   => 'fire-hydrant-and-hose-reel',
+		'alarm'          => 'alarm-systems',
+		'access-control' => 'access-control-systems',
+		'cctv'           => 'cctv-cameras',
+	);
+	if ( isset( $slug_map[ $slug ] ) ) {
+		$slug = $slug_map[ $slug ];
+	}
+
+	$works_url = kataskevi_get_page_url( 'works', 'Our Works' );
+
+	if ( get_option( 'permalink_structure' ) ) {
+		return trailingslashit( $works_url ) . $slug . '/';
+	}
+
+	return add_query_arg( 'project', $slug, $works_url );
+}
+
+/**
  * Retrieve single project by slug
  */
 function kataskevi_get_project_by_slug( $slug ) {
+	$slug_map = array(
+		'fire-hydrant'   => 'fire-hydrant-and-hose-reel',
+		'alarm'          => 'alarm-systems',
+		'access-control' => 'access-control-systems',
+		'cctv'           => 'cctv-cameras',
+	);
+	if ( isset( $slug_map[ $slug ] ) ) {
+		$slug = $slug_map[ $slug ];
+	}
+
 	$projects = kataskevi_get_projects( -1 );
 	if ( isset( $projects[ $slug ] ) ) {
 		return $projects[ $slug ];
@@ -1674,7 +1832,7 @@ function kataskevi_get_project_by_slug( $slug ) {
 	$defaults = kataskevi_get_default_projects();
 	if ( isset( $defaults[ $slug ] ) ) {
 		$item = $defaults[ $slug ];
-		$item['permalink'] = home_url( '/works/' . $item['slug'] . '/' );
+		$item['permalink'] = kataskevi_get_project_url( $item['slug'] );
 		return $item;
 	}
 
@@ -1682,11 +1840,20 @@ function kataskevi_get_project_by_slug( $slug ) {
 }
 
 /**
- * Seed default projects into WordPress database
+ * Seed & Synchronize default projects into WordPress database (runs once)
  */
 function kataskevi_seed_default_projects() {
-	if ( get_option( 'kataskevi_projects_seeded_v1' ) ) {
+	if ( get_option( 'kataskevi_projects_seeded_v5' ) ) {
 		return;
+	}
+
+	// Clean up legacy decommissioned projects
+	$legacy_slugs = array( 'clean-agent-gas-suppression', 'industrial-deluge-ppe-program' );
+	foreach ( $legacy_slugs as $l_slug ) {
+		$legacy_post = get_page_by_path( $l_slug, OBJECT, 'project' );
+		if ( $legacy_post ) {
+			wp_delete_post( $legacy_post->ID, true );
+		}
 	}
 
 	$defaults = kataskevi_get_default_projects();
@@ -1704,14 +1871,13 @@ function kataskevi_seed_default_projects() {
 					'comment_status' => 'closed',
 				)
 			);
-
 			if ( $post_id && ! is_wp_error( $post_id ) ) {
 				update_post_meta( $post_id, '_kataskevi_client', $data['client'] );
 				update_post_meta( $post_id, '_kataskevi_location', $data['location'] );
 				update_post_meta( $post_id, '_kataskevi_year', $data['year'] );
 				update_post_meta( $post_id, '_kataskevi_sector', $data['sector'] );
 				update_post_meta( $post_id, '_kataskevi_sector_slug', $data['sector_slug'] );
-				update_post_meta( $post_id, '_kataskevi_featured', $data['featured'] ? '1' : '0' );
+				update_post_meta( $post_id, '_kataskevi_featured', '1' );
 				update_post_meta( $post_id, '_kataskevi_metric', $data['metric'] );
 				update_post_meta( $post_id, '_kataskevi_metric_label', $data['metric_label'] );
 				update_post_meta( $post_id, '_kataskevi_stat_2', $data['stat_2'] );
@@ -1722,16 +1888,203 @@ function kataskevi_seed_default_projects() {
 				update_post_meta( $post_id, '_kataskevi_challenge', $data['challenge'] );
 				update_post_meta( $post_id, '_kataskevi_solution', $data['solution'] );
 				update_post_meta( $post_id, '_kataskevi_image', $data['image'] );
+				update_post_meta( $post_id, '_kataskevi_gallery', $data['gallery'] );
 				update_post_meta( $post_id, '_kataskevi_deliverables', $data['deliverables'] );
 
-				// Assign or create sector term
+				// Assign sector term
 				wp_set_object_terms( $post_id, $data['sector'], 'project_sector' );
 			}
 		}
 	}
 
-	update_option( 'kataskevi_projects_seeded_v1', 1 );
+	update_option( 'kataskevi_projects_seeded_v5', 1 );
 }
+add_action( 'init', 'kataskevi_seed_default_projects', 25 );
+
+/**
+ * Register Meta Box for Project CPT to ensure all project fields are editable in WP Admin
+ */
+function kataskevi_register_project_meta_boxes() {
+	add_meta_box(
+		'kataskevi_project_details',
+		__( 'Project Specifications & Gallery', 'kataskevi' ),
+		'kataskevi_render_project_meta_box',
+		'project',
+		'normal',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'kataskevi_register_project_meta_boxes' );
+
+function kataskevi_render_project_meta_box( $post ) {
+	wp_nonce_field( 'kataskevi_save_project_meta', 'kataskevi_project_nonce' );
+
+	$client       = get_post_meta( $post->ID, '_kataskevi_client', true );
+	$location     = get_post_meta( $post->ID, '_kataskevi_location', true );
+	$year         = get_post_meta( $post->ID, '_kataskevi_year', true );
+	$sector       = get_post_meta( $post->ID, '_kataskevi_sector', true );
+	$metric       = get_post_meta( $post->ID, '_kataskevi_metric', true );
+	$metric_label = get_post_meta( $post->ID, '_kataskevi_metric_label', true );
+	$stat_2       = get_post_meta( $post->ID, '_kataskevi_stat_2', true );
+	$stat_2_label = get_post_meta( $post->ID, '_kataskevi_stat_2_label', true );
+	$stat_3       = get_post_meta( $post->ID, '_kataskevi_stat_3', true );
+	$stat_3_label = get_post_meta( $post->ID, '_kataskevi_stat_3_label', true );
+	$scope        = get_post_meta( $post->ID, '_kataskevi_scope', true );
+	$challenge    = get_post_meta( $post->ID, '_kataskevi_challenge', true );
+	$solution     = get_post_meta( $post->ID, '_kataskevi_solution', true );
+
+	$gallery_urls = get_post_meta( $post->ID, '_kataskevi_gallery_urls', true );
+	if ( empty( $gallery_urls ) ) {
+		$gal = get_post_meta( $post->ID, '_kataskevi_gallery', true );
+		if ( is_array( $gal ) ) {
+			$gallery_urls = implode( "\n", $gal );
+		}
+	}
+
+	$deliverables = get_post_meta( $post->ID, '_kataskevi_deliverables', true );
+	if ( is_array( $deliverables ) ) {
+		$deliverables = implode( "\n", $deliverables );
+	}
+	?>
+	<style>
+		.kataskevi-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px; }
+		.kataskevi-field { margin-bottom: 14px; }
+		.kataskevi-field label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #1e293b; }
+		.kataskevi-field input[type="text"], .kataskevi-field textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 7px 10px; font-size: 13px; box-sizing: border-box; }
+		.kataskevi-field .description { font-size: 12px; color: #64748b; margin-top: 4px; }
+	</style>
+	<div class="kataskevi-meta-wrapper">
+		<div class="kataskevi-meta-grid">
+			<div class="kataskevi-field">
+				<label for="_kataskevi_client"><?php esc_html_e( 'Client / Facility Name', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_client" name="_kataskevi_client" value="<?php echo esc_attr( $client ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_location"><?php esc_html_e( 'Location', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_location" name="_kataskevi_location" value="<?php echo esc_attr( $location ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_year"><?php esc_html_e( 'Completion Year', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_year" name="_kataskevi_year" value="<?php echo esc_attr( $year ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_sector"><?php esc_html_e( 'Sector / Category Label', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_sector" name="_kataskevi_sector" value="<?php echo esc_attr( $sector ); ?>">
+			</div>
+		</div>
+
+		<div class="kataskevi-meta-grid">
+			<div class="kataskevi-field">
+				<label for="_kataskevi_metric"><?php esc_html_e( 'Key Metric (e.g. 100% Pass)', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_metric" name="_kataskevi_metric" value="<?php echo esc_attr( $metric ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_metric_label"><?php esc_html_e( 'Key Metric Label', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_metric_label" name="_kataskevi_metric_label" value="<?php echo esc_attr( $metric_label ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_stat_2"><?php esc_html_e( 'Stat 2', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_stat_2" name="_kataskevi_stat_2" value="<?php echo esc_attr( $stat_2 ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_stat_2_label"><?php esc_html_e( 'Stat 2 Label', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_stat_2_label" name="_kataskevi_stat_2_label" value="<?php echo esc_attr( $stat_2_label ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_stat_3"><?php esc_html_e( 'Stat 3', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_stat_3" name="_kataskevi_stat_3" value="<?php echo esc_attr( $stat_3 ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_stat_3_label"><?php esc_html_e( 'Stat 3 Label', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_stat_3_label" name="_kataskevi_stat_3_label" value="<?php echo esc_attr( $stat_3_label ); ?>">
+			</div>
+		</div>
+
+		<div class="kataskevi-field">
+			<label for="_kataskevi_scope"><?php esc_html_e( 'Scope Summary', 'kataskevi' ); ?></label>
+			<input type="text" id="_kataskevi_scope" name="_kataskevi_scope" value="<?php echo esc_attr( $scope ); ?>">
+		</div>
+
+		<div class="kataskevi-field">
+			<label for="_kataskevi_challenge"><?php esc_html_e( 'The Operational Challenge', 'kataskevi' ); ?></label>
+			<textarea id="_kataskevi_challenge" name="_kataskevi_challenge" rows="3"><?php echo esc_textarea( $challenge ); ?></textarea>
+		</div>
+
+		<div class="kataskevi-field">
+			<label for="_kataskevi_solution"><?php esc_html_e( 'The Engineered Solution', 'kataskevi' ); ?></label>
+			<textarea id="_kataskevi_solution" name="_kataskevi_solution" rows="4"><?php echo esc_textarea( $solution ); ?></textarea>
+		</div>
+
+		<div class="kataskevi-field">
+			<label for="_kataskevi_gallery_urls"><?php esc_html_e( 'Project Gallery Image URLs (one per line for card slider and case study gallery)', 'kataskevi' ); ?></label>
+			<textarea id="_kataskevi_gallery_urls" name="_kataskevi_gallery_urls" rows="4" placeholder="https://..."><?php echo esc_textarea( $gallery_urls ); ?></textarea>
+			<p class="description"><?php esc_html_e( 'Enter one image URL per line. These images appear in the preview card slider and on the project details page gallery.', 'kataskevi' ); ?></p>
+		</div>
+
+		<div class="kataskevi-field">
+			<label for="_kataskevi_deliverables"><?php esc_html_e( 'Deliverables / Scope Checklist (one item per line)', 'kataskevi' ); ?></label>
+			<textarea id="_kataskevi_deliverables" name="_kataskevi_deliverables" rows="4"><?php echo esc_textarea( $deliverables ); ?></textarea>
+		</div>
+	</div>
+	<?php
+}
+
+function kataskevi_save_project_meta_box( $post_id ) {
+	if ( ! isset( $_POST['kataskevi_project_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['kataskevi_project_nonce'] ), 'kataskevi_save_project_meta' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$text_fields = array(
+		'_kataskevi_client',
+		'_kataskevi_location',
+		'_kataskevi_year',
+		'_kataskevi_sector',
+		'_kataskevi_metric',
+		'_kataskevi_metric_label',
+		'_kataskevi_stat_2',
+		'_kataskevi_stat_2_label',
+		'_kataskevi_stat_3',
+		'_kataskevi_stat_3_label',
+		'_kataskevi_scope',
+	);
+
+	foreach ( $text_fields as $field ) {
+		if ( isset( $_POST[ $field ] ) ) {
+			update_post_meta( $post_id, $field, sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) );
+		}
+	}
+
+	$textarea_fields = array(
+		'_kataskevi_challenge',
+		'_kataskevi_solution',
+	);
+
+	foreach ( $textarea_fields as $field ) {
+		if ( isset( $_POST[ $field ] ) ) {
+			update_post_meta( $post_id, $field, sanitize_textarea_field( wp_unslash( $_POST[ $field ] ) ) );
+		}
+	}
+
+	if ( isset( $_POST['_kataskevi_gallery_urls'] ) ) {
+		$raw_gallery = sanitize_textarea_field( wp_unslash( $_POST['_kataskevi_gallery_urls'] ) );
+		update_post_meta( $post_id, '_kataskevi_gallery_urls', $raw_gallery );
+		$gallery_array = array_filter( array_map( 'esc_url_raw', array_map( 'trim', explode( "\n", $raw_gallery ) ) ) );
+		update_post_meta( $post_id, '_kataskevi_gallery', array_values( $gallery_array ) );
+	}
+
+	if ( isset( $_POST['_kataskevi_deliverables'] ) ) {
+		$raw_del = sanitize_textarea_field( wp_unslash( $_POST['_kataskevi_deliverables'] ) );
+		$del_array = array_filter( array_map( 'sanitize_text_field', array_map( 'trim', explode( "\n", $raw_del ) ) ) );
+		update_post_meta( $post_id, '_kataskevi_deliverables', array_values( $del_array ) );
+	}
+}
+add_action( 'save_post_project', 'kataskevi_save_project_meta_box' );
 
 /**
  * Handle AJAX quote & site survey form submissions
