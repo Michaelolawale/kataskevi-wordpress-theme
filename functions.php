@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.6' );
+define( 'KATASKEVI_VERSION', '2.1.7' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -1465,7 +1465,10 @@ function kataskevi_get_default_projects() {
 			'title'        => 'Fire Hydrant & Hose Reel',
 			'client'       => 'Industrial Facilities & Commercial Compounds',
 			'location'     => 'Lekki Free Zone, Lagos',
-			'year'         => '2025',
+			'year'         => '2014',
+			'surface_area' => '450,000 m²',
+			'value'        => '$250,000',
+			'architect'    => 'Jason & Perry',
 			'sector'       => 'Fire Protection & Suppression',
 			'sector_slug'  => 'fire-hydrant',
 			'featured'     => true,
@@ -1501,7 +1504,10 @@ function kataskevi_get_default_projects() {
 			'title'        => 'Alarm Systems',
 			'client'       => 'Enterprise Banking & Corporate Towers',
 			'location'     => 'Victoria Island, Lagos',
-			'year'         => '2025',
+			'year'         => '2014',
+			'surface_area' => '450,000 m²',
+			'value'        => '$250,000',
+			'architect'    => 'Jason & Perry',
 			'sector'       => 'Life Safety & Detection',
 			'sector_slug'  => 'alarm-systems',
 			'featured'     => true,
@@ -1537,7 +1543,10 @@ function kataskevi_get_default_projects() {
 			'title'        => 'Access Control Systems',
 			'client'       => 'Financial Headquarters & Multi-Tenant Towers',
 			'location'     => 'Marina CBD, Lagos',
-			'year'         => '2024',
+			'year'         => '2014',
+			'surface_area' => '450,000 m²',
+			'value'        => '$250,000',
+			'architect'    => 'Jason & Perry',
 			'sector'       => 'Electronic Security',
 			'sector_slug'  => 'access-control',
 			'featured'     => true,
@@ -1573,7 +1582,10 @@ function kataskevi_get_default_projects() {
 			'title'        => 'CCTV Cameras',
 			'client'       => 'Logistics Hubs & Industrial Port Terminals',
 			'location'     => 'Apapa & Ikeja Industrial Zones',
-			'year'         => '2024',
+			'year'         => '2014',
+			'surface_area' => '450,000 m²',
+			'value'        => '$250,000',
+			'architect'    => 'Jason & Perry',
 			'sector'       => 'Video Surveillance',
 			'sector_slug'  => 'cctv-cameras',
 			'featured'     => true,
@@ -1729,7 +1741,10 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 				'permalink'    => kataskevi_get_project_url( $slug ),
 				'client'       => get_post_meta( $post_id, '_kataskevi_client', true ) ?: ( $defaults[ $slug ]['client'] ?? 'Corporate Client' ),
 				'location'     => get_post_meta( $post_id, '_kataskevi_location', true ) ?: ( $defaults[ $slug ]['location'] ?? 'Nigeria' ),
-				'year'         => get_post_meta( $post_id, '_kataskevi_year', true ) ?: ( $defaults[ $slug ]['year'] ?? gmdate( 'Y' ) ),
+				'surface_area' => get_post_meta( $post_id, '_kataskevi_surface_area', true ) ?: ( $defaults[ $slug ]['surface_area'] ?? '450,000 m²' ),
+				'year'         => get_post_meta( $post_id, '_kataskevi_year', true ) ?: ( $defaults[ $slug ]['year'] ?? '2014' ),
+				'value'        => get_post_meta( $post_id, '_kataskevi_value', true ) ?: ( $defaults[ $slug ]['value'] ?? '$250,000' ),
+				'architect'    => get_post_meta( $post_id, '_kataskevi_architect', true ) ?: ( $defaults[ $slug ]['architect'] ?? 'Jason & Perry' ),
 				'sector'       => get_post_meta( $post_id, '_kataskevi_sector', true ) ?: ( $defaults[ $slug ]['sector'] ?? 'Engineering' ),
 				'sector_slug'  => get_post_meta( $post_id, '_kataskevi_sector_slug', true ) ?: ( $defaults[ $slug ]['sector_slug'] ?? 'engineering' ),
 				'featured'     => true,
@@ -1921,7 +1936,10 @@ function kataskevi_render_project_meta_box( $post ) {
 
 	$client       = get_post_meta( $post->ID, '_kataskevi_client', true );
 	$location     = get_post_meta( $post->ID, '_kataskevi_location', true );
+	$surface_area = get_post_meta( $post->ID, '_kataskevi_surface_area', true );
 	$year         = get_post_meta( $post->ID, '_kataskevi_year', true );
+	$value        = get_post_meta( $post->ID, '_kataskevi_value', true );
+	$architect    = get_post_meta( $post->ID, '_kataskevi_architect', true );
 	$sector       = get_post_meta( $post->ID, '_kataskevi_sector', true );
 	$metric       = get_post_meta( $post->ID, '_kataskevi_metric', true );
 	$metric_label = get_post_meta( $post->ID, '_kataskevi_metric_label', true );
@@ -1964,8 +1982,20 @@ function kataskevi_render_project_meta_box( $post ) {
 				<input type="text" id="_kataskevi_location" name="_kataskevi_location" value="<?php echo esc_attr( $location ); ?>">
 			</div>
 			<div class="kataskevi-field">
-				<label for="_kataskevi_year"><?php esc_html_e( 'Completion Year', 'kataskevi' ); ?></label>
+				<label for="_kataskevi_surface_area"><?php esc_html_e( 'Surface Area (e.g. 450,000 m²)', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_surface_area" name="_kataskevi_surface_area" value="<?php echo esc_attr( $surface_area ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_year"><?php esc_html_e( 'Completion Year (e.g. 2014)', 'kataskevi' ); ?></label>
 				<input type="text" id="_kataskevi_year" name="_kataskevi_year" value="<?php echo esc_attr( $year ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_value"><?php esc_html_e( 'Project Value (e.g. $250,000)', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_value" name="_kataskevi_value" value="<?php echo esc_attr( $value ); ?>">
+			</div>
+			<div class="kataskevi-field">
+				<label for="_kataskevi_architect"><?php esc_html_e( 'Architect / Lead Consultant (e.g. Jason & Perry)', 'kataskevi' ); ?></label>
+				<input type="text" id="_kataskevi_architect" name="_kataskevi_architect" value="<?php echo esc_attr( $architect ); ?>">
 			</div>
 			<div class="kataskevi-field">
 				<label for="_kataskevi_sector"><?php esc_html_e( 'Sector / Category Label', 'kataskevi' ); ?></label>
@@ -2043,7 +2073,10 @@ function kataskevi_save_project_meta_box( $post_id ) {
 	$text_fields = array(
 		'_kataskevi_client',
 		'_kataskevi_location',
+		'_kataskevi_surface_area',
 		'_kataskevi_year',
+		'_kataskevi_value',
+		'_kataskevi_architect',
 		'_kataskevi_sector',
 		'_kataskevi_metric',
 		'_kataskevi_metric_label',

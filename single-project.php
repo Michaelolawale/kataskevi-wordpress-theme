@@ -112,34 +112,6 @@ foreach ( $all_projects as $k => $item ) {
 		</div>
 	</section>
 
-	<!-- KEY METRICS STRIP -->
-	<section class="section-case-metrics">
-		<div class="container-editorial">
-			<div class="case-metrics-grid">
-				<div class="case-metric-card">
-					<div class="metric-num"><?php echo esc_html( $proj['metric'] ); ?></div>
-					<div class="metric-txt"><?php echo esc_html( $proj['metric_label'] ); ?></div>
-				</div>
-				<?php if ( ! empty( $proj['stat_2'] ) ) : ?>
-					<div class="case-metric-card">
-						<div class="metric-num"><?php echo esc_html( $proj['stat_2'] ); ?></div>
-						<div class="metric-txt"><?php echo esc_html( $proj['stat_2_label'] ); ?></div>
-					</div>
-				<?php endif; ?>
-				<?php if ( ! empty( $proj['stat_3'] ) ) : ?>
-					<div class="case-metric-card">
-						<div class="metric-num"><?php echo esc_html( $proj['stat_3'] ); ?></div>
-						<div class="metric-txt"><?php echo esc_html( $proj['stat_3_label'] ); ?></div>
-					</div>
-				<?php endif; ?>
-				<div class="case-metric-card">
-					<div class="metric-num"><?php esc_html_e( 'Turnkey', 'kataskevi' ); ?></div>
-					<div class="metric-txt"><?php esc_html_e( 'EPC Handover Standard', 'kataskevi' ); ?></div>
-				</div>
-			</div>
-		</div>
-	</section>
-
 	<!-- MAIN CONTENT SPLIT: BODY & SIDEBAR -->
 	<section class="section-case-body">
 		<div class="container-editorial">
@@ -238,8 +210,20 @@ foreach ( $all_projects as $k => $item ) {
 									<dd><?php echo esc_html( $proj['location'] ); ?></dd>
 								</div>
 								<div class="spec-row">
-									<dt><?php esc_html_e( 'Completion', 'kataskevi' ); ?></dt>
-									<dd><?php echo esc_html( $proj['year'] ); ?></dd>
+									<dt><?php esc_html_e( 'Surface Area', 'kataskevi' ); ?></dt>
+									<dd><?php echo esc_html( $proj['surface_area'] ?? '450,000 m²' ); ?></dd>
+								</div>
+								<div class="spec-row">
+									<dt><?php esc_html_e( 'Year Completed', 'kataskevi' ); ?></dt>
+									<dd><?php echo esc_html( $proj['year'] ?? '2014' ); ?></dd>
+								</div>
+								<div class="spec-row">
+									<dt><?php esc_html_e( 'Value', 'kataskevi' ); ?></dt>
+									<dd><?php echo esc_html( $proj['value'] ?? '$250,000' ); ?></dd>
+								</div>
+								<div class="spec-row">
+									<dt><?php esc_html_e( 'Architect', 'kataskevi' ); ?></dt>
+									<dd><?php echo esc_html( $proj['architect'] ?? 'Jason & Perry' ); ?></dd>
 								</div>
 								<div class="spec-row">
 									<dt><?php esc_html_e( 'Accountability', 'kataskevi' ); ?></dt>
