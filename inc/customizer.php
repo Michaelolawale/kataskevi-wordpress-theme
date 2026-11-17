@@ -17,6 +17,152 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Available Predefined Color Theme Presets
+ *
+ * @return array
+ */
+function kataskevi_get_color_presets() {
+	return array(
+		'default' => array(
+			'label'       => esc_html__( 'Steel Blue (Default Kataskevi)', 'kataskevi' ),
+			'description' => esc_html__( 'Architectural precision steel blue with cool slate accents.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#3f75a1',
+				'primary_hover'    => '#346389',
+				'secondary'        => '#f1f5f9',
+				'secondary_hover'  => '#e2e8f0',
+				'dark_bg'          => '#171f27',
+				'dark_text'        => '#ffffff',
+				'background'       => '#f8fafc',
+				'foreground'       => '#171f27',
+				'muted_foreground' => '#60676f',
+				'card'             => '#ffffff',
+				'border'           => '#dbdee2',
+			),
+		),
+		'amber_industrial' => array(
+			'label'       => esc_html__( 'Industrial Safety Amber & Charcoal', 'kataskevi' ),
+			'description' => esc_html__( 'Authoritative civil, heavy equipment & hazard warning palette.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#d97706',
+				'primary_hover'    => '#b45309',
+				'secondary'        => '#fef3c7',
+				'secondary_hover'  => '#fde68a',
+				'dark_bg'          => '#1e293b',
+				'dark_text'        => '#ffffff',
+				'background'       => '#f8fafc',
+				'foreground'       => '#0f172a',
+				'muted_foreground' => '#64748b',
+				'card'             => '#ffffff',
+				'border'           => '#e2e8f0',
+			),
+		),
+		'cobalt_tech' => array(
+			'label'       => esc_html__( 'Enterprise Cobalt & Midnight Navy', 'kataskevi' ),
+			'description' => esc_html__( 'High-tech electronic security, enterprise CCTV & banking automation.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#2563eb',
+				'primary_hover'    => '#1d4ed8',
+				'secondary'        => '#eff6ff',
+				'secondary_hover'  => '#dbeafe',
+				'dark_bg'          => '#0f172a',
+				'dark_text'        => '#ffffff',
+				'background'       => '#f8fafc',
+				'foreground'       => '#0f172a',
+				'muted_foreground' => '#64748b',
+				'card'             => '#ffffff',
+				'border'           => '#cbd5e1',
+			),
+		),
+		'crimson_fire' => array(
+			'label'       => esc_html__( 'Life Safety Crimson & Obsidian', 'kataskevi' ),
+			'description' => esc_html__( 'Bold NFPA fire protection red with deep obsidian dark contrast.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#dc2626',
+				'primary_hover'    => '#b91c1c',
+				'secondary'        => '#fef2f2',
+				'secondary_hover'  => '#fee2e2',
+				'dark_bg'          => '#18181b',
+				'dark_text'        => '#ffffff',
+				'background'       => '#fafafa',
+				'foreground'       => '#18181b',
+				'muted_foreground' => '#71717a',
+				'card'             => '#ffffff',
+				'border'           => '#e4e4e7',
+			),
+		),
+		'emerald_infra' => array(
+			'label'       => esc_html__( 'Sustainable Emerald & Forest', 'kataskevi' ),
+			'description' => esc_html__( 'Clean green energy, MEP infrastructure & environmental safety.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#059669',
+				'primary_hover'    => '#047857',
+				'secondary'        => '#ecfdf5',
+				'secondary_hover'  => '#d1fae5',
+				'dark_bg'          => '#064e3b',
+				'dark_text'        => '#ffffff',
+				'background'       => '#f8fafc',
+				'foreground'       => '#0f172a',
+				'muted_foreground' => '#64748b',
+				'card'             => '#ffffff',
+				'border'           => '#cbd5e1',
+			),
+		),
+		'copper_warm' => array(
+			'label'       => esc_html__( 'Architectural Bronze & Warm Taupe', 'kataskevi' ),
+			'description' => esc_html__( 'Structural steel, mechanical fabrication & warm architectural finishes.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#b45309',
+				'primary_hover'    => '#92400e',
+				'secondary'        => '#fef3c7',
+				'secondary_hover'  => '#fde68a',
+				'dark_bg'          => '#1c1917',
+				'dark_text'        => '#ffffff',
+				'background'       => '#fafaf9',
+				'foreground'       => '#1c1917',
+				'muted_foreground' => '#78716c',
+				'card'             => '#ffffff',
+				'border'           => '#e7e5e4',
+			),
+		),
+		'monochrome_slate' => array(
+			'label'       => esc_html__( 'Minimalist Charcoal & Platinum', 'kataskevi' ),
+			'description' => esc_html__( 'Ultra-clean modernist architectural and engineering firm aesthetic.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#0f172a',
+				'primary_hover'    => '#334155',
+				'secondary'        => '#f1f5f9',
+				'secondary_hover'  => '#e2e8f0',
+				'dark_bg'          => '#020617',
+				'dark_text'        => '#ffffff',
+				'background'       => '#ffffff',
+				'foreground'       => '#0f172a',
+				'muted_foreground' => '#64748b',
+				'card'             => '#f8fafc',
+				'border'           => '#e2e8f0',
+			),
+		),
+		'royal_purple' => array(
+			'label'       => esc_html__( 'Executive Violet & Deep Indigo', 'kataskevi' ),
+			'description' => esc_html__( 'Modern executive engineering, high-value contracts & consulting.', 'kataskevi' ),
+			'colors'      => array(
+				'primary'          => '#7c3aed',
+				'primary_hover'    => '#6d28d9',
+				'secondary'        => '#f5f3ff',
+				'secondary_hover'  => '#ede9fe',
+				'dark_bg'          => '#1e1b4b',
+				'dark_text'        => '#ffffff',
+				'background'       => '#f8fafc',
+				'foreground'       => '#0f172a',
+				'muted_foreground' => '#64748b',
+				'card'             => '#ffffff',
+				'border'           => '#e2e8f0',
+			),
+		),
+	);
+}
+
+/**
  * Register all Theme Customizer settings, panels, and controls.
  *
  * @param WP_Customize_Manager $wp_customize Theme Customizer object.
@@ -195,7 +341,34 @@ function kataskevi_customize_register( $wp_customize ) {
 			'title'       => esc_html__( '2. Color Theme & Palette', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
 			'priority'    => 15,
-			'description' => esc_html__( 'Configure your theme brand colors. You can pick colors visually using the color picker or input exact hexadecimal color codes (e.g., #3f75a1).', 'kataskevi' ),
+			'description' => esc_html__( 'Choose a predefined color preset or customize every individual brand color visually.', 'kataskevi' ),
+		)
+	);
+
+	// Predefined Theme Presets Selector
+	$color_presets  = kataskevi_get_color_presets();
+	$preset_choices = array();
+	foreach ( $color_presets as $p_key => $p_data ) {
+		$preset_choices[ $p_key ] = $p_data['label'];
+	}
+
+	$wp_customize->add_setting(
+		'kataskevi_color_preset',
+		array(
+			'default'           => 'default',
+			'sanitize_callback' => 'sanitize_key',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_color_preset',
+		array(
+			'label'       => esc_html__( 'Predefined Color Theme / Preset', 'kataskevi' ),
+			'description' => esc_html__( 'Select a coordinated brand palette. Selecting a preset updates all color pickers below automatically.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_colors',
+			'type'        => 'select',
+			'choices'     => $preset_choices,
+			'priority'    => 1,
 		)
 	);
 
@@ -1894,17 +2067,33 @@ function kataskevi_hex_to_rgba( $hex, $alpha = 0.08 ) {
  * @return string Inline CSS.
  */
 function kataskevi_get_customizer_css() {
-	$primary          = kataskevi_get_mod( 'kataskevi_color_primary', '#3f75a1' );
-	$primary_hover    = kataskevi_get_mod( 'kataskevi_color_primary_hover', '#346389' );
-	$secondary        = kataskevi_get_mod( 'kataskevi_color_secondary', '#f1f5f9' );
-	$secondary_hover  = kataskevi_get_mod( 'kataskevi_color_secondary_hover', '#e2e8f0' );
-	$dark_bg          = kataskevi_get_mod( 'kataskevi_color_dark_bg', '#171f27' );
-	$dark_text        = kataskevi_get_mod( 'kataskevi_color_dark_text', '#ffffff' );
-	$background       = kataskevi_get_mod( 'kataskevi_color_background', '#f8fafc' );
-	$foreground       = kataskevi_get_mod( 'kataskevi_color_foreground', '#171f27' );
-	$muted_foreground = kataskevi_get_mod( 'kataskevi_color_muted_foreground', '#60676f' );
-	$card             = kataskevi_get_mod( 'kataskevi_color_card', '#ffffff' );
-	$border           = kataskevi_get_mod( 'kataskevi_color_border', '#dbdee2' );
+	$preset_key = kataskevi_get_mod( 'kataskevi_color_preset', 'default' );
+	$presets    = kataskevi_get_color_presets();
+	$preset     = $presets[ $preset_key ]['colors'] ?? array();
+
+	$default_primary          = $preset['primary'] ?? '#3f75a1';
+	$default_primary_hover    = $preset['primary_hover'] ?? '#346389';
+	$default_secondary        = $preset['secondary'] ?? '#f1f5f9';
+	$default_secondary_hover  = $preset['secondary_hover'] ?? '#e2e8f0';
+	$default_dark_bg          = $preset['dark_bg'] ?? '#171f27';
+	$default_dark_text        = $preset['dark_text'] ?? '#ffffff';
+	$default_background       = $preset['background'] ?? '#f8fafc';
+	$default_foreground       = $preset['foreground'] ?? '#171f27';
+	$default_muted_foreground = $preset['muted_foreground'] ?? '#60676f';
+	$default_card             = $preset['card'] ?? '#ffffff';
+	$default_border           = $preset['border'] ?? '#dbdee2';
+
+	$primary          = kataskevi_get_mod( 'kataskevi_color_primary', $default_primary );
+	$primary_hover    = kataskevi_get_mod( 'kataskevi_color_primary_hover', $default_primary_hover );
+	$secondary        = kataskevi_get_mod( 'kataskevi_color_secondary', $default_secondary );
+	$secondary_hover  = kataskevi_get_mod( 'kataskevi_color_secondary_hover', $default_secondary_hover );
+	$dark_bg          = kataskevi_get_mod( 'kataskevi_color_dark_bg', $default_dark_bg );
+	$dark_text        = kataskevi_get_mod( 'kataskevi_color_dark_text', $default_dark_text );
+	$background       = kataskevi_get_mod( 'kataskevi_color_background', $default_background );
+	$foreground       = kataskevi_get_mod( 'kataskevi_color_foreground', $default_foreground );
+	$muted_foreground = kataskevi_get_mod( 'kataskevi_color_muted_foreground', $default_muted_foreground );
+	$card             = kataskevi_get_mod( 'kataskevi_color_card', $default_card );
+	$border           = kataskevi_get_mod( 'kataskevi_color_border', $default_border );
 
 	$primary_subtle = kataskevi_hex_to_rgba( $primary, 0.08 );
 

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.8' );
+define( 'KATASKEVI_VERSION', '2.1.9' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -458,8 +458,45 @@ function kataskevi_customize_preview_js() {
 		$preview_ver,
 		true
 	);
+
+	if ( function_exists( 'kataskevi_get_color_presets' ) ) {
+		$presets       = kataskevi_get_color_presets();
+		$preset_colors = array();
+		foreach ( $presets as $k => $p ) {
+			if ( ! empty( $p['colors'] ) ) {
+				$preset_colors[ $k ] = $p['colors'];
+			}
+		}
+		wp_localize_script( 'kataskevi-customizer-preview', 'kataskeviColorPresets', $preset_colors );
+	}
 }
 add_action( 'customize_preview_init', 'kataskevi_customize_preview_js' );
+
+/**
+ * Enqueue scripts and localized data for Customizer controls pane.
+ */
+function kataskevi_customize_controls_js() {
+	$controls_ver = file_exists( KATASKEVI_DIR . '/assets/js/customizer-controls.js' ) ? (string) filemtime( KATASKEVI_DIR . '/assets/js/customizer-controls.js' ) : KATASKEVI_VERSION;
+	wp_enqueue_script(
+		'kataskevi-customizer-controls',
+		KATASKEVI_URI . '/assets/js/customizer-controls.js',
+		array( 'customize-controls', 'jquery' ),
+		$controls_ver,
+		true
+	);
+
+	if ( function_exists( 'kataskevi_get_color_presets' ) ) {
+		$presets       = kataskevi_get_color_presets();
+		$preset_colors = array();
+		foreach ( $presets as $k => $p ) {
+			if ( ! empty( $p['colors'] ) ) {
+				$preset_colors[ $k ] = $p['colors'];
+			}
+		}
+		wp_localize_script( 'kataskevi-customizer-controls', 'kataskeviColorPresets', $preset_colors );
+	}
+}
+add_action( 'customize_controls_enqueue_scripts', 'kataskevi_customize_controls_js' );
 
 /**
  * Load Plugin Update Checker (PUC) for automatic theme updates from Bitbucket.

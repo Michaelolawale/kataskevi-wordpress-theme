@@ -88,4 +88,31 @@
       document.documentElement.style.setProperty('--border', to);
     });
   });
+
+  // Predefined Color Presets live preview
+  wp.customize('kataskevi_color_preset', function(value) {
+    value.bind(function(presetKey) {
+      if (window.kataskeviColorPresets && window.kataskeviColorPresets[presetKey]) {
+        var p = window.kataskeviColorPresets[presetKey];
+        if (p.primary) {
+          document.documentElement.style.setProperty('--primary', p.primary);
+          document.documentElement.style.setProperty('--border-focus', p.primary);
+          document.documentElement.style.setProperty('--primary-glow', p.primary);
+        }
+        if (p.primary_hover) document.documentElement.style.setProperty('--primary-hover', p.primary_hover);
+        if (p.secondary) document.documentElement.style.setProperty('--secondary', p.secondary);
+        if (p.secondary_hover) document.documentElement.style.setProperty('--secondary-hover', p.secondary_hover);
+        if (p.dark_bg) document.documentElement.style.setProperty('--dark-section-bg', p.dark_bg);
+        if (p.dark_text) document.documentElement.style.setProperty('--dark-section-text', p.dark_text);
+        if (p.background) document.documentElement.style.setProperty('--background', p.background);
+        if (p.foreground) {
+          document.documentElement.style.setProperty('--foreground', p.foreground);
+          document.documentElement.style.setProperty('--card-foreground', p.foreground);
+        }
+        if (p.muted_foreground) document.documentElement.style.setProperty('--muted-foreground', p.muted_foreground);
+        if (p.card) document.documentElement.style.setProperty('--card', p.card);
+        if (p.border) document.documentElement.style.setProperty('--border', p.border);
+      }
+    });
+  });
 })(jQuery);
