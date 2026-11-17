@@ -1503,6 +1503,299 @@ function kataskevi_customize_register( $wp_customize ) {
 		);
 	}
 
+	// =========================================================================
+	// Corporate Framework Accordion Section
+	// =========================================================================
+
+	// Framework Eyebrow.
+	$wp_customize->add_setting(
+		'kataskevi_about_framework_eyebrow',
+		array(
+			'default'           => 'Corporate Framework',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_framework_eyebrow',
+		array(
+			'label'   => esc_html__( 'Corporate Framework Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	// Framework Headline.
+	$wp_customize->add_setting(
+		'kataskevi_about_framework_title',
+		array(
+			'default'           => 'Vision, Mission & Operational Standards',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_framework_title',
+		array(
+			'label'   => esc_html__( 'Corporate Framework Headline', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	// Framework Description.
+	$wp_customize->add_setting(
+		'kataskevi_about_framework_desc',
+		array(
+			'default'           => 'The foundational principles, certified safety protocols, and technical competencies guiding every engineering engagement across modern facilities.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_framework_desc',
+		array(
+			'label'   => esc_html__( 'Corporate Framework Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Accordion Item 1: Vision.
+	$wp_customize->add_setting(
+		'kataskevi_about_vision_title',
+		array(
+			'default'           => 'Vision',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_vision_title',
+		array(
+			'label'   => esc_html__( 'Accordion Item 1: Vision Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_about_vision_desc',
+		array(
+			'default'           => 'To be the premier engineering, safety, and infrastructure solutions partner across West Africa — recognized for technical distinction, uncompromised safety integrity, and long-term client value.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_vision_desc',
+		array(
+			'label'   => esc_html__( 'Accordion Item 1: Vision Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Accordion Item 2: Mission.
+	$wp_customize->add_setting(
+		'kataskevi_about_mission_title',
+		array(
+			'default'           => 'Mission',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_mission_title',
+		array(
+			'label'   => esc_html__( 'Accordion Item 2: Mission Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_about_mission_desc',
+		array(
+			'default'           => 'To protect lives, mission-critical assets, and operational continuity by delivering world-class engineering, fire suppression, electronic security, and IT/telecommunications services through certified technical expertise and responsive lifecycle maintenance.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_mission_desc',
+		array(
+			'label'   => esc_html__( 'Accordion Item 2: Mission Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Accordion Item 3: HSE Policy.
+	$wp_customize->add_setting(
+		'kataskevi_about_hse_title',
+		array(
+			'default'           => 'HSE Policy',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_hse_title',
+		array(
+			'label'   => esc_html__( 'Accordion Item 3: HSE Policy Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_about_hse_desc',
+		array(
+			'default'           => 'We operate under an uncompromising "Zero Harm, Zero Incident" policy. Every project engagement adheres strictly to OSHA, NFPA, and ISO-aligned protocols to ensure the absolute safety of our workforce, client infrastructure, and the surrounding environment.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_hse_desc',
+		array(
+			'label'   => esc_html__( 'Accordion Item 3: HSE Policy Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Accordion Item 4: Experienced Customer Support.
+	$wp_customize->add_setting(
+		'kataskevi_about_support_title',
+		array(
+			'default'           => 'Experienced Customer Support',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_support_title',
+		array(
+			'label'   => esc_html__( 'Accordion Item 4: Customer Support Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_about_support_desc',
+		array(
+			'default'           => 'Our dedicated technical support desk and mobile field engineers provide 24/7/365 coverage, offering rapid emergency dispatch, proactive SLA monitoring, and scheduled preventive maintenance routines to guarantee zero facility downtime.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_support_desc',
+		array(
+			'label'   => esc_html__( 'Accordion Item 4: Customer Support Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Accordion Item 5: Professional Technical Staff.
+	$wp_customize->add_setting(
+		'kataskevi_about_staff_title',
+		array(
+			'default'           => 'Professional Technical Staff',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_staff_title',
+		array(
+			'label'   => esc_html__( 'Accordion Item 5: Technical Staff Title', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'kataskevi_about_staff_desc',
+		array(
+			'default'           => 'Our multidisciplinary engineering roster consists of certified fire protection specialists, OEM-trained instrumentation technicians, certified fiber optic engineers, and licensed industrial safety consultants with decades of combined hands-on industrial field experience.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_about_staff_desc',
+		array(
+			'label'   => esc_html__( 'Accordion Item 5: Technical Staff Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_about',
+			'type'    => 'textarea',
+		)
+	);
+
+	// =========================================================================
+	// Philosophy Pillars (4 Grid Cards)
+	// =========================================================================
+	$default_pillars = array(
+		1 => array(
+			'title' => 'Safety first, always',
+			'desc'  => 'Every system we design and install exists to protect people, assets and continuity of operations.',
+		),
+		2 => array(
+			'title' => 'Engineered, not guessed',
+			'desc'  => 'Site surveys, precise specifications and structured commissioning — the system fits the facility, because it was designed for it.',
+		),
+		3 => array(
+			'title' => 'One accountable partner',
+			'desc'  => 'Design, supply, installation and maintenance under one roof — no finger-pointing between vendors.',
+		),
+		4 => array(
+			'title' => 'Built around your profit',
+			'desc'  => 'In a busy, changing industry, our variety of services supports our clientele towards maximising profit.',
+		),
+	);
+
+	for ( $pl = 1; $pl <= 4; $pl++ ) {
+		$wp_customize->add_setting(
+			'kataskevi_about_pillar_' . $pl . '_title',
+			array(
+				'default'           => $default_pillars[ $pl ]['title'],
+				'sanitize_callback' => 'sanitize_text_field',
+				'transport'         => 'refresh',
+			)
+		);
+		$wp_customize->add_control(
+			'kataskevi_about_pillar_' . $pl . '_title',
+			array(
+				/* translators: %d: pillar number */
+				'label'   => sprintf( esc_html__( 'Philosophy Pillar %d Title', 'kataskevi' ), $pl ),
+				'section' => 'kataskevi_sec_page_about',
+				'type'    => 'text',
+			)
+		);
+
+		$wp_customize->add_setting(
+			'kataskevi_about_pillar_' . $pl . '_desc',
+			array(
+				'default'           => $default_pillars[ $pl ]['desc'],
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'transport'         => 'refresh',
+			)
+		);
+		$wp_customize->add_control(
+			'kataskevi_about_pillar_' . $pl . '_desc',
+			array(
+				/* translators: %d: pillar number */
+				'label'   => sprintf( esc_html__( 'Philosophy Pillar %d Description', 'kataskevi' ), $pl ),
+				'section' => 'kataskevi_sec_page_about',
+				'type'    => 'textarea',
+			)
+		);
+	}
+
 	// Who We Serve Eyebrow.
 	$wp_customize->add_setting(
 		'kataskevi_about_who_eyebrow',

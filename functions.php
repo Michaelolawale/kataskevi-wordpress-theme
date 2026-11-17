@@ -1167,24 +1167,24 @@ add_action( 'init', 'kataskevi_seed_default_services', 20 );
 function kataskevi_get_pillars() {
 	return array(
 		array(
-			'title'       => 'Safety first, always',
-			'desc'        => 'Every system we design and install exists to protect people, assets and continuity of operations.',
-			'icon'        => 'shield-check',
+			'title' => kataskevi_get_mod( 'kataskevi_about_pillar_1_title', 'Safety first, always' ),
+			'desc'  => kataskevi_get_mod( 'kataskevi_about_pillar_1_desc', 'Every system we design and install exists to protect people, assets and continuity of operations.' ),
+			'icon'  => 'shield-check',
 		),
 		array(
-			'title'       => 'Engineered, not guessed',
-			'desc'        => 'Site surveys, precise specifications and structured commissioning — the system fits the facility, because it was designed for it.',
-			'icon'        => 'compass',
+			'title' => kataskevi_get_mod( 'kataskevi_about_pillar_2_title', 'Engineered, not guessed' ),
+			'desc'  => kataskevi_get_mod( 'kataskevi_about_pillar_2_desc', 'Site surveys, precise specifications and structured commissioning — the system fits the facility, because it was designed for it.' ),
+			'icon'  => 'compass',
 		),
 		array(
-			'title'       => 'One accountable partner',
-			'desc'        => 'Design, supply, installation and maintenance under one roof — no finger-pointing between vendors.',
-			'icon'        => 'handshake',
+			'title' => kataskevi_get_mod( 'kataskevi_about_pillar_3_title', 'One accountable partner' ),
+			'desc'  => kataskevi_get_mod( 'kataskevi_about_pillar_3_desc', 'Design, supply, installation and maintenance under one roof — no finger-pointing between vendors.' ),
+			'icon'  => 'handshake',
 		),
 		array(
-			'title'       => 'Built around your profit',
-			'desc'        => 'In a busy, changing industry, our variety of services supports our clientele towards maximising profit.',
-			'icon'        => 'users',
+			'title' => kataskevi_get_mod( 'kataskevi_about_pillar_4_title', 'Built around your profit' ),
+			'desc'  => kataskevi_get_mod( 'kataskevi_about_pillar_4_desc', 'In a busy, changing industry, our variety of services supports our clientele towards maximising profit.' ),
+			'icon'  => 'users',
 		),
 	);
 }

@@ -35,41 +35,54 @@ $who_title   = kataskevi_get_mod( 'kataskevi_about_who_title', 'Different indust
 $who_desc    = kataskevi_get_mod( 'kataskevi_about_who_desc', 'Systems that work when they\'re needed most.' );
 $who_btn     = kataskevi_get_mod( 'kataskevi_about_who_btn', 'Discuss your facility' );
 
-// Accordion Customizer Descriptions.
-$vision_desc  = kataskevi_get_mod( 'kataskevi_about_vision_desc', 'To be the premier engineering, safety, and infrastructure solutions partner across West Africa — recognized for technical distinction, uncompromised safety integrity, and long-term client value.' );
-$mission_desc = kataskevi_get_mod( 'kataskevi_about_mission_desc', 'To protect lives, mission-critical assets, and operational continuity by delivering world-class engineering, fire suppression, electronic security, and IT/telecommunications services through certified technical expertise and responsive lifecycle maintenance.' );
-$hse_desc     = kataskevi_get_mod( 'kataskevi_about_hse_desc', 'We operate under an uncompromising "Zero Harm, Zero Incident" policy. Every project engagement adheres strictly to OSHA, NFPA, and ISO-aligned protocols to ensure the absolute safety of our workforce, client infrastructure, and the surrounding environment.' );
-$support_desc = kataskevi_get_mod( 'kataskevi_about_support_desc', 'Our dedicated technical support desk and mobile field engineers provide 24/7/365 coverage, offering rapid emergency dispatch, proactive SLA monitoring, and scheduled preventive maintenance routines to guarantee zero facility downtime.' );
-$staff_desc   = kataskevi_get_mod( 'kataskevi_about_staff_desc', 'Our multidisciplinary engineering roster consists of certified fire protection specialists, OEM-trained instrumentation technicians, certified fiber optic engineers, and licensed industrial safety consultants with decades of combined hands-on industrial field experience.' );
+// Framework Accordion Customizer Headlines & Descriptions.
+$framework_eyebrow = kataskevi_get_mod( 'kataskevi_about_framework_eyebrow', 'Corporate Framework' );
+$framework_title   = kataskevi_get_mod( 'kataskevi_about_framework_title', 'Vision, Mission & Operational Standards' );
+$framework_desc    = kataskevi_get_mod( 'kataskevi_about_framework_desc', 'The foundational principles, certified safety protocols, and technical competencies guiding every engineering engagement across modern facilities.' );
+
+$vision_title  = kataskevi_get_mod( 'kataskevi_about_vision_title', 'Vision' );
+$vision_desc   = kataskevi_get_mod( 'kataskevi_about_vision_desc', 'To be the premier engineering, safety, and infrastructure solutions partner across West Africa — recognized for technical distinction, uncompromised safety integrity, and long-term client value.' );
+
+$mission_title = kataskevi_get_mod( 'kataskevi_about_mission_title', 'Mission' );
+$mission_desc  = kataskevi_get_mod( 'kataskevi_about_mission_desc', 'To protect lives, mission-critical assets, and operational continuity by delivering world-class engineering, fire suppression, electronic security, and IT/telecommunications services through certified technical expertise and responsive lifecycle maintenance.' );
+
+$hse_title     = kataskevi_get_mod( 'kataskevi_about_hse_title', 'HSE Policy' );
+$hse_desc      = kataskevi_get_mod( 'kataskevi_about_hse_desc', 'We operate under an uncompromising "Zero Harm, Zero Incident" policy. Every project engagement adheres strictly to OSHA, NFPA, and ISO-aligned protocols to ensure the absolute safety of our workforce, client infrastructure, and the surrounding environment.' );
+
+$support_title = kataskevi_get_mod( 'kataskevi_about_support_title', 'Experienced Customer Support' );
+$support_desc  = kataskevi_get_mod( 'kataskevi_about_support_desc', 'Our dedicated technical support desk and mobile field engineers provide 24/7/365 coverage, offering rapid emergency dispatch, proactive SLA monitoring, and scheduled preventive maintenance routines to guarantee zero facility downtime.' );
+
+$staff_title   = kataskevi_get_mod( 'kataskevi_about_staff_title', 'Professional Technical Staff' );
+$staff_desc    = kataskevi_get_mod( 'kataskevi_about_staff_desc', 'Our multidisciplinary engineering roster consists of certified fire protection specialists, OEM-trained instrumentation technicians, certified fiber optic engineers, and licensed industrial safety consultants with decades of combined hands-on industrial field experience.' );
 
 $accordion_items = array(
 	array(
 		'id'      => 'vision',
-		'title'   => esc_html__( 'Vision', 'kataskevi' ),
+		'title'   => $vision_title,
 		'desc'    => $vision_desc,
 		'is_open' => false,
 	),
 	array(
 		'id'      => 'mission',
-		'title'   => esc_html__( 'Mission', 'kataskevi' ),
+		'title'   => $mission_title,
 		'desc'    => $mission_desc,
 		'is_open' => false,
 	),
 	array(
 		'id'      => 'hse-policy',
-		'title'   => esc_html__( 'HSE Policy', 'kataskevi' ),
+		'title'   => $hse_title,
 		'desc'    => $hse_desc,
 		'is_open' => false,
 	),
 	array(
 		'id'      => 'customer-support',
-		'title'   => esc_html__( 'Experienced Customer Support', 'kataskevi' ),
+		'title'   => $support_title,
 		'desc'    => $support_desc,
 		'is_open' => false,
 	),
 	array(
 		'id'      => 'technical-staff',
-		'title'   => esc_html__( 'Professional Technical Staff', 'kataskevi' ),
+		'title'   => $staff_title,
 		'desc'    => $staff_desc,
 		'is_open' => true,
 	),
@@ -159,11 +172,17 @@ $accordion_items = array(
 		<div class="container-editorial">
 			<div class="why-split-grid">
 				<div>
-					<p class="eyebrow"><?php esc_html_e( 'Corporate Framework', 'kataskevi' ); ?></p>
-					<h2 class="section-title"><?php esc_html_e( 'Vision, Mission & Operational Standards', 'kataskevi' ); ?></h2>
-					<p class="text-muted-foreground mt-4" style="line-height: 1.7;">
-						<?php esc_html_e( 'The foundational principles, certified safety protocols, and technical competencies guiding every engineering engagement across modern facilities.', 'kataskevi' ); ?>
-					</p>
+					<?php if ( ! empty( $framework_eyebrow ) ) : ?>
+						<p class="eyebrow"><?php echo esc_html( $framework_eyebrow ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $framework_title ) ) : ?>
+						<h2 class="section-title"><?php echo esc_html( $framework_title ); ?></h2>
+					<?php endif; ?>
+					<?php if ( ! empty( $framework_desc ) ) : ?>
+						<p class="text-muted-foreground mt-4" style="line-height: 1.7;">
+							<?php echo esc_html( $framework_desc ); ?>
+						</p>
+					<?php endif; ?>
 				</div>
 				<div>
 					<div class="about-accordion-card" role="region" aria-label="<?php esc_attr_e( 'Company Corporate Framework and Policies', 'kataskevi' ); ?>">
