@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.1.7' );
+define( 'KATASKEVI_VERSION', '2.1.8' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -1917,6 +1917,19 @@ function kataskevi_seed_default_projects() {
 add_action( 'init', 'kataskevi_seed_default_projects', 25 );
 
 /**
+ * Enqueue WordPress Media Uploader scripts for Project post type in WP Admin
+ */
+function kataskevi_admin_project_scripts( $hook ) {
+	if ( in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+		$screen = get_current_screen();
+		if ( $screen && 'project' === $screen->post_type ) {
+			wp_enqueue_media();
+		}
+	}
+}
+add_action( 'admin_enqueue_scripts', 'kataskevi_admin_project_scripts' );
+
+/**
  * Register Meta Box for Project CPT to ensure all project fields are editable in WP Admin
  */
 function kataskevi_register_project_meta_boxes() {
@@ -1970,6 +1983,63 @@ function kataskevi_render_project_meta_box( $post ) {
 		.kataskevi-field label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #1e293b; }
 		.kataskevi-field input[type="text"], .kataskevi-field textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 7px 10px; font-size: 13px; box-sizing: border-box; }
 		.kataskevi-field .description { font-size: 12px; color: #64748b; margin-top: 4px; }
+		.kataskevi-gallery-preview-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			padding: 14px;
+			background: #f8fafc;
+			border: 2px dashed #cbd5e1;
+			border-radius: 8px;
+			min-height: 100px;
+			align-items: center;
+		}
+		.kataskevi-gallery-item {
+			position: relative;
+			width: 90px;
+			height: 90px;
+			border-radius: 6px;
+			overflow: hidden;
+			border: 1px solid #cbd5e1;
+			background: #ffffff;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+		}
+		.kataskevi-gallery-item img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
+		.kataskevi-gallery-item .remove-img-btn {
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			width: 22px;
+			height: 22px;
+			background: rgba(220, 38, 38, 0.92);
+			color: #ffffff;
+			border: none;
+			border-radius: 50%;
+			cursor: pointer;
+			font-size: 15px;
+			line-height: 20px;
+			text-align: center;
+			padding: 0;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+			transition: background 0.2s ease, transform 0.15s ease;
+		}
+		.kataskevi-gallery-item .remove-img-btn:hover {
+			background: #b91c1c;
+			transform: scale(1.1);
+		}
+		.kataskevi-gallery-empty-msg {
+			color: #64748b;
+			font-size: 13px;
+			font-style: italic;
+			width: 100%;
+			text-align: center;
+			padding: 20px 0;
+		}
 	</style>
 	<div class="kataskevi-meta-wrapper">
 		<div class="kataskevi-meta-grid">
@@ -2045,10 +2115,27 @@ function kataskevi_render_project_meta_box( $post ) {
 			<textarea id="_kataskevi_solution" name="_kataskevi_solution" rows="4"><?php echo esc_textarea( $solution ); ?></textarea>
 		</div>
 
-		<div class="kataskevi-field">
-			<label for="_kataskevi_gallery_urls"><?php esc_html_e( 'Project Gallery Image URLs (one per line for card slider and case study gallery)', 'kataskevi' ); ?></label>
-			<textarea id="_kataskevi_gallery_urls" name="_kataskevi_gallery_urls" rows="4" placeholder="https://..."><?php echo esc_textarea( $gallery_urls ); ?></textarea>
-			<p class="description"><?php esc_html_e( 'Enter one image URL per line. These images appear in the preview card slider and on the project details page gallery.', 'kataskevi' ); ?></p>
+		<div class="kataskevi-field kataskevi-gallery-field" style="margin-top: 12px; margin-bottom: 20px;">
+			<label style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block;">
+				<?php esc_html_e( 'Project Gallery Images (Card Slider & Case Study Gallery)', 'kataskevi' ); ?>
+			</label>
+			
+			<div id="kataskevi-gallery-preview" class="kataskevi-gallery-preview-grid"></div>
+
+			<div class="kataskevi-gallery-actions" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+				<button type="button" class="button button-primary" id="kataskevi-upload-gallery-btn">
+					<span class="dashicons dashicons-images-alt2" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+					<?php esc_html_e( 'Upload / Select Gallery Images', 'kataskevi' ); ?>
+				</button>
+				<button type="button" class="button button-secondary" id="kataskevi-clear-gallery-btn">
+					<?php esc_html_e( 'Clear All', 'kataskevi' ); ?>
+				</button>
+			</div>
+
+			<textarea id="_kataskevi_gallery_urls" name="_kataskevi_gallery_urls" style="display:none;"><?php echo esc_textarea( $gallery_urls ); ?></textarea>
+			<p class="description" style="margin-top: 8px;">
+				<?php esc_html_e( 'Click "Upload / Select Gallery Images" to upload photos from your computer or choose from your WordPress Media Library. Selected photos automatically populate the card preview slider and the project details gallery.', 'kataskevi' ); ?>
+			</p>
 		</div>
 
 		<div class="kataskevi-field">
@@ -2056,6 +2143,89 @@ function kataskevi_render_project_meta_box( $post ) {
 			<textarea id="_kataskevi_deliverables" name="_kataskevi_deliverables" rows="4"><?php echo esc_textarea( $deliverables ); ?></textarea>
 		</div>
 	</div>
+
+	<script>
+	jQuery(document).ready(function($) {
+		var galleryFrame;
+		var $textarea = $('#_kataskevi_gallery_urls');
+		var $preview  = $('#kataskevi-gallery-preview');
+
+		function getUrls() {
+			var raw = $textarea.val().trim();
+			return raw ? raw.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+		}
+
+		function renderPreviews() {
+			var urls = getUrls();
+			$preview.empty();
+			if (urls.length === 0) {
+				$preview.append('<div class="kataskevi-gallery-empty-msg"><?php echo esc_js( __( 'No gallery images selected yet. Click "Upload / Select Gallery Images" below to add photos.', 'kataskevi' ) ); ?></div>');
+				return;
+			}
+			urls.forEach(function(url, index) {
+				var $item = $('<div class="kataskevi-gallery-item" data-index="' + index + '"></div>');
+				var $img  = $('<img>').attr('src', url);
+				var $del  = $('<button type="button" class="remove-img-btn" title="<?php echo esc_js( __( 'Remove image', 'kataskevi' ) ); ?>">&times;</button>');
+				$del.on('click', function(e) {
+					e.preventDefault();
+					urls.splice(index, 1);
+					$textarea.val(urls.join('\n'));
+					renderPreviews();
+				});
+				$item.append($img).append($del);
+				$preview.append($item);
+			});
+		}
+
+		renderPreviews();
+
+		$('#kataskevi-upload-gallery-btn').on('click', function(e) {
+			e.preventDefault();
+			if (galleryFrame) {
+				galleryFrame.open();
+				return;
+			}
+
+			galleryFrame = wp.media({
+				title: '<?php echo esc_js( __( 'Select or Upload Project Gallery Images', 'kataskevi' ) ); ?>',
+				button: {
+					text: '<?php echo esc_js( __( 'Add to Project Gallery', 'kataskevi' ) ); ?>'
+				},
+				multiple: true,
+				library: {
+					type: 'image'
+				}
+			});
+
+			galleryFrame.on('select', function() {
+				var selection = galleryFrame.state().get('selection');
+				var urls = getUrls();
+				selection.each(function(attachment) {
+					var json = attachment.toJSON();
+					var url  = json.url;
+					if (json.sizes && json.sizes.large) {
+						url = json.sizes.large.url;
+					}
+					if (url && urls.indexOf(url) === -1) {
+						urls.push(url);
+					}
+				});
+				$textarea.val(urls.join('\n'));
+				renderPreviews();
+			});
+
+			galleryFrame.open();
+		});
+
+		$('#kataskevi-clear-gallery-btn').on('click', function(e) {
+			e.preventDefault();
+			if (confirm('<?php echo esc_js( __( 'Are you sure you want to remove all gallery images from this project?', 'kataskevi' ) ); ?>')) {
+				$textarea.val('');
+				renderPreviews();
+			}
+		});
+	});
+	</script>
 	<?php
 }
 
