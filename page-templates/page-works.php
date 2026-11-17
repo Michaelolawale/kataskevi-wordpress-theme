@@ -104,14 +104,22 @@ $cta_btn2    = kataskevi_get_mod( 'kataskevi_works_cta_btn2', 'View Capabilities
 							<div class="card-image-slider" data-current-slide="0">
 								<div class="card-slider-track">
 									<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
-										<div class="card-slider-slide <?php echo 0 === $g_idx ? 'is-active' : ''; ?>">
+										<?php
+										$optimized_img = kataskevi_get_webp_url( $g_img );
+										$is_first      = ( 0 === $g_idx );
+										?>
+										<div class="card-slider-slide <?php echo $is_first ? 'is-active' : ''; ?>">
 											<a href="<?php echo esc_url( $proj['permalink'] ); ?>" tabindex="-1" aria-hidden="true" class="card-slider-img-link">
 												<img 
-													src="<?php echo esc_url( $g_img ); ?>" 
+													src="<?php echo esc_url( $is_first ? $optimized_img : 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 800 500\'%3E%3C/svg%3E' ); ?>" 
+													<?php if ( ! $is_first ) : ?>
+														data-src="<?php echo esc_url( $optimized_img ); ?>" 
+													<?php endif; ?>
 													alt="<?php echo esc_attr( $proj['title'] . ( $has_slider ? ' - ' . ( $g_idx + 1 ) : '' ) ); ?>" 
 													width="800" 
 													height="500" 
 													loading="lazy" 
+													decoding="async" 
 													class="work-card-media-img"
 												>
 											</a>

@@ -53,13 +53,13 @@ $hero_desc    = kataskevi_get_mod(
 );
 $hero_btn1    = kataskevi_get_mod( 'kataskevi_hero_btn1_text', 'Explore Services' );
 $hero_btn2    = kataskevi_get_mod( 'kataskevi_hero_btn2_text', 'Request a Quote' );
-$hero_image   = kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' );
+$hero_image   = kataskevi_get_webp_url( kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' ) );
 
 $works_eyebrow = kataskevi_get_mod( 'kataskevi_home_works_eyebrow', 'Proven in the field' );
 $works_title   = kataskevi_get_mod( 'kataskevi_home_works_title', 'Featured Engineering Projects' );
 $works_desc    = kataskevi_get_mod( 'kataskevi_home_works_desc', 'Explore our core installations across Fire Hydrants & Hose Reels, Intelligent Alarms, Biometric Access Control, and 4K CCTV Video Surveillance.' );
 
-$lifecycle_image   = kataskevi_get_mod( 'kataskevi_lifecycle_image', get_template_directory_uri() . '/assets/images/band.jpg' );
+$lifecycle_image   = kataskevi_get_webp_url( kataskevi_get_mod( 'kataskevi_lifecycle_image', get_template_directory_uri() . '/assets/images/band.jpg' ) );
 $lifecycle_eyebrow = kataskevi_get_mod( 'kataskevi_lifecycle_eyebrow', 'Core Services' );
 $lifecycle_title   = kataskevi_get_mod( 'kataskevi_lifecycle_title', 'Beyond installation' );
 $lifecycle_desc    = kataskevi_get_mod( 'kataskevi_lifecycle_desc', 'From preliminary risk assessment to turnkey deployment and lifetime preventative maintenance, our team delivers complete protection across every project stage.' );
@@ -224,14 +224,22 @@ $dark_cta_btn2    = kataskevi_get_mod( 'kataskevi_dark_cta_btn2_text', 'View All
 							<div class="featured-work-media card-image-slider" data-current-slide="0">
 								<div class="card-slider-track">
 									<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
-										<div class="card-slider-slide <?php echo 0 === $g_idx ? 'is-active' : ''; ?>">
+										<?php
+										$optimized_img = kataskevi_get_webp_url( $g_img );
+										$is_first      = ( 0 === $g_idx );
+										?>
+										<div class="card-slider-slide <?php echo $is_first ? 'is-active' : ''; ?>">
 											<a href="<?php echo esc_url( $proj['permalink'] ); ?>" class="card-slider-img-link" aria-label="<?php echo esc_attr( $proj['title'] ); ?>">
 												<img 
-													src="<?php echo esc_url( $g_img ); ?>" 
+													src="<?php echo esc_url( $is_first ? $optimized_img : 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 800 500\'%3E%3C/svg%3E' ); ?>" 
+													<?php if ( ! $is_first ) : ?>
+														data-src="<?php echo esc_url( $optimized_img ); ?>" 
+													<?php endif; ?>
 													alt="<?php echo esc_attr( $proj['title'] . ( $has_card_slider ? ' - ' . ( $g_idx + 1 ) : '' ) ); ?>" 
 													width="800" 
 													height="500" 
 													loading="lazy" 
+													decoding="async" 
 													class="featured-work-img"
 												>
 											</a>

@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // 3. AJAX Site Survey / Consultation Form Submission
-  const inquiryForm = document.getElementById('kataskevi-inquiry-form');
-  const statusBox = document.getElementById('form-status-message');
+  const inquiryForm = document.getElementById('editorial-survey-form') || document.getElementById('kataskevi-inquiry-form');
+  const statusBox = document.getElementById('form-feedback-alert') || document.getElementById('form-status-message');
   const submitBtn = document.getElementById('submit-inquiry-btn');
   const successState = document.getElementById('contact-success-state');
   const resetBtn = document.getElementById('contact-reset-btn');
@@ -79,46 +79,60 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  if (inquiryForm && statusBox && submitBtn) {
+  if (inquiryForm) {
     inquiryForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const fullnameEl = document.getElementById('fullname');
-      const emailEl = document.getElementById('email');
-      const phoneEl = document.getElementById('phone');
-      const serviceEl = document.getElementById('service');
-      const companyEl = document.getElementById('company');
-      const messageEl = document.getElementById('message');
+      const fullnameEl = document.getElementById('contact-name') || document.getElementById('fullname') || inquiryForm.querySelector('input[name="fullname"]');
+      const emailEl = document.getElementById('contact-email') || document.getElementById('email') || inquiryForm.querySelector('input[name="email"]');
+      const phoneEl = document.getElementById('contact-phone') || document.getElementById('phone') || inquiryForm.querySelector('input[name="phone"]');
+      const orgEl = document.getElementById('contact-org') || document.getElementById('company') || inquiryForm.querySelector('input[name="organization"]') || inquiryForm.querySelector('input[name="company"]');
+      const serviceEl = document.getElementById('contact-service') || document.getElementById('service') || inquiryForm.querySelector('select[name="service"]');
+      const messageEl = document.getElementById('contact-message') || document.getElementById('message') || inquiryForm.querySelector('textarea[name="message"]');
 
       const fullname = fullnameEl ? fullnameEl.value.trim() : '';
       const email = emailEl ? emailEl.value.trim() : '';
       const phone = phoneEl ? phoneEl.value.trim() : '';
+      const organization = orgEl ? orgEl.value.trim() : '';
       const service = serviceEl ? serviceEl.value : '';
-      const company = companyEl ? companyEl.value.trim() : '';
       const message = messageEl ? messageEl.value.trim() : '';
 
-      if (!fullname || !email || !phone) {
-        showStatus('Please complete all required fields (Name, Email, Phone).', 'error');
+      if (!fullname || !email || !message) {
+        showStatus('Please complete all required fields (Full Name, Work Email, and Project Scope).', 'error');
         return;
       }
 
       // UI Loading state
-      submitBtn.disabled = true;
-      const originalBtnHtml = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span>Sending Request...</span>';
-      statusBox.style.display = 'none';
+      const currentSubmitBtn = submitBtn || inquiryForm.querySelector('button[type="submit"]');
+      let originalBtnHtml = '';
+      if (currentSubmitBtn) {
+        currentSubmitBtn.disabled = true;
+        originalBtnHtml = currentSubmitBtn.innerHTML;
+        currentSubmitBtn.innerHTML = '<span>Sending Request...</span>';
+      }
+      if (statusBox) {
+        statusBox.style.display = 'none';
+      }
 
       const formData = new FormData();
       formData.append('action', 'kataskevi_submit_inquiry');
-      formData.append('nonce', typeof kataskeviData !== 'undefined' ? kataskeviData.nonce : '');
+
+      const nonceVal = (typeof kataskeviData !== 'undefined' && kataskeviData.nonce) ? kataskeviData.nonce : '';
+      formData.append('nonce', nonceVal);
+
+      const nonceInput = inquiryForm.querySelector('input[name="kataskevi_inquiry_nonce"]');
+      if (nonceInput) {
+        formData.append('kataskevi_inquiry_nonce', nonceInput.value);
+      }
+
       formData.append('fullname', fullname);
       formData.append('email', email);
       formData.append('phone', phone);
+      formData.append('organization', organization);
       formData.append('service', service);
-      formData.append('sector', company);
-      formData.append('message', (company ? 'Company: ' + company + '\n\n' : '') + message);
+      formData.append('message', message);
 
-      const ajaxUrl = typeof kataskeviData !== 'undefined' ? kataskeviData.ajaxUrl : '/wp-admin/admin-ajax.php';
+      const ajaxUrl = (typeof kataskeviData !== 'undefined' && kataskeviData.ajaxUrl) ? kataskeviData.ajaxUrl : '/wp-admin/admin-ajax.php';
 
       fetch(ajaxUrl, {
         method: 'POST',
@@ -126,15 +140,17 @@ document.addEventListener('DOMContentLoaded', function () {
       })
         .then((response) => response.json())
         .then((data) => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnHtml;
+          if (currentSubmitBtn) {
+            currentSubmitBtn.disabled = false;
+            currentSubmitBtn.innerHTML = originalBtnHtml;
+          }
 
           if (data && data.success) {
             if (successState) {
               inquiryForm.style.display = 'none';
               successState.style.display = 'flex';
             } else {
-              showStatus(data.data.message || 'Thank you! Your inquiry has been received. Our engineers will contact you shortly.', 'success');
+              showStatus((data.data && data.data.message) ? data.data.message : 'Thank you! Your inquiry has been received. Our engineers will contact you shortly.', 'success');
               inquiryForm.reset();
             }
           } else {
@@ -143,8 +159,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch((err) => {
           console.error('Submission error:', err);
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnHtml;
+          if (currentSubmitBtn) {
+            currentSubmitBtn.disabled = false;
+            currentSubmitBtn.innerHTML = originalBtnHtml;
+          }
           if (successState) {
             inquiryForm.style.display = 'none';
             successState.style.display = 'flex';
@@ -156,9 +174,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function showStatus(msg, type) {
+      if (!statusBox) return;
       statusBox.textContent = msg;
       statusBox.className = 'form-status-alert ' + type;
       statusBox.style.display = 'block';
+      statusBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
@@ -232,7 +252,20 @@ document.addEventListener('DOMContentLoaded', function () {
       let currentIndex = 0;
       const totalSlides = slides.length;
 
+      // Lazy load remaining slides on interaction or hover
+      const loadLazyImages = () => {
+        const lazyImgs = slider.querySelectorAll('img[data-src]');
+        lazyImgs.forEach((img) => {
+          img.src = img.getAttribute('data-src');
+          img.removeAttribute('data-src');
+        });
+      };
+
+      slider.addEventListener('mouseenter', loadLazyImages, { once: true, passive: true });
+      slider.addEventListener('touchstart', loadLazyImages, { once: true, passive: true });
+
       const goToSlide = (index) => {
+        loadLazyImages();
         currentIndex = (index + totalSlides) % totalSlides;
         track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
 

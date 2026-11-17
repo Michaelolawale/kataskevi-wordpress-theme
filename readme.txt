@@ -4,7 +4,7 @@ Tags: engineering, safety, telecommunications, corporate, responsive-layout, mod
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: v2.2.2
+Stable tag: v2.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,16 @@ Updates are distributed through the integrated Plugin Update Checker (PUC) v6.0 
 Navigate to Appearance > Theme Updates in your WordPress admin dashboard and input your Bitbucket Username (`unionolivia`) along with an App Password configured with `Repositories: Read` permissions.
 
 == Changelog ==
+
+= 2.2.3 =
+* High-Performance Image Optimization: converted all theme assets to modern WebP format with automated fallback.
+* On-Demand Card Slider Image Loading: hidden project card slides (1..3) use lightweight SVG placeholders and only load high-res assets upon card hover, touch, or navigation.
+* LCP Hero Preload: added high-priority image preload tag in `<head>` for front page hero section.
+* Contact & Site Survey Form Full Functionality: updated AJAX and server-side POST handlers, aligned form input selectors, streamlined dual-nonce validation, and enabled automatic logging to `kataskevi_recent_inquiries`.
+
+= 2.2.2 =
+* Resolved Customizer publish timeout by decoupling Google Maps embed settings to Appearance > Theme Updates.
+* Upgraded iframe sanitization and added robust embed URL parsing for full iframe tags and raw Google Maps URLs.
 
 = 2.1.3 =
 * Automated release verification update for Plugin Update Checker (PUC) via Bitbucket API.

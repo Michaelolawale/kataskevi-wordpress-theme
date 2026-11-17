@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.2.2' );
+define( 'KATASKEVI_VERSION', '2.2.3' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -1733,6 +1733,10 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 				$gallery = array( $img );
 			}
 
+			// Ensure high-performance WebP formats are used if available
+			$img     = kataskevi_get_webp_url( $img );
+			$gallery = array_map( 'kataskevi_get_webp_url', (array) $gallery );
+
 			$deliverables_raw = get_post_meta( $post_id, '_kataskevi_deliverables', true );
 			$deliverables     = is_array( $deliverables_raw ) ? $deliverables_raw : array_filter( array_map( 'trim', explode( "\n", (string) $deliverables_raw ) ) );
 
@@ -1814,6 +1818,8 @@ function kataskevi_get_projects( $limit = -1, $featured_only = false, $sector_sl
 				if ( ! empty( $sector_slug ) && 'all' !== $sector_slug && $item['sector_slug'] !== $sector_slug ) {
 					continue;
 				}
+				$item['image']     = kataskevi_get_webp_url( $item['image'] );
+				$item['gallery']   = array_map( 'kataskevi_get_webp_url', (array) $item['gallery'] );
 				$item['permalink'] = kataskevi_get_project_url( $item['slug'] );
 				$projects[ $k ]    = $item;
 			}
@@ -2327,39 +2333,97 @@ function kataskevi_save_project_meta_box( $post_id ) {
 add_action( 'save_post_project', 'kataskevi_save_project_meta_box' );
 
 /**
+ * Return WebP URL if available, otherwise original URL.
+ *
+ * @param string $image_url The image URL.
+ * @return string The WebP URL if the file exists on disk, otherwise original URL.
+ */
+function kataskevi_get_webp_url( $image_url ) {
+	if ( empty( $image_url ) ) {
+		return $image_url;
+	}
+
+	$theme_uri = get_template_directory_uri();
+	$theme_dir = KATASKEVI_DIR;
+
+	if ( 0 === strpos( $image_url, $theme_uri ) ) {
+		$rel_path  = substr( $image_url, strlen( $theme_uri ) );
+		$file_path = $theme_dir . $rel_path;
+		$webp_path = preg_replace( '/\.(jpg|jpeg|png)$/i', '.webp', $file_path );
+		$webp_url  = preg_replace( '/\.(jpg|jpeg|png)$/i', '.webp', $image_url );
+
+		if ( file_exists( $webp_path ) ) {
+			return $webp_url;
+		}
+	}
+
+	return $image_url;
+}
+
+/**
  * Handle AJAX quote & site survey form submissions
  */
 function kataskevi_handle_inquiry_submission() {
-	check_ajax_referer( 'kataskevi_inquiry_nonce', 'nonce' );
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : ( isset( $_POST['kataskevi_inquiry_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_inquiry_nonce'] ) ) : '' );
+	if ( ! wp_verify_nonce( $nonce, 'kataskevi_inquiry_nonce' ) && ! wp_verify_nonce( $nonce, 'kataskevi_inquiry_action' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'kataskevi' ) ) );
+	}
 
-	$name     = isset( $_POST['fullname'] ) ? sanitize_text_field( wp_unslash( $_POST['fullname'] ) ) : '';
-	$email    = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
-	$phone    = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
-	$service  = isset( $_POST['service'] ) ? sanitize_text_field( wp_unslash( $_POST['service'] ) ) : '';
-	$sector   = isset( $_POST['sector'] ) ? sanitize_text_field( wp_unslash( $_POST['sector'] ) ) : '';
-	$message  = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
+	$name         = isset( $_POST['fullname'] ) ? sanitize_text_field( wp_unslash( $_POST['fullname'] ) ) : '';
+	$email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+	$phone        = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+	$organization = isset( $_POST['organization'] ) ? sanitize_text_field( wp_unslash( $_POST['organization'] ) ) : ( isset( $_POST['sector'] ) ? sanitize_text_field( wp_unslash( $_POST['sector'] ) ) : '' );
+	$service      = isset( $_POST['service'] ) ? sanitize_text_field( wp_unslash( $_POST['service'] ) ) : '';
+	$message      = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
 
-	if ( empty( $name ) || empty( $email ) || empty( $phone ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Please complete all required fields.', 'kataskevi' ) ) );
+	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Please complete all required fields (Full Name, Work Email, and Project Scope).', 'kataskevi' ) ) );
+	}
+
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Please provide a valid work email address.', 'kataskevi' ) ) );
 	}
 
 	$admin_email = get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) );
 	$brand_name  = kataskevi_get_brand_name();
 	/* translators: 1: Brand name, 2: Customer name */
-	$subject     = sprintf( '[%1$s Inquiry] New Request from %2$s', $brand_name, $name );
+	$subject     = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
 	$body        = "You have received a new consultation / site survey request:\n\n";
 	$body       .= "Full Name: $name\n";
 	$body       .= "Email: $email\n";
-	$body       .= "Phone: $phone\n";
-	$body       .= "Service Required: $service\n";
-	$body       .= "Industry Sector: $sector\n";
+	$body       .= "Phone: " . ( ! empty( $phone ) ? $phone : 'Not provided' ) . "\n";
+	$body       .= "Company / Organization: " . ( ! empty( $organization ) ? $organization : 'Not provided' ) . "\n";
+	$body       .= "Service Required: " . ( ! empty( $service ) ? $service : 'General Audit / Inquiries' ) . "\n\n";
 	$body       .= "Project Scope / Notes:\n$message\n\n";
-	$body       .= "Sent from: " . home_url();
+	$body       .= "---\nSent from: " . home_url() . "\n";
 
-	$headers = array( 'Content-Type: text/plain; charset=UTF-8', "Reply-To: $name <$email>" );
+	$headers = array(
+		'Content-Type: text/plain; charset=UTF-8',
+		"Reply-To: $name <$email>",
+	);
 
-	// Send email (falls back gracefully in local dev)
+	// Send email (falls back gracefully in local dev).
 	@wp_mail( $admin_email, $subject, $body, $headers );
+
+	// Store in options as recent inquiries log so admin never loses a lead even without SMTP.
+	$inquiries = get_option( 'kataskevi_recent_inquiries', array() );
+	if ( ! is_array( $inquiries ) ) {
+		$inquiries = array();
+	}
+	array_unshift(
+		$inquiries,
+		array(
+			'date'         => current_time( 'mysql' ),
+			'name'         => $name,
+			'email'        => $email,
+			'phone'        => $phone,
+			'organization' => $organization,
+			'service'      => $service,
+			'message'      => $message,
+		)
+	);
+	$inquiries = array_slice( $inquiries, 0, 50 );
+	update_option( 'kataskevi_recent_inquiries', $inquiries, false );
 
 	wp_send_json_success( array(
 		'message' => esc_html__( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' ),

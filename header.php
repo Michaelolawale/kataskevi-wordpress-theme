@@ -33,6 +33,14 @@ $header_cta_text = kataskevi_get_mod( 'kataskevi_header_cta_text', 'Get a Quote'
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<?php if ( is_front_page() ) : ?>
+		<?php
+		$hero_img_preload = function_exists( 'kataskevi_get_webp_url' ) 
+			? kataskevi_get_webp_url( kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' ) )
+			: kataskevi_get_mod( 'kataskevi_hero_image', get_template_directory_uri() . '/assets/images/hero.jpg' );
+		?>
+		<link rel="preload" as="image" href="<?php echo esc_url( $hero_img_preload ); ?>" fetchpriority="high">
+	<?php endif; ?>
 	<?php wp_head(); ?>
 </head>
 

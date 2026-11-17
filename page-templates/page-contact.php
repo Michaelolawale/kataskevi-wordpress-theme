@@ -14,6 +14,75 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$form_feedback = null;
+if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) && ( isset( $_POST['kataskevi_inquiry_nonce'] ) || isset( $_POST['nonce'] ) ) ) {
+	$submitted_nonce = isset( $_POST['kataskevi_inquiry_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_inquiry_nonce'] ) ) : sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
+	if ( wp_verify_nonce( $submitted_nonce, 'kataskevi_inquiry_action' ) || wp_verify_nonce( $submitted_nonce, 'kataskevi_inquiry_nonce' ) ) {
+		$name         = isset( $_POST['fullname'] ) ? sanitize_text_field( wp_unslash( $_POST['fullname'] ) ) : '';
+		$email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+		$phone        = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+		$organization = isset( $_POST['organization'] ) ? sanitize_text_field( wp_unslash( $_POST['organization'] ) ) : '';
+		$service      = isset( $_POST['service'] ) ? sanitize_text_field( wp_unslash( $_POST['service'] ) ) : '';
+		$message      = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
+
+		if ( empty( $name ) || empty( $email ) || empty( $message ) || ! is_email( $email ) ) {
+			$form_feedback = array(
+				'type'    => 'error',
+				'message' => __( 'Please complete all required fields (Full Name, Work Email, and Project Scope) with a valid email.', 'kataskevi' ),
+			);
+		} else {
+			$admin_email = get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) );
+			$brand_name  = kataskevi_get_brand_name();
+			/* translators: 1: Brand name, 2: Customer name */
+			$subject     = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
+			$body        = "You have received a new consultation / site survey request:\n\n";
+			$body       .= "Full Name: $name\n";
+			$body       .= "Email: $email\n";
+			$body       .= "Phone: " . ( ! empty( $phone ) ? $phone : 'Not provided' ) . "\n";
+			$body       .= "Company / Organization: " . ( ! empty( $organization ) ? $organization : 'Not provided' ) . "\n";
+			$body       .= "Service Required: " . ( ! empty( $service ) ? $service : 'General Audit / Inquiries' ) . "\n\n";
+			$body       .= "Project Scope / Notes:\n$message\n\n";
+			$body       .= "---\nSent from: " . home_url() . "\n";
+
+			$headers = array(
+				'Content-Type: text/plain; charset=UTF-8',
+				"Reply-To: $name <$email>",
+			);
+
+			@wp_mail( $admin_email, $subject, $body, $headers );
+
+			$inquiries = get_option( 'kataskevi_recent_inquiries', array() );
+			if ( ! is_array( $inquiries ) ) {
+				$inquiries = array();
+			}
+			array_unshift(
+				$inquiries,
+				array(
+					'date'         => current_time( 'mysql' ),
+					'name'         => $name,
+					'email'        => $email,
+					'phone'        => $phone,
+					'organization' => $organization,
+					'service'      => $service,
+					'message'      => $message,
+				)
+			);
+			$inquiries = array_slice( $inquiries, 0, 50 );
+			update_option( 'kataskevi_recent_inquiries', $inquiries, false );
+
+			$form_feedback = array(
+				'type'    => 'success',
+				'message' => __( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' ),
+			);
+		}
+	} else {
+		$form_feedback = array(
+			'type'    => 'error',
+			'message' => __( 'Security verification failed. Please try again.', 'kataskevi' ),
+		);
+	}
+}
+
 get_header();
 
 $services     = kataskevi_get_services();
@@ -120,7 +189,9 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 					<form id="editorial-survey-form" class="editorial-interactive-form" method="post" action="">
 						<?php wp_nonce_field( 'kataskevi_inquiry_action', 'kataskevi_inquiry_nonce' ); ?>
 						
-						<div id="form-feedback-alert" class="form-status-alert" style="display: none;" role="alert"></div>
+						<div id="form-feedback-alert" class="form-status-alert <?php echo ! empty( $form_feedback['type'] ) ? esc_attr( $form_feedback['type'] ) : ''; ?>" style="<?php echo ! empty( $form_feedback['message'] ) ? 'display: block;' : 'display: none;'; ?>" role="alert">
+							<?php echo ! empty( $form_feedback['message'] ) ? esc_html( $form_feedback['message'] ) : ''; ?>
+						</div>
 
 						<div class="form-row-2col">
 							<div class="form-input-group">

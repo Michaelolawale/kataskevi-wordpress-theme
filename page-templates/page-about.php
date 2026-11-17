@@ -25,7 +25,7 @@ $sectors = kataskevi_get_sectors();
 $about_eyebrow = kataskevi_get_mod( 'kataskevi_about_hero_eyebrow', 'About' );
 $about_title   = kataskevi_get_mod( 'kataskevi_about_hero_title', 'One partner for the systems <em class="text-primary italic">modern facilities depend on.</em>' );
 $about_desc    = kataskevi_get_mod( 'kataskevi_about_hero_desc', 'An Engineering, Safety, Information Technology and Telecommunications support services company — established to provide complete service in the design, supply, installation and maintenance of the systems modern facilities run on.' );
-$about_image   = kataskevi_get_mod( 'kataskevi_about_image', get_template_directory_uri() . '/assets/images/about.jpg' );
+$about_image   = kataskevi_get_webp_url( kataskevi_get_mod( 'kataskevi_about_image', get_template_directory_uri() . '/assets/images/about.jpg' ) );
 
 $why_eyebrow = kataskevi_get_mod( 'kataskevi_about_why_eyebrow', 'Why we exist' );
 $why_title   = kataskevi_get_mod( 'kataskevi_about_why_title', 'Closing the gaps between systems' );

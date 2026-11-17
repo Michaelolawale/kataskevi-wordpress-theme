@@ -102,7 +102,7 @@ foreach ( $all_projects as $k => $item ) {
 		<div class="container-editorial">
 			<div class="case-media-frame">
 				<img 
-					src="<?php echo esc_url( $proj['image'] ); ?>" 
+					src="<?php echo esc_url( kataskevi_get_webp_url( $proj['image'] ) ); ?>" 
 					alt="<?php echo esc_attr( $proj['title'] ); ?>" 
 					width="1400" 
 					height="780" 
@@ -162,9 +162,10 @@ foreach ( $all_projects as $k => $item ) {
 								<?php foreach ( $gallery as $g_idx => $g_img ) : ?>
 									<div class="case-gallery-item">
 										<img 
-											src="<?php echo esc_url( $g_img ); ?>" 
+											src="<?php echo esc_url( kataskevi_get_webp_url( $g_img ) ); ?>" 
 											alt="<?php echo esc_attr( $proj['title'] . ' - Photo ' . ( $g_idx + 1 ) ); ?>" 
 											loading="lazy" 
+											decoding="async"
 											class="case-gallery-img"
 										>
 									</div>
