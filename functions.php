@@ -2367,3 +2367,36 @@ function kataskevi_handle_inquiry_submission() {
 }
 add_action( 'wp_ajax_kataskevi_submit_inquiry', 'kataskevi_handle_inquiry_submission' );
 add_action( 'wp_ajax_nopriv_kataskevi_submit_inquiry', 'kataskevi_handle_inquiry_submission' );
+
+/**
+ * Safely parse and normalize Google Maps embed input into a valid embed URL.
+ * Accepts full iframe embed code, raw embed URL, or partial Google pb snippets.
+ *
+ * @param string $input Raw input (iframe HTML, embed URL, or pb snippet).
+ * @return string Clean embed URL or empty string.
+ */
+function kataskevi_parse_map_url( $input ) {
+	if ( empty( $input ) ) {
+		return '';
+	}
+
+	$trimmed = trim( wp_unslash( $input ) );
+
+	// 1. Extract src attribute if full iframe tag was provided.
+	if ( preg_match( '/src=["\']([^"\']+)["\']/i', $trimmed, $matches ) ) {
+		return esc_url_raw( $matches[1] );
+	}
+
+	// 2. Direct URL provided (https://...).
+	if ( preg_match( '/https?:\/\/[^\s"\'<>]+/i', $trimmed, $matches ) ) {
+		return esc_url_raw( $matches[0] );
+	}
+
+	// 3. Fallback: if partial Google pb parameter was pasted (e.g. !1m or !3m).
+	if ( preg_match( '/(!1m|!3m|pb=!)[^\s"\'<>]+/i', $trimmed, $matches ) ) {
+		$pb = ltrim( $matches[0], 'pb=' );
+		return esc_url_raw( 'https://www.google.com/maps/embed?pb=' . $pb );
+	}
+
+	return '';
+}

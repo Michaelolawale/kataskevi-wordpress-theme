@@ -202,55 +202,22 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 				</div>
 
 				<div class="contact-map-frame">
-					<?php if ( ! empty( $map_embed ) ) : ?>
-						<?php
-						$trimmed_map = trim( $map_embed );
-						if ( 0 === strpos( $trimmed_map, 'http://' ) || 0 === strpos( $trimmed_map, 'https://' ) ) :
-						?>
-							<iframe 
-								src="<?php echo esc_url( $trimmed_map ); ?>" 
-								width="100%" 
-								height="450" 
-								style="border:0;" 
-								allowfullscreen="" 
-								loading="lazy" 
-								referrerpolicy="no-referrer-when-downgrade"
-								title="<?php esc_attr_e( 'Office Location Map', 'kataskevi' ); ?>"
-							></iframe>
-						<?php else : ?>
-							<?php
-							echo wp_kses(
-								$trimmed_map,
-								array(
-									'iframe' => array(
-										'src'             => true,
-										'width'           => true,
-										'height'          => true,
-										'style'           => true,
-										'allowfullscreen' => true,
-										'loading'         => true,
-										'referrerpolicy'  => true,
-										'title'           => true,
-										'frameborder'     => true,
-										'aria-hidden'     => true,
-										'tabindex'        => true,
-									),
-								)
-							);
-							?>
-						<?php endif; ?>
-					<?php else : ?>
-						<iframe 
-							src="https://maps.google.com/maps?q=<?php echo rawurlencode( $address ); ?>&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-							width="100%" 
-							height="450" 
-							style="border:0;" 
-							allowfullscreen="" 
-							loading="lazy" 
-							referrerpolicy="no-referrer-when-downgrade"
-							title="<?php esc_attr_e( 'Headquarters Location Map', 'kataskevi' ); ?>"
-						></iframe>
-					<?php endif; ?>
+					<?php
+					$parsed_map_url = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $map_embed ) : '';
+					$embed_src      = ! empty( $parsed_map_url )
+						? $parsed_map_url
+						: 'https://maps.google.com/maps?q=' . rawurlencode( $address ) . '&t=&z=15&ie=UTF8&iwloc=&output=embed';
+					?>
+					<iframe 
+						src="<?php echo esc_url( $embed_src ); ?>" 
+						width="100%" 
+						height="450" 
+						style="border:0;" 
+						allowfullscreen="" 
+						loading="lazy" 
+						referrerpolicy="no-referrer-when-downgrade"
+						title="<?php esc_attr_e( 'Headquarters Location Map', 'kataskevi' ); ?>"
+					></iframe>
 				</div>
 			</div>
 		</section>

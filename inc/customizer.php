@@ -2280,8 +2280,8 @@ function kataskevi_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'kataskevi_contact_map_embed',
 		array(
-			'label'       => esc_html__( 'Custom Google Map Embed Code (Optional)', 'kataskevi' ),
-			'description' => esc_html__( 'Paste an iframe embed code from Google Maps. Leave empty to automatically use your company address.', 'kataskevi' ),
+			'label'       => esc_html__( 'Google Map Embed Code or URL (Optional)', 'kataskevi' ),
+			'description' => esc_html__( 'Paste the full Google Maps iframe code OR just the embed URL. Leave empty to automatically use your company address.', 'kataskevi' ),
 			'section'     => 'kataskevi_sec_page_contact',
 			'type'        => 'textarea',
 		)
@@ -2332,40 +2332,17 @@ function kataskevi_sanitize_hex_color( $color, $setting = null ) {
 }
 
 /**
- * Sanitize Google Map iframe embed code or raw embed URL.
+ * Sanitize Google Map embed input into a clean embed URL.
+ * Accepts full iframe embed code, raw embed URL, or partial Google pb snippets.
  *
  * @param string $input Raw iframe embed code or map URL.
- * @return string Sanitized iframe or URL string.
+ * @return string Clean embed URL or empty string.
  */
 function kataskevi_sanitize_map_embed( $input ) {
-	if ( empty( $input ) ) {
-		return '';
+	if ( function_exists( 'kataskevi_parse_map_url' ) ) {
+		return kataskevi_parse_map_url( $input );
 	}
-
-	$trimmed = trim( $input );
-
-	// If a raw Google Maps URL is provided instead of an iframe tag.
-	if ( 0 === strpos( $trimmed, 'http://' ) || 0 === strpos( $trimmed, 'https://' ) ) {
-		return esc_url_raw( $trimmed );
-	}
-
-	$allowed_html = array(
-		'iframe' => array(
-			'src'             => true,
-			'width'           => true,
-			'height'          => true,
-			'style'           => true,
-			'allowfullscreen' => true,
-			'loading'         => true,
-			'referrerpolicy'  => true,
-			'title'           => true,
-			'frameborder'     => true,
-			'aria-hidden'     => true,
-			'tabindex'        => true,
-		),
-	);
-
-	return wp_kses( $trimmed, $allowed_html );
+	return esc_url_raw( trim( wp_unslash( $input ) ) );
 }
 
 /**
