@@ -317,6 +317,36 @@ function kataskevi_handle_updater_actions() {
 		exit;
 	}
 
+	// 1b. Handle Saving Contact Google Map Settings Form.
+	if ( 'POST' === ( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) && isset( $_POST['kataskevi_save_map_settings'] ) ) {
+		check_admin_referer( 'kataskevi_map_settings_nonce', 'kataskevi_map_nonce' );
+
+		$show_map    = isset( $_POST['kataskevi_contact_show_map'] ) ? 1 : 0;
+		$map_eyebrow = isset( $_POST['kataskevi_contact_map_eyebrow'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_contact_map_eyebrow'] ) ) : 'Visit Our Office';
+		$map_title   = isset( $_POST['kataskevi_contact_map_title'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_contact_map_title'] ) ) : 'Engineering Headquarters & Consultation Hub';
+		$map_desc    = isset( $_POST['kataskevi_contact_map_desc'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kataskevi_contact_map_desc'] ) ) : '';
+		$raw_embed   = isset( $_POST['kataskevi_contact_map_embed'] ) ? wp_unslash( $_POST['kataskevi_contact_map_embed'] ) : '';
+
+		// Parse into clean embed URL.
+		$clean_embed = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $raw_embed ) : esc_url_raw( trim( $raw_embed ) );
+
+		update_option( 'kataskevi_contact_show_map', $show_map );
+		update_option( 'kataskevi_contact_map_eyebrow', $map_eyebrow );
+		update_option( 'kataskevi_contact_map_title', $map_title );
+		update_option( 'kataskevi_contact_map_desc', $map_desc );
+		update_option( 'kataskevi_contact_map_embed', $clean_embed );
+
+		// Sync with theme mod so any legacy calls continue to receive updated values.
+		set_theme_mod( 'kataskevi_contact_show_map', (bool) $show_map );
+		set_theme_mod( 'kataskevi_contact_map_eyebrow', $map_eyebrow );
+		set_theme_mod( 'kataskevi_contact_map_title', $map_title );
+		set_theme_mod( 'kataskevi_contact_map_desc', $map_desc );
+		set_theme_mod( 'kataskevi_contact_map_embed', $clean_embed );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'map_updated' => '1' ), admin_url( 'themes.php' ) ) );
+		exit;
+	}
+
 	// 2. Handle Manual "Check for Updates" Button.
 	if ( isset( $_GET['action'] ) && 'check_now' === $_GET['action'] ) {
 		check_admin_referer( 'kataskevi_manual_check_nonce' );
@@ -394,9 +424,21 @@ function kataskevi_render_updater_page() {
 
 	$check_result = isset( $_GET['check_result'] ) ? sanitize_text_field( wp_unslash( $_GET['check_result'] ) ) : '';
 	$is_updated   = isset( $_GET['updated'] ) && '1' === $_GET['updated'];
+	$map_updated  = isset( $_GET['map_updated'] ) && '1' === $_GET['map_updated'];
 	$diag_run     = isset( $_GET['diag_run'] ) && '1' === $_GET['diag_run'];
 	$diag_results = get_transient( 'kataskevi_diag_results' );
 	$error_notice = get_transient( 'kataskevi_update_error_notice' );
+
+	$default_map_embed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2844.38140054598!2d3.4053212!3d6.4476227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b248e126613%3A0x58cb7affcae5e3a7!2s48%20King%20George%20V%20Rd%2C%20Lagos%20Island%2C%20Lagos%20234001%2C%20Lagos!5e1!3m2!1sen!2sng!4v1794913471007!5m2!1sen!2sng';
+
+	$saved_show_map    = get_option( 'kataskevi_contact_show_map', get_theme_mod( 'kataskevi_contact_show_map', 1 ) );
+	$saved_map_eyebrow = get_option( 'kataskevi_contact_map_eyebrow', get_theme_mod( 'kataskevi_contact_map_eyebrow', 'Visit Our Office' ) );
+	$saved_map_title   = get_option( 'kataskevi_contact_map_title', get_theme_mod( 'kataskevi_contact_map_title', 'Engineering Headquarters & Consultation Hub' ) );
+	$saved_map_desc    = get_option( 'kataskevi_contact_map_desc', get_theme_mod( 'kataskevi_contact_map_desc', 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.' ) );
+	$saved_map_embed   = get_option( 'kataskevi_contact_map_embed', get_theme_mod( 'kataskevi_contact_map_embed', $default_map_embed ) );
+	if ( empty( $saved_map_embed ) ) {
+		$saved_map_embed = $default_map_embed;
+	}
 	?>
 	<div class="wrap kataskevi-admin-wrap" style="max-width: 960px; margin-top: 2rem;">
 		
@@ -411,6 +453,12 @@ function kataskevi_render_updater_page() {
 		<?php if ( $is_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #3f75a1;">
 				<p><strong><?php esc_html_e( 'Repository settings and credentials saved successfully.', 'kataskevi' ); ?></strong></p>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $map_updated ) : ?>
+			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
+				<p><strong><?php esc_html_e( '✅ Contact Google Map settings saved successfully! The map is updated on your Contact page.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
@@ -610,6 +658,144 @@ function kataskevi_render_updater_page() {
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
+
+		<!-- Contact Page Google Maps Settings Card -->
+		<div class="card" style="max-width: 100%; padding: 24px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">
+			<h2 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid #eee; padding-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #0f172a;">
+				<span style="font-size: 1.25rem;">📍</span>
+				<span><?php esc_html_e( 'Contact Page — Google Maps Location & Embed Settings', 'kataskevi' ); ?></span>
+			</h2>
+			<p class="description" style="margin-bottom: 20px;">
+				<?php esc_html_e( 'Manage the interactive Google Map on your Contact Us page without Customizer limitations. Paste your full Google Maps <iframe> embed code or just the embed URL below.', 'kataskevi' ); ?>
+			</p>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates' ) ); ?>">
+				<?php wp_nonce_field( 'kataskevi_map_settings_nonce', 'kataskevi_map_nonce' ); ?>
+
+				<table class="form-table" role="presentation">
+					<tbody>
+						<!-- Display Map Toggle -->
+						<tr>
+							<th scope="row">
+								<label for="kataskevi_contact_show_map"><?php esc_html_e( 'Display Map', 'kataskevi' ); ?></label>
+							</th>
+							<td>
+								<label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+									<input 
+										name="kataskevi_contact_show_map" 
+										type="checkbox" 
+										id="kataskevi_contact_show_map" 
+										value="1" 
+										<?php checked( 1, (int) $saved_show_map ); ?>
+									>
+									<?php esc_html_e( 'Show office location map section on the Contact Us page', 'kataskevi' ); ?>
+								</label>
+							</td>
+						</tr>
+
+						<!-- Map Eyebrow -->
+						<tr>
+							<th scope="row">
+								<label for="kataskevi_contact_map_eyebrow"><?php esc_html_e( 'Section Eyebrow', 'kataskevi' ); ?></label>
+							</th>
+							<td>
+								<input 
+									name="kataskevi_contact_map_eyebrow" 
+									type="text" 
+									id="kataskevi_contact_map_eyebrow" 
+									value="<?php echo esc_attr( $saved_map_eyebrow ); ?>" 
+									class="regular-text" 
+									style="width: 100%; max-width: 480px;"
+								>
+							</td>
+						</tr>
+
+						<!-- Map Title -->
+						<tr>
+							<th scope="row">
+								<label for="kataskevi_contact_map_title"><?php esc_html_e( 'Section Headline', 'kataskevi' ); ?></label>
+							</th>
+							<td>
+								<input 
+									name="kataskevi_contact_map_title" 
+									type="text" 
+									id="kataskevi_contact_map_title" 
+									value="<?php echo esc_attr( $saved_map_title ); ?>" 
+									class="regular-text" 
+									style="width: 100%; max-width: 480px;"
+								>
+							</td>
+						</tr>
+
+						<!-- Map Description -->
+						<tr>
+							<th scope="row">
+								<label for="kataskevi_contact_map_desc"><?php esc_html_e( 'Lead Description', 'kataskevi' ); ?></label>
+							</th>
+							<td>
+								<textarea 
+									name="kataskevi_contact_map_desc" 
+									id="kataskevi_contact_map_desc" 
+									rows="3" 
+									class="large-text" 
+									style="width: 100%; max-width: 600px;"
+								><?php echo esc_textarea( $saved_map_desc ); ?></textarea>
+							</td>
+						</tr>
+
+						<!-- Google Map Embed Code or URL -->
+						<tr>
+							<th scope="row">
+								<label for="kataskevi_contact_map_embed"><?php esc_html_e( 'Google Map Embed Code or URL', 'kataskevi' ); ?></label>
+							</th>
+							<td>
+								<textarea 
+									name="kataskevi_contact_map_embed" 
+									id="kataskevi_contact_map_embed" 
+									rows="4" 
+									class="large-text code" 
+									style="width: 100%; max-width: 700px; font-size: 12px; line-height: 1.5;"
+									placeholder="https://www.google.com/maps/embed?pb=... or <iframe src=...>"
+								><?php echo esc_textarea( $saved_map_embed ); ?></textarea>
+								<p class="description" style="margin-top: 6px;">
+									<?php esc_html_e( 'Paste your Google Maps embed code or URL here. It will automatically be cleaned, secured, and rendered responsively.', 'kataskevi' ); ?>
+								</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- Live Preview Box -->
+				<?php
+				$preview_url = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $saved_map_embed ) : $saved_map_embed;
+				if ( ! empty( $preview_url ) ) :
+				?>
+					<div style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; padding: 14px;">
+						<p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #475569;">
+							🖥️ <?php esc_html_e( 'Live Map Preview (Your Saved Configuration):', 'kataskevi' ); ?>
+						</p>
+						<div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1;">
+							<iframe 
+								src="<?php echo esc_url( $preview_url ); ?>" 
+								width="100%" 
+								height="100%" 
+								style="border:0;" 
+								allowfullscreen="" 
+								loading="lazy" 
+								referrerpolicy="no-referrer-when-downgrade"
+								title="<?php esc_attr_e( 'Google Map Preview', 'kataskevi' ); ?>"
+							></iframe>
+						</div>
+					</div>
+				<?php endif; ?>
+
+				<p class="submit" style="margin-top: 20px; padding-top: 14px; border-top: 1px solid #f1f5f9;">
+					<button type="submit" name="kataskevi_save_map_settings" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1; padding: 4px 18px; height: 36px; font-size: 14px;">
+						💾 <?php esc_html_e( 'Save Map Settings', 'kataskevi' ); ?>
+					</button>
+				</p>
+			</form>
+		</div>
 
 		<!-- Main Settings Form -->
 		<div class="card" style="max-width: 100%; padding: 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">

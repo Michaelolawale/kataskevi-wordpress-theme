@@ -180,11 +180,17 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 
 	<!-- OFFICE LOCATION MAP -->
 	<?php
-	$show_map    = kataskevi_get_mod( 'kataskevi_contact_show_map', true );
-	$map_eyebrow = kataskevi_get_mod( 'kataskevi_contact_map_eyebrow', 'Visit Our Office' );
-	$map_title   = kataskevi_get_mod( 'kataskevi_contact_map_title', 'Engineering Headquarters & Consultation Hub' );
-	$map_desc    = kataskevi_get_mod( 'kataskevi_contact_map_desc', 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.' );
-	$map_embed   = kataskevi_get_mod( 'kataskevi_contact_map_embed', '' );
+	$default_embed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2844.38140054598!2d3.4053212!3d6.4476227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b248e126613%3A0x58cb7affcae5e3a7!2s48%20King%20George%20V%20Rd%2C%20Lagos%20Island%2C%20Lagos%20234001%2C%20Lagos!5e1!3m2!1sen!2sng!4v1794913471007!5m2!1sen!2sng';
+
+	$show_map    = (bool) get_option( 'kataskevi_contact_show_map', kataskevi_get_mod( 'kataskevi_contact_show_map', 1 ) );
+	$map_eyebrow = get_option( 'kataskevi_contact_map_eyebrow', kataskevi_get_mod( 'kataskevi_contact_map_eyebrow', 'Visit Our Office' ) );
+	$map_title   = get_option( 'kataskevi_contact_map_title', kataskevi_get_mod( 'kataskevi_contact_map_title', 'Engineering Headquarters & Consultation Hub' ) );
+	$map_desc    = get_option( 'kataskevi_contact_map_desc', kataskevi_get_mod( 'kataskevi_contact_map_desc', 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.' ) );
+	$map_embed   = get_option( 'kataskevi_contact_map_embed', kataskevi_get_mod( 'kataskevi_contact_map_embed', $default_embed ) );
+
+	if ( empty( $map_embed ) ) {
+		$map_embed = $default_embed;
+	}
 	?>
 	<?php if ( $show_map ) : ?>
 		<section class="section-contact-map">
@@ -204,9 +210,7 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 				<div class="contact-map-frame">
 					<?php
 					$parsed_map_url = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $map_embed ) : '';
-					$embed_src      = ! empty( $parsed_map_url )
-						? $parsed_map_url
-						: 'https://maps.google.com/maps?q=' . rawurlencode( $address ) . '&t=&z=15&ie=UTF8&iwloc=&output=embed';
+					$embed_src      = ! empty( $parsed_map_url ) ? $parsed_map_url : $default_embed;
 					?>
 					<iframe 
 						src="<?php echo esc_url( $embed_src ); ?>" 
