@@ -234,9 +234,9 @@ if ( empty( $submit_label ) ) {
 						<div id="form-feedback-alert" class="form-status-alert <?php echo ! empty( $form_feedback['type'] ) ? esc_attr( $form_feedback['type'] ) : ''; ?>" style="<?php echo ! empty( $form_feedback['message'] ) ? 'display: flex;' : 'display: none;'; ?>" role="alert">
 							<span class="status-alert-icon" aria-hidden="true">
 								<?php if ( ( $form_feedback['type'] ?? '' ) === 'success' ) : ?>
-									✅
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
 								<?php else : ?>
-									⚠️
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
 								<?php endif; ?>
 							</span>
 							<span class="status-alert-text">

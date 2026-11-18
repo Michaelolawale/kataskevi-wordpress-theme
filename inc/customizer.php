@@ -2706,6 +2706,24 @@ function kataskevi_get_customizer_css() {
 	--dark-section-bg: {$dark_bg};
 	--dark-section-text: {$dark_text};
 }
+::selection {
+	background-color: {$primary} !important;
+	color: #ffffff !important;
+}
+::-moz-selection {
+	background-color: {$primary} !important;
+	color: #ffffff !important;
+}
+mark,
+.text-highlight {
+	background-color: {$primary_subtle} !important;
+	color: {$primary} !important;
+}
+.btn-pill:focus-visible,
+button:focus-visible,
+a.btn-pill:focus-visible {
+	outline-color: {$primary} !important;
+}
 body {
 	background-color: var(--background);
 	color: var(--foreground);

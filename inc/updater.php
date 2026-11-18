@@ -639,7 +639,8 @@ function kataskevi_render_updater_page() {
 					v<?php echo esc_html( $current_ver ); ?>
 				</span>
 				<a href="<?php echo esc_url( admin_url( 'customize.php' ) ); ?>" class="button">
-					🎨 <?php esc_html_e( 'Open Customizer', 'kataskevi' ); ?>
+					<span class="dashicons dashicons-admin-customizer" style="font-size: 16px; line-height: 1.6; margin-right: 2px; vertical-align: text-top;"></span>
+					<?php esc_html_e( 'Open Customizer', 'kataskevi' ); ?>
 				</a>
 			</div>
 		</div>
@@ -650,7 +651,8 @@ function kataskevi_render_updater_page() {
 		<!-- TAB NAVIGATION -->
 		<nav class="kataskevi-nav-tabs" aria-label="<?php esc_attr_e( 'Theme Settings Tabs', 'kataskevi' ); ?>">
 			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=forms' ) ); ?>" class="kataskevi-tab-item <?php echo 'forms' === $active_tab ? 'active' : ''; ?>">
-				📩 <span><?php esc_html_e( 'Form Settings & Leads', 'kataskevi' ); ?></span>
+				<span class="dashicons dashicons-email-alt" style="font-size: 16px; line-height: 1.4; vertical-align: text-top;"></span>
+				<span><?php esc_html_e( 'Form Settings & Leads', 'kataskevi' ); ?></span>
 				<?php if ( ! empty( $inquiries_list ) ) : ?>
 					<span class="kataskevi-badge kataskevi-badge-info" style="font-size: 11px; padding: 1px 7px;">
 						<?php echo count( $inquiries_list ); ?>
@@ -658,42 +660,44 @@ function kataskevi_render_updater_page() {
 				<?php endif; ?>
 			</a>
 			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=map' ) ); ?>" class="kataskevi-tab-item <?php echo 'map' === $active_tab ? 'active' : ''; ?>">
-				📍 <span><?php esc_html_e( 'Google Maps Location', 'kataskevi' ); ?></span>
+				<span class="dashicons dashicons-location" style="font-size: 16px; line-height: 1.4; vertical-align: text-top;"></span>
+				<span><?php esc_html_e( 'Google Maps Location', 'kataskevi' ); ?></span>
 			</a>
 			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates' ) ); ?>" class="kataskevi-tab-item <?php echo 'updates' === $active_tab ? 'active' : ''; ?>">
-				🔄 <span><?php esc_html_e( 'Theme Updates & Git Repository', 'kataskevi' ); ?></span>
+				<span class="dashicons dashicons-update" style="font-size: 16px; line-height: 1.4; vertical-align: text-top;"></span>
+				<span><?php esc_html_e( 'Theme Updates & Git Repository', 'kataskevi' ); ?></span>
 			</a>
 		</nav>
 
 		<!-- NOTICES -->
 		<?php if ( $is_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #3f75a1;">
-				<p><strong>✅ <?php esc_html_e( 'Repository settings and credentials saved successfully.', 'kataskevi' ); ?></strong></p>
+				<p><strong><?php esc_html_e( 'Repository settings and credentials saved successfully.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
 		<?php if ( $form_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
-				<p><strong>✅ <?php esc_html_e( 'Form settings updated! Client inquiries will now follow your configured notifications and messages.', 'kataskevi' ); ?></strong></p>
+				<p><strong><?php esc_html_e( 'Form settings updated! Client inquiries will now follow your configured notifications and messages.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
 		<?php if ( $inq_cleared ) : ?>
 			<div class="notice notice-warning is-dismissible" style="border-left-color: #f59e0b;">
-				<p><strong>🗑️ <?php esc_html_e( 'Inquiries log has been cleared successfully.', 'kataskevi' ); ?></strong></p>
+				<p><strong><?php esc_html_e( 'Inquiries log has been cleared successfully.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
 		<?php if ( $map_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
-				<p><strong>✅ <?php esc_html_e( 'Google Maps settings saved! Your office location on the Contact page is updated.', 'kataskevi' ); ?></strong></p>
+				<p><strong><?php esc_html_e( 'Google Maps settings saved! Your office location on the Contact page is updated.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
 		<?php if ( 'update_available' === $check_result ) : ?>
 			<div class="notice notice-warning" style="border-left-color: #f59e0b; padding: 12px 16px;">
 				<p style="font-size: 1rem; margin: 0 0 6px 0;">
-					<strong>🎉 <?php esc_html_e( 'A new version of Kataskevi is available on Bitbucket!', 'kataskevi' ); ?></strong>
+					<strong><?php esc_html_e( 'A new version of Kataskevi is available on Bitbucket!', 'kataskevi' ); ?></strong>
 				</p>
 				<p style="margin: 0;">
 					<a href="<?php echo esc_url( admin_url( 'update-core.php' ) ); ?>" class="button kataskevi-btn-primary">
@@ -703,11 +707,11 @@ function kataskevi_render_updater_page() {
 			</div>
 		<?php elseif ( 'up_to_date' === $check_result ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
-				<p><strong>✅ <?php esc_html_e( 'Your Kataskevi theme is fully up to date! (Current Version: ', 'kataskevi' ); ?><?php echo esc_html( $current_ver ); ?>)</strong></p>
+				<p><strong><?php esc_html_e( 'Your Kataskevi theme is fully up to date! (Current Version: ', 'kataskevi' ); ?><?php echo esc_html( $current_ver ); ?>)</strong></p>
 			</div>
 		<?php elseif ( 'check_error' === $check_result ) : ?>
 			<div class="notice notice-error is-dismissible" style="padding: 12px 16px;">
-				<p style="font-size: 0.95rem; margin: 0 0 6px 0;"><strong>⚠️ <?php esc_html_e( 'Could not fetch updates from Bitbucket.', 'kataskevi' ); ?></strong></p>
+				<p style="font-size: 0.95rem; margin: 0 0 6px 0;"><strong><?php esc_html_e( 'Could not fetch updates from Bitbucket.', 'kataskevi' ); ?></strong></p>
 				<?php if ( ! empty( $error_notice ) ) : ?>
 					<p style="margin: 0 0 8px 0; font-family: monospace; font-size: 0.88rem;"><?php echo esc_html( $error_notice ); ?></p>
 				<?php endif; ?>
@@ -722,7 +726,7 @@ function kataskevi_render_updater_page() {
 			<!-- Form Configuration Settings -->
 			<div class="kataskevi-card">
 				<h2 class="kataskevi-card-title">
-					<span>⚙️</span>
+					<span class="dashicons dashicons-admin-generic" style="font-size: 20px; width: 20px; height: 20px; line-height: 1; color: #3f75a1;"></span>
 					<span><?php esc_html_e( 'Consultation & Inquiry Form Routing', 'kataskevi' ); ?></span>
 				</h2>
 				<p class="description" style="margin-bottom: 20px;">
@@ -859,8 +863,9 @@ function kataskevi_render_updater_page() {
 					</table>
 
 					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-						<button type="submit" name="kataskevi_save_form_settings" class="button kataskevi-btn-primary">
-							💾 <?php esc_html_e( 'Save Form Settings', 'kataskevi' ); ?>
+						<button type="submit" name="kataskevi_save_form_settings" class="button kataskevi-btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+							<span class="dashicons dashicons-saved" style="font-size: 16px; width: 16px; height: 16px;"></span>
+							<span><?php esc_html_e( 'Save Form Settings', 'kataskevi' ); ?></span>
 						</button>
 					</p>
 				</form>
@@ -870,7 +875,7 @@ function kataskevi_render_updater_page() {
 			<div class="kataskevi-card">
 				<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
 					<h2 style="margin: 0; font-size: 1.15rem; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-						<span>📋</span>
+						<span class="dashicons dashicons-list-view" style="font-size: 20px; width: 20px; height: 20px; line-height: 1; color: #3f75a1;"></span>
 						<span><?php esc_html_e( 'Recent Consultation Inquiries Log', 'kataskevi' ); ?></span>
 						<span class="kataskevi-badge kataskevi-badge-info"><?php echo count( $inquiries_list ); ?> <?php esc_html_e( 'Saved Leads', 'kataskevi' ); ?></span>
 					</h2>
@@ -878,8 +883,9 @@ function kataskevi_render_updater_page() {
 					<?php if ( ! empty( $inquiries_list ) ) : ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=forms' ) ); ?>" onsubmit="return confirm('<?php esc_attr_e( 'Are you sure you want to clear all logged inquiries? This cannot be undone.', 'kataskevi' ); ?>');">
 							<?php wp_nonce_field( 'kataskevi_clear_inquiries_nonce', 'kataskevi_clear_nonce' ); ?>
-							<button type="submit" name="kataskevi_clear_inquiries" class="button button-link-delete" style="font-size: 13px; color: #b91c1c;">
-								🗑️ <?php esc_html_e( 'Clear All Inquiries', 'kataskevi' ); ?>
+							<button type="submit" name="kataskevi_clear_inquiries" class="button button-link-delete" style="font-size: 13px; color: #b91c1c; display: inline-flex; align-items: center; gap: 4px;">
+								<span class="dashicons dashicons-trash" style="font-size: 15px; width: 15px; height: 15px; vertical-align: middle;"></span>
+								<span><?php esc_html_e( 'Clear All Inquiries', 'kataskevi' ); ?></span>
 							</button>
 						</form>
 					<?php endif; ?>
@@ -887,7 +893,9 @@ function kataskevi_render_updater_page() {
 
 				<?php if ( empty( $inquiries_list ) ) : ?>
 					<div style="text-align: center; padding: 3rem 1rem; color: #64748b; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
-						<p style="font-size: 2rem; margin: 0 0 0.5rem 0;">📭</p>
+						<p style="margin: 0 0 0.5rem 0;">
+							<span class="dashicons dashicons-email-alt" style="font-size: 38px; width: 38px; height: 38px; color: #94a3b8;"></span>
+						</p>
 						<p style="font-size: 1rem; font-weight: 600; color: #334155; margin: 0 0 4px 0;"><?php esc_html_e( 'No inquiries logged yet', 'kataskevi' ); ?></p>
 						<p style="font-size: 0.88rem; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto;">
 							<?php esc_html_e( 'When visitors submit consultation or site survey requests through your website form, their details will automatically be backed up and listed here.', 'kataskevi' ); ?>
@@ -930,12 +938,14 @@ function kataskevi_render_updater_page() {
 										</td>
 										<td>
 											<?php if ( ! empty( $inq_phone ) ) : ?>
-												<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $inq_phone ) ); ?>" style="color: #1e293b; font-size: 12.5px;">
-													📞 <?php echo esc_html( $inq_phone ); ?>
+												<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $inq_phone ) ); ?>" style="color: #1e293b; font-size: 12.5px; display: inline-flex; align-items: center; gap: 4px;">
+													<span class="dashicons dashicons-phone" style="font-size: 13px; width: 13px; height: 13px; line-height: 1;"></span>
+													<span><?php echo esc_html( $inq_phone ); ?></span>
 												</a><br>
 											<?php endif; ?>
-											<span style="color: #64748b; font-size: 12px;">
-												🏢 <?php echo esc_html( $inq_org ); ?>
+											<span style="color: #64748b; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
+												<span class="dashicons dashicons-building" style="font-size: 13px; width: 13px; height: 13px; line-height: 1;"></span>
+												<span><?php echo esc_html( $inq_org ); ?></span>
 											</span>
 										</td>
 										<td>
@@ -961,7 +971,7 @@ function kataskevi_render_updater_page() {
 
 			<div class="kataskevi-card">
 				<h2 class="kataskevi-card-title">
-					<span>📍</span>
+					<span class="dashicons dashicons-location" style="font-size: 20px; width: 20px; height: 20px; line-height: 1; color: #3f75a1;"></span>
 					<span><?php esc_html_e( 'Contact Page — Google Maps Location & Embed Settings', 'kataskevi' ); ?></span>
 				</h2>
 				<p class="description" style="margin-bottom: 20px;">
@@ -1065,8 +1075,9 @@ function kataskevi_render_updater_page() {
 					if ( ! empty( $preview_url ) ) :
 					?>
 						<div style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; padding: 14px;">
-							<p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #475569;">
-								🖥️ <?php esc_html_e( 'Live Map Preview (Your Saved Location):', 'kataskevi' ); ?>
+							<p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px;">
+								<span class="dashicons dashicons-desktop" style="font-size: 16px; width: 16px; height: 16px; line-height: 1; color: #64748b;"></span>
+								<span><?php esc_html_e( 'Live Map Preview (Your Saved Location):', 'kataskevi' ); ?></span>
 							</p>
 							<div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1;">
 								<iframe 
@@ -1084,8 +1095,9 @@ function kataskevi_render_updater_page() {
 					<?php endif; ?>
 
 					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-						<button type="submit" name="kataskevi_save_map_settings" class="button kataskevi-btn-primary">
-							💾 <?php esc_html_e( 'Save Map Settings', 'kataskevi' ); ?>
+						<button type="submit" name="kataskevi_save_map_settings" class="button kataskevi-btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+							<span class="dashicons dashicons-saved" style="font-size: 16px; width: 16px; height: 16px;"></span>
+							<span><?php esc_html_e( 'Save Map Settings', 'kataskevi' ); ?></span>
 						</button>
 					</p>
 				</form>
@@ -1099,7 +1111,7 @@ function kataskevi_render_updater_page() {
 			<!-- System Status Card -->
 			<div class="kataskevi-card">
 				<h2 class="kataskevi-card-title">
-					<span>📊</span>
+					<span class="dashicons dashicons-chart-bar" style="font-size: 20px; width: 20px; height: 20px; line-height: 1; color: #3f75a1;"></span>
 					<span><?php esc_html_e( 'Current Installation & Git Status', 'kataskevi' ); ?></span>
 				</h2>
 
@@ -1136,11 +1148,13 @@ function kataskevi_render_updater_page() {
 						</a>
 					</div>
 					<div style="display: flex; gap: 8px;">
-						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=test_connection' ), 'kataskevi_test_connection_nonce' ) ); ?>" class="button button-secondary">
-							🔍 <?php esc_html_e( 'Test Connection & Diagnostics', 'kataskevi' ); ?>
+						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=test_connection' ), 'kataskevi_test_connection_nonce' ) ); ?>" class="button button-secondary" style="display: inline-flex; align-items: center; gap: 5px;">
+							<span class="dashicons dashicons-search" style="font-size: 15px; width: 15px; height: 15px;"></span>
+							<span><?php esc_html_e( 'Test Connection & Diagnostics', 'kataskevi' ); ?></span>
 						</a>
-						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button kataskevi-btn-primary">
-							🔄 <?php esc_html_e( 'Check for Updates Now', 'kataskevi' ); ?>
+						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button kataskevi-btn-primary" style="display: inline-flex; align-items: center; gap: 5px;">
+							<span class="dashicons dashicons-update" style="font-size: 15px; width: 15px; height: 15px;"></span>
+							<span><?php esc_html_e( 'Check for Updates Now', 'kataskevi' ); ?></span>
 						</a>
 					</div>
 				</div>
@@ -1150,7 +1164,7 @@ function kataskevi_render_updater_page() {
 				<!-- Live Diagnostic Report Card -->
 				<div class="kataskevi-card" style="border-color: #bbf7d0; background: #f0fdf4;">
 					<h3 style="margin-top: 0; font-size: 1.1rem; color: #166534; display: flex; align-items: center; gap: 8px;">
-						<span>🩺</span>
+						<span class="dashicons dashicons-shield-alt" style="font-size: 18px; width: 18px; height: 18px; line-height: 1;"></span>
 						<span><?php esc_html_e( 'Bitbucket API Live Diagnostics Report', 'kataskevi' ); ?></span>
 						<span style="font-size: 0.8rem; font-weight: normal; color: #15803d; margin-left: auto;">
 							<?php echo esc_html( $diag_results['timestamp'] ); ?>
@@ -1215,7 +1229,7 @@ function kataskevi_render_updater_page() {
 			<!-- Repository Credentials Settings Card -->
 			<div class="kataskevi-card">
 				<h2 class="kataskevi-card-title">
-					<span>🔑</span>
+					<span class="dashicons dashicons-admin-network" style="font-size: 20px; width: 20px; height: 20px; line-height: 1; color: #3f75a1;"></span>
 					<span><?php esc_html_e( 'Bitbucket Repository Credentials', 'kataskevi' ); ?></span>
 				</h2>
 				<p class="description" style="margin-bottom: 20px;">
@@ -1323,8 +1337,9 @@ function kataskevi_render_updater_page() {
 					</table>
 
 					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-						<button type="submit" name="kataskevi_save_repo_settings" class="button kataskevi-btn-primary">
-							💾 <?php esc_html_e( 'Save Repository Settings', 'kataskevi' ); ?>
+						<button type="submit" name="kataskevi_save_repo_settings" class="button kataskevi-btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+							<span class="dashicons dashicons-saved" style="font-size: 16px; width: 16px; height: 16px;"></span>
+							<span><?php esc_html_e( 'Save Repository Settings', 'kataskevi' ); ?></span>
 						</button>
 					</p>
 				</form>
@@ -1333,13 +1348,14 @@ function kataskevi_render_updater_page() {
 			<!-- Quick Step-by-Step Guide -->
 			<div class="kataskevi-card" style="background: #fbfcfe;">
 				<h3 style="margin-top: 0; font-size: 1.05rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-					<span>💡</span>
+					<span class="dashicons dashicons-info" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; color: #0284c7;"></span>
 					<span><?php esc_html_e( 'Credential Setup Instructions', 'kataskevi' ); ?></span>
 				</h3>
 				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
 					<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
-						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
-							🏆 <?php esc_html_e( 'Option A (Recommended): Repository Access Token', 'kataskevi' ); ?>
+						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+							<span class="dashicons dashicons-yes-alt" style="font-size: 16px; width: 16px; height: 16px; color: #0284c7;"></span>
+							<span><?php esc_html_e( 'Option A (Recommended): Repository Access Token', 'kataskevi' ); ?></span>
 						</h4>
 						<ol style="margin-left: 18px; line-height: 1.6; color: #475569; font-size: 0.88rem; padding: 0;">
 							<?php
@@ -1353,8 +1369,9 @@ function kataskevi_render_updater_page() {
 					</div>
 
 					<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
-						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
-							⚙️ <?php esc_html_e( 'Option B: Personal Bitbucket App Password', 'kataskevi' ); ?>
+						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+							<span class="dashicons dashicons-admin-generic" style="font-size: 16px; width: 16px; height: 16px; color: #0284c7;"></span>
+							<span><?php esc_html_e( 'Option B: Personal Bitbucket App Password', 'kataskevi' ); ?></span>
 						</h4>
 						<ol style="margin-left: 18px; line-height: 1.6; color: #475569; font-size: 0.88rem; padding: 0;">
 							<li>Open: <a href="https://bitbucket.org/account/settings/app-passwords/" target="_blank" rel="noopener noreferrer"><strong>Personal App Passwords &rarr;</strong></a></li>
