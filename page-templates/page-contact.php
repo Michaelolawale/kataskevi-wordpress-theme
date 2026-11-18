@@ -31,22 +31,32 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) && ( isset( $_POST['kataske
 				'message' => __( 'Please complete all required fields (Full Name, Work Email, and Project Scope) with a valid email.', 'kataskevi' ),
 			);
 		} else {
-			$admin_email = get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) );
-			$brand_name  = kataskevi_get_brand_name();
-			/* translators: 1: Brand name, 2: Customer name */
-			$subject     = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
-			$body        = "You have received a new consultation / site survey request:\n\n";
-			$body       .= "Full Name: $name\n";
-			$body       .= "Email: $email\n";
-			$body       .= "Phone: " . ( ! empty( $phone ) ? $phone : 'Not provided' ) . "\n";
-			$body       .= "Company / Organization: " . ( ! empty( $organization ) ? $organization : 'Not provided' ) . "\n";
-			$body       .= "Service Required: " . ( ! empty( $service ) ? $service : 'General Audit / Inquiries' ) . "\n\n";
-			$body       .= "Project Scope / Notes:\n$message\n\n";
-			$body       .= "---\nSent from: " . home_url() . "\n";
+			$admin_email = get_option( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) ) ) );
+			if ( empty( $admin_email ) || ! is_email( $admin_email ) ) {
+				$admin_email = get_option( 'admin_email' );
+			}
+
+			$brand_name     = kataskevi_get_brand_name();
+			$subject_prefix = get_option( 'kataskevi_form_email_subject', get_theme_mod( 'kataskevi_form_email_subject', '' ) );
+			if ( empty( $subject_prefix ) ) {
+				/* translators: 1: Brand name, 2: Customer name */
+				$subject = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
+			} else {
+				$subject = sprintf( '%1$s from %2$s', $subject_prefix, $name );
+			}
+
+			$body  = "You have received a new consultation / site survey request:\n\n";
+			$body .= 'Full Name: ' . $name . "\n";
+			$body .= 'Email: ' . $email . "\n";
+			$body .= 'Phone: ' . ( ! empty( $phone ) ? $phone : esc_html__( 'Not provided', 'kataskevi' ) ) . "\n";
+			$body .= 'Company / Organization: ' . ( ! empty( $organization ) ? $organization : esc_html__( 'Not provided', 'kataskevi' ) ) . "\n";
+			$body .= 'Service Required: ' . ( ! empty( $service ) ? $service : esc_html__( 'General Audit / Inquiries', 'kataskevi' ) ) . "\n\n";
+			$body .= "Project Scope / Notes:\n" . $message . "\n\n";
+			$body .= "---\nSent from: " . esc_url( home_url( '/' ) ) . "\n";
 
 			$headers = array(
 				'Content-Type: text/plain; charset=UTF-8',
-				"Reply-To: $name <$email>",
+				'Reply-To: ' . $name . ' <' . $email . '>',
 			);
 
 			@wp_mail( $admin_email, $subject, $body, $headers );
@@ -70,9 +80,15 @@ if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) && ( isset( $_POST['kataske
 			$inquiries = array_slice( $inquiries, 0, 50 );
 			update_option( 'kataskevi_recent_inquiries', $inquiries, false );
 
+			$default_success_msg = __( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' );
+			$success_msg         = get_option( 'kataskevi_form_success_msg', get_theme_mod( 'kataskevi_form_success_msg', $default_success_msg ) );
+			if ( empty( $success_msg ) ) {
+				$success_msg = $default_success_msg;
+			}
+
 			$form_feedback = array(
 				'type'    => 'success',
-				'message' => __( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' ),
+				'message' => $success_msg,
 			);
 		}
 	} else {
@@ -95,11 +111,22 @@ $services_url = kataskevi_get_page_url( 'services', 'Services' );
 $selected_service = isset( $_GET['service'] ) ? sanitize_text_field( wp_unslash( $_GET['service'] ) ) : '';
 
 // Customizer Theme Options.
-$contact_eyebrow  = kataskevi_get_mod( 'kataskevi_contact_page_eyebrow', 'Contact' );
-$contact_title    = kataskevi_get_mod( 'kataskevi_contact_page_title', 'Let\'s talk about <em class="text-primary italic">your site.</em>' );
-$contact_desc     = kataskevi_get_mod( 'kataskevi_contact_page_desc', 'Request a quote, book a site survey, or ask about maintenance for an existing system — our team will respond promptly.' );
-$urgent_title     = kataskevi_get_mod( 'kataskevi_contact_urgent_title', 'Need urgent support?' );
-$urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For active alarm faults, critical camera outages, or urgent life-safety requirements, contact our 24/7 technical desk directly:' );
+$contact_eyebrow = kataskevi_get_mod( 'kataskevi_contact_page_eyebrow', 'Contact' );
+$contact_title   = kataskevi_get_mod( 'kataskevi_contact_page_title', 'Let\'s talk about <em class="text-primary italic">your site.</em>' );
+$contact_desc    = kataskevi_get_mod( 'kataskevi_contact_page_desc', 'Request a quote, book a site survey, or ask about maintenance for an existing system — our team will respond promptly.' );
+$urgent_title    = kataskevi_get_mod( 'kataskevi_contact_urgent_title', 'Need urgent support?' );
+$urgent_desc     = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For active alarm faults, critical camera outages, or urgent life-safety requirements, contact our 24/7 technical desk directly:' );
+
+// Form Settings Options.
+$form_title    = get_option( 'kataskevi_form_title', kataskevi_get_mod( 'kataskevi_form_title', '' ) );
+$form_desc     = get_option( 'kataskevi_form_desc', kataskevi_get_mod( 'kataskevi_form_desc', '' ) );
+$submit_label  = get_option( 'kataskevi_form_submit_label', kataskevi_get_mod( 'kataskevi_form_submit_label', __( 'Submit Consultation Request', 'kataskevi' ) ) );
+$show_phone    = (bool) get_option( 'kataskevi_form_show_phone', kataskevi_get_mod( 'kataskevi_form_show_phone', 1 ) );
+$show_org      = (bool) get_option( 'kataskevi_form_show_org', kataskevi_get_mod( 'kataskevi_form_show_org', 1 ) );
+$show_service  = (bool) get_option( 'kataskevi_form_show_service', kataskevi_get_mod( 'kataskevi_form_show_service', 1 ) );
+if ( empty( $submit_label ) ) {
+	$submit_label = __( 'Submit Consultation Request', 'kataskevi' );
+}
 ?>
 
 <main id="primary" class="site-main">
@@ -186,11 +213,35 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 
 				<!-- RIGHT COLUMN: INTERACTIVE EDITORIAL FORM -->
 				<div class="contact-editorial-card">
+					<?php if ( ! empty( $form_title ) || ! empty( $form_desc ) ) : ?>
+						<div class="contact-form-intro mb-6 pb-4 border-b border-border">
+							<?php if ( ! empty( $form_title ) ) : ?>
+								<h2 class="text-xl md:text-2xl font-serif font-bold text-foreground m-0">
+									<?php echo esc_html( $form_title ); ?>
+								</h2>
+							<?php endif; ?>
+							<?php if ( ! empty( $form_desc ) ) : ?>
+								<p class="text-sm text-muted-foreground mt-1 mb-0">
+									<?php echo esc_html( $form_desc ); ?>
+								</p>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
 					<form id="editorial-survey-form" class="editorial-interactive-form" method="post" action="">
 						<?php wp_nonce_field( 'kataskevi_inquiry_action', 'kataskevi_inquiry_nonce' ); ?>
 						
-						<div id="form-feedback-alert" class="form-status-alert <?php echo ! empty( $form_feedback['type'] ) ? esc_attr( $form_feedback['type'] ) : ''; ?>" style="<?php echo ! empty( $form_feedback['message'] ) ? 'display: block;' : 'display: none;'; ?>" role="alert">
-							<?php echo ! empty( $form_feedback['message'] ) ? esc_html( $form_feedback['message'] ) : ''; ?>
+						<div id="form-feedback-alert" class="form-status-alert <?php echo ! empty( $form_feedback['type'] ) ? esc_attr( $form_feedback['type'] ) : ''; ?>" style="<?php echo ! empty( $form_feedback['message'] ) ? 'display: flex;' : 'display: none;'; ?>" role="alert">
+							<span class="status-alert-icon" aria-hidden="true">
+								<?php if ( ( $form_feedback['type'] ?? '' ) === 'success' ) : ?>
+									✅
+								<?php else : ?>
+									⚠️
+								<?php endif; ?>
+							</span>
+							<span class="status-alert-text">
+								<?php echo ! empty( $form_feedback['message'] ) ? esc_html( $form_feedback['message'] ) : ''; ?>
+							</span>
 						</div>
 
 						<div class="form-row-2col">
@@ -205,31 +256,39 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 							</div>
 						</div>
 
-						<div class="form-row-2col">
-							<div class="form-input-group">
-								<label for="contact-phone"><?php esc_html_e( 'Phone Number', 'kataskevi' ); ?></label>
-								<input type="tel" id="contact-phone" name="phone" class="input-editorial" placeholder="<?php esc_attr_e( '+234 ...', 'kataskevi' ); ?>">
-							</div>
+						<?php if ( $show_phone || $show_org ) : ?>
+							<div class="form-row-2col">
+								<?php if ( $show_phone ) : ?>
+									<div class="form-input-group">
+										<label for="contact-phone"><?php esc_html_e( 'Phone Number', 'kataskevi' ); ?></label>
+										<input type="tel" id="contact-phone" name="phone" class="input-editorial" placeholder="<?php esc_attr_e( '+234 ...', 'kataskevi' ); ?>">
+									</div>
+								<?php endif; ?>
 
-							<div class="form-input-group">
-								<label for="contact-org"><?php esc_html_e( 'Company / Organization', 'kataskevi' ); ?></label>
-								<input type="text" id="contact-org" name="organization" class="input-editorial" placeholder="<?php esc_attr_e( 'Enterprise Facility Ltd', 'kataskevi' ); ?>">
+								<?php if ( $show_org ) : ?>
+									<div class="form-input-group <?php echo ! $show_phone ? 'col-span-2' : ''; ?>">
+										<label for="contact-org"><?php esc_html_e( 'Company / Organization', 'kataskevi' ); ?></label>
+										<input type="text" id="contact-org" name="organization" class="input-editorial" placeholder="<?php esc_attr_e( 'Enterprise Facility Ltd', 'kataskevi' ); ?>">
+									</div>
+								<?php endif; ?>
 							</div>
-						</div>
+						<?php endif; ?>
 
-						<div class="form-input-group">
-							<label for="contact-service"><?php esc_html_e( 'Primary System of Interest', 'kataskevi' ); ?></label>
-							<select id="contact-service" name="service" class="input-editorial">
-								<option value=""><?php esc_html_e( 'Select service or project type...', 'kataskevi' ); ?></option>
-								<?php foreach ( $services as $s ) : ?>
-									<option value="<?php echo esc_attr( $s['id'] ); ?>" <?php selected( $selected_service, $s['id'] ); ?>>
-										<?php echo esc_html( $s['title'] ); ?>
-									</option>
-								<?php endforeach; ?>
-								<option value="general-audit"><?php esc_html_e( 'Full Site Audit & Survey', 'kataskevi' ); ?></option>
-								<option value="maintenance"><?php esc_html_e( 'Preventive Maintenance Agreement', 'kataskevi' ); ?></option>
-							</select>
-						</div>
+						<?php if ( $show_service ) : ?>
+							<div class="form-input-group">
+								<label for="contact-service"><?php esc_html_e( 'Primary System of Interest', 'kataskevi' ); ?></label>
+								<select id="contact-service" name="service" class="input-editorial">
+									<option value=""><?php esc_html_e( 'Select service or project type...', 'kataskevi' ); ?></option>
+									<?php foreach ( $services as $s ) : ?>
+										<option value="<?php echo esc_attr( $s['id'] ); ?>" <?php selected( $selected_service, $s['id'] ); ?>>
+											<?php echo esc_html( $s['title'] ); ?>
+										</option>
+									<?php endforeach; ?>
+									<option value="general-audit"><?php esc_html_e( 'Full Site Audit & Survey', 'kataskevi' ); ?></option>
+									<option value="maintenance"><?php esc_html_e( 'Preventive Maintenance Agreement', 'kataskevi' ); ?></option>
+								</select>
+							</div>
+						<?php endif; ?>
 
 						<div class="form-input-group">
 							<label for="contact-message"><?php esc_html_e( 'Project Scope or Site Details', 'kataskevi' ); ?> <span class="required" aria-hidden="true">*</span></label>
@@ -238,8 +297,8 @@ $urgent_desc      = kataskevi_get_mod( 'kataskevi_contact_urgent_desc', 'For act
 
 						<div class="form-action-row">
 							<button type="submit" id="submit-inquiry-btn" class="btn-pill btn-pill-primary w-full sm:w-auto">
-								<span><?php esc_html_e( 'Submit Consultation Request', 'kataskevi' ); ?></span>
-								<?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?>
+								<span class="btn-text"><?php echo esc_html( $submit_label ); ?></span>
+								<span class="btn-icon"><?php echo kataskevi_render_icon( 'arrow-right', 'icon icon-xs' ); ?></span>
 							</button>
 						</div>
 					</form>

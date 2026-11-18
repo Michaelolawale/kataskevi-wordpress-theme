@@ -468,49 +468,6 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 3: SOCIAL CHANNELS
-	 * =========================================================================
-	 */
-	$wp_customize->add_section(
-		'kataskevi_sec_social',
-		array(
-			'title'       => esc_html__( '3. Social Channels', 'kataskevi' ),
-			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 20,
-			'description' => esc_html__( 'Configure links for corporate social profiles displayed in the footer and contact sections.', 'kataskevi' ),
-		)
-	);
-
-	$social_platforms = array(
-		'linkedin'  => array( 'label' => __( 'LinkedIn Profile URL', 'kataskevi' ),  'default' => 'https://linkedin.com/company/kataskevi' ),
-		'twitter'   => array( 'label' => __( 'X (Twitter) URL', 'kataskevi' ),       'default' => 'https://x.com/kataskevi' ),
-		'facebook'  => array( 'label' => __( 'Facebook Page URL', 'kataskevi' ),     'default' => 'https://facebook.com/kataskevi' ),
-		'instagram' => array( 'label' => __( 'Instagram Profile URL', 'kataskevi' ), 'default' => 'https://instagram.com/kataskevi' ),
-		'youtube'   => array( 'label' => __( 'YouTube Channel URL', 'kataskevi' ),   'default' => 'https://youtube.com/@kataskevi' ),
-		'whatsapp'  => array( 'label' => __( 'WhatsApp Direct Chat Link', 'kataskevi' ), 'default' => 'https://wa.me/2348005282753' ),
-	);
-
-	foreach ( $social_platforms as $key => $data ) {
-		$wp_customize->add_setting(
-			'kataskevi_' . $key,
-			array(
-				'default'           => $data['default'],
-				'sanitize_callback' => 'esc_url_raw',
-				'transport'         => 'refresh',
-			)
-		);
-		$wp_customize->add_control(
-			'kataskevi_' . $key,
-			array(
-				'label'   => esc_html( $data['label'] ),
-				'section' => 'kataskevi_sec_social',
-				'type'    => 'url',
-			)
-		);
-	}
-
-	/*
-	 * =========================================================================
 	 * SECTION 3: HEADER & FOOTER
 	 * =========================================================================
 	 */
@@ -598,15 +555,58 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 4: HOMEPAGE HERO SECTION
+	 * SECTION 4: SOCIAL CHANNELS
+	 * =========================================================================
+	 */
+	$wp_customize->add_section(
+		'kataskevi_sec_social',
+		array(
+			'title'       => esc_html__( '4. Social Media Channels', 'kataskevi' ),
+			'panel'       => 'kataskevi_options_panel',
+			'priority'    => 40,
+			'description' => esc_html__( 'Configure links for corporate social profiles displayed in the footer and contact sections.', 'kataskevi' ),
+		)
+	);
+
+	$social_platforms = array(
+		'linkedin'  => array( 'label' => __( 'LinkedIn Profile URL', 'kataskevi' ),  'default' => 'https://linkedin.com/company/kataskevi' ),
+		'twitter'   => array( 'label' => __( 'X (Twitter) URL', 'kataskevi' ),       'default' => 'https://x.com/kataskevi' ),
+		'facebook'  => array( 'label' => __( 'Facebook Page URL', 'kataskevi' ),     'default' => 'https://facebook.com/kataskevi' ),
+		'instagram' => array( 'label' => __( 'Instagram Profile URL', 'kataskevi' ), 'default' => 'https://instagram.com/kataskevi' ),
+		'youtube'   => array( 'label' => __( 'YouTube Channel URL', 'kataskevi' ),   'default' => 'https://youtube.com/@kataskevi' ),
+		'whatsapp'  => array( 'label' => __( 'WhatsApp Direct Chat Link', 'kataskevi' ), 'default' => 'https://wa.me/2348005282753' ),
+	);
+
+	foreach ( $social_platforms as $key => $data ) {
+		$wp_customize->add_setting(
+			'kataskevi_' . $key,
+			array(
+				'default'           => $data['default'],
+				'sanitize_callback' => 'esc_url_raw',
+				'transport'         => 'refresh',
+			)
+		);
+		$wp_customize->add_control(
+			'kataskevi_' . $key,
+			array(
+				'label'   => esc_html( $data['label'] ),
+				'section' => 'kataskevi_sec_social',
+				'type'    => 'url',
+			)
+		);
+	}
+
+	/*
+	 * =========================================================================
+	 * SECTION 5: HOMEPAGE HERO SECTION
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_hero',
 		array(
-			'title'       => esc_html__( '4. Homepage: Hero Section', 'kataskevi' ),
+			'title'       => esc_html__( '5. Homepage: Hero Section', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 40,
+			'priority'    => 50,
 			'description' => esc_html__( 'Configure homepage hero titles, description, CTA buttons, and the full-width hero feature image.', 'kataskevi' ),
 		)
 	);
@@ -784,15 +784,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 5: HOMEPAGE FEATURED WORKS
+	 * SECTION 6: HOMEPAGE FEATURED WORKS
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_sections',
 		array(
-			'title'       => esc_html__( '5. Homepage: Featured Works', 'kataskevi' ),
+			'title'       => esc_html__( '6. Homepage: Featured Works', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 50,
+			'priority'    => 60,
 			'description' => esc_html__( 'Headings and introductory text for the Featured Works carousel section on the homepage.', 'kataskevi' ),
 		)
 	);
@@ -853,15 +853,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 6: HOMEPAGE LIFECYCLE BANNER & 4 STEPS
+	 * SECTION 7: HOMEPAGE LIFECYCLE BANNER & 4 STEPS
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_lifecycle',
 		array(
-			'title'       => esc_html__( '6. Homepage: Lifecycle Support Banner', 'kataskevi' ),
+			'title'       => esc_html__( '7. Homepage: Lifecycle Support Banner', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 60,
+			'priority'    => 70,
 			'description' => esc_html__( 'Configure the high-impact media banner image, headline, and the 4 lifecycle engineering cards.', 'kataskevi' ),
 		)
 	);
@@ -989,15 +989,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 7: HOMEPAGE SECTORS & DARK CTA
+	 * SECTION 8: HOMEPAGE SECTORS & DARK CTA
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_home_dark_cta',
 		array(
-			'title'       => esc_html__( '7. Homepage: Sectors, Clients & Dark CTA', 'kataskevi' ),
+			'title'       => esc_html__( '8. Homepage: Sectors, Clients & Dark CTA', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 70,
+			'priority'    => 80,
 			'description' => esc_html__( 'Configure the industry sectors header, our clients dual marquee section, and the high-contrast dark CTA banner at the bottom of the front page.', 'kataskevi' ),
 		)
 	);
@@ -1206,15 +1206,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 8: PAGE - SERVICES OVERVIEW
+	 * SECTION 9: PAGE - SERVICES OVERVIEW
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_page_services',
 		array(
-			'title'       => esc_html__( '8. Page: Services Overview', 'kataskevi' ),
+			'title'       => esc_html__( '9. Page: Services Overview', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 80,
+			'priority'    => 90,
 			'description' => esc_html__( 'Configure the hero header titles and bottom Call to Action section on the Services page template.', 'kataskevi' ),
 		)
 	);
@@ -1347,15 +1347,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 9: PAGE - ABOUT KATASKEVI
+	 * SECTION 10: PAGE - ABOUT KATASKEVI
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_page_about',
 		array(
-			'title'       => esc_html__( '9. Page: About Us', 'kataskevi' ),
+			'title'       => esc_html__( '10. Page: About Us', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 90,
+			'priority'    => 100,
 			'description' => esc_html__( 'Configure hero text, full-width media banner, "Why we exist" narrative story, and sector CTA on the About page.', 'kataskevi' ),
 		)
 	);
@@ -1870,15 +1870,15 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 10: PAGE - OUR WORKS & COMMITMENTS
+	 * SECTION 11: PAGE - OUR WORKS & COMMITMENTS
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_page_works',
 		array(
-			'title'       => esc_html__( '10. Page: Our Works & Commitments', 'kataskevi' ),
+			'title'       => esc_html__( '11. Page: Our Works & Commitments', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 100,
+			'priority'    => 110,
 			'description' => esc_html__( 'Configure the headline, lead summary, and the 4 engineering commitments displayed on the Our Works archive page.', 'kataskevi' ),
 		)
 	);
@@ -2093,16 +2093,16 @@ function kataskevi_customize_register( $wp_customize ) {
 
 	/*
 	 * =========================================================================
-	 * SECTION 11: PAGE - CONTACT & SITE SURVEY
+	 * SECTION 12: PAGE - CONTACT & GOOGLE MAP
 	 * =========================================================================
 	 */
 	$wp_customize->add_section(
 		'kataskevi_sec_page_contact',
 		array(
-			'title'       => esc_html__( '11. Page: Contact & Consultation', 'kataskevi' ),
+			'title'       => esc_html__( '12. Page: Contact & Location Map', 'kataskevi' ),
 			'panel'       => 'kataskevi_options_panel',
-			'priority'    => 110,
-			'description' => esc_html__( 'Configure the Contact page hero headlines, description, and urgent response callout card.', 'kataskevi' ),
+			'priority'    => 120,
+			'description' => esc_html__( 'Configure the Contact page hero headlines, description, urgent 24/7 callout, and Google Map location embed.', 'kataskevi' ),
 		)
 	);
 
@@ -2195,8 +2195,383 @@ function kataskevi_customize_register( $wp_customize ) {
 			'type'    => 'textarea',
 		)
 	);
+
+	// Contact Google Map: Display Toggle.
+	$wp_customize->add_setting(
+		'kataskevi_contact_show_map',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'wp_validate_boolean',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_show_map',
+		array(
+			'label'       => esc_html__( 'Display Office Location Map', 'kataskevi' ),
+			'description' => esc_html__( 'Toggle the interactive Google Map section on the Contact Us page.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_page_contact',
+			'type'        => 'checkbox',
+		)
+	);
+
+	// Contact Google Map: Eyebrow.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_eyebrow',
+		array(
+			'default'           => 'Visit Our Office',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_eyebrow',
+		array(
+			'label'   => esc_html__( 'Map Section Eyebrow', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'text',
+		)
+	);
+
+	// Contact Google Map: Title.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_title',
+		array(
+			'default'           => 'Engineering Headquarters & Consultation Hub',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_title',
+		array(
+			'label'   => esc_html__( 'Map Section Headline', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'text',
+		)
+	);
+
+	// Contact Google Map: Description.
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_desc',
+		array(
+			'default'           => 'Located in Victoria Island, Lagos. We welcome blueprint review meetings, technical audits, and project consultations.',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_desc',
+		array(
+			'label'   => esc_html__( 'Map Section Description', 'kataskevi' ),
+			'section' => 'kataskevi_sec_page_contact',
+			'type'    => 'textarea',
+		)
+	);
+
+	// Contact Google Map: Embed Code / URL.
+	$default_map_embed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2844.38140054598!2d3.4053212!3d6.4476227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b248e126613%3A0x58cb7affcae5e3a7!2s48%20King%20George%20V%20Rd%2C%20Lagos%20Island%2C%20Lagos%20234001%2C%20Lagos!5e1!3m2!1sen!2sng!4v1794913471007!5m2!1sen!2sng';
+	$wp_customize->add_setting(
+		'kataskevi_contact_map_embed',
+		array(
+			'default'           => $default_map_embed,
+			'sanitize_callback' => 'kataskevi_sanitize_map_embed',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_contact_map_embed',
+		array(
+			'label'       => esc_html__( 'Google Map Embed Code or URL', 'kataskevi' ),
+			'description' => esc_html__( 'Paste full <iframe> embed HTML or direct Google Maps embed URL (https://www.google.com/maps/embed?pb=...). Automatically parsed and sanitized.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_page_contact',
+			'type'        => 'textarea',
+		)
+	);
+
+	/*
+	 * =========================================================================
+	 * SECTION 13: CONSULTATION & FORM SETTINGS
+	 * =========================================================================
+	 */
+	$wp_customize->add_section(
+		'kataskevi_sec_forms',
+		array(
+			'title'       => esc_html__( '13. Inquiry & Form Settings', 'kataskevi' ),
+			'panel'       => 'kataskevi_options_panel',
+			'priority'    => 130,
+			'description' => esc_html__( 'Configure consultation & site survey form notifications, labels, success messages, and field options.', 'kataskevi' ),
+		)
+	);
+
+	// Form Section Title.
+	$wp_customize->add_setting(
+		'kataskevi_form_title',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_title',
+		array(
+			'label'       => esc_html__( 'Form Header Headline (Optional)', 'kataskevi' ),
+			'description' => esc_html__( 'Leave empty to preserve minimal split layout or enter a custom form headline (e.g. "Request a Consultation").', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'text',
+		)
+	);
+
+	// Form Section Description.
+	$wp_customize->add_setting(
+		'kataskevi_form_desc',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_desc',
+		array(
+			'label'       => esc_html__( 'Form Lead Description (Optional)', 'kataskevi' ),
+			'description' => esc_html__( 'Optional brief instructions displayed directly above the form fields.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'textarea',
+		)
+	);
+
+	// Form Recipient Email.
+	$wp_customize->add_setting(
+		'kataskevi_form_recipient_email',
+		array(
+			'default'           => get_option( 'admin_email' ),
+			'sanitize_callback' => 'sanitize_email',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_recipient_email',
+		array(
+			'label'       => esc_html__( 'Notification Recipient Email', 'kataskevi' ),
+			'description' => esc_html__( 'Email address where new consultation requests and survey inquiries will be dispatched.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'email',
+		)
+	);
+
+	// Form Email Subject.
+	$wp_customize->add_setting(
+		'kataskevi_form_email_subject',
+		array(
+			'default'           => esc_html__( '[Kataskevi Inquiry] New Consultation Request', 'kataskevi' ),
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_email_subject',
+		array(
+			'label'       => esc_html__( 'Notification Subject Prefix', 'kataskevi' ),
+			'description' => esc_html__( 'Prefix used in email subject lines for new inquiries.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'text',
+		)
+	);
+
+	// Submit Button Label.
+	$wp_customize->add_setting(
+		'kataskevi_form_submit_label',
+		array(
+			'default'           => esc_html__( 'Submit Consultation Request', 'kataskevi' ),
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_submit_label',
+		array(
+			'label'       => esc_html__( 'Submit Button Text', 'kataskevi' ),
+			'description' => esc_html__( 'Call-to-action text on the inquiry form submit button.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'text',
+		)
+	);
+
+	// Success Message.
+	$wp_customize->add_setting(
+		'kataskevi_form_success_msg',
+		array(
+			'default'           => esc_html__( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' ),
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_success_msg',
+		array(
+			'label'       => esc_html__( 'Success Confirmation Message', 'kataskevi' ),
+			'description' => esc_html__( 'Message shown to clients after successful submission.', 'kataskevi' ),
+			'section'     => 'kataskevi_sec_forms',
+			'type'        => 'textarea',
+		)
+	);
+
+	// Show Phone Field.
+	$wp_customize->add_setting(
+		'kataskevi_form_show_phone',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'wp_validate_boolean',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_show_phone',
+		array(
+			'label'   => esc_html__( 'Display Phone Number Field', 'kataskevi' ),
+			'section' => 'kataskevi_sec_forms',
+			'type'    => 'checkbox',
+		)
+	);
+
+	// Show Company Field.
+	$wp_customize->add_setting(
+		'kataskevi_form_show_org',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'wp_validate_boolean',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_show_org',
+		array(
+			'label'   => esc_html__( 'Display Company / Organization Field', 'kataskevi' ),
+			'section' => 'kataskevi_sec_forms',
+			'type'    => 'checkbox',
+		)
+	);
+
+	// Show Service Dropdown.
+	$wp_customize->add_setting(
+		'kataskevi_form_show_service',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'wp_validate_boolean',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'kataskevi_form_show_service',
+		array(
+			'label'   => esc_html__( 'Display Service / System Selection Field', 'kataskevi' ),
+			'section' => 'kataskevi_sec_forms',
+			'type'    => 'checkbox',
+		)
+	);
 }
 add_action( 'customize_register', 'kataskevi_customize_register' );
+
+/**
+ * Enqueue refined, modern styles for Theme Customizer controls panel.
+ *
+ * @return void
+ */
+function kataskevi_customizer_controls_styles() {
+	?>
+	<style type="text/css">
+		/* Clean & Refined Kataskevi Customizer Theme */
+		#accordion-panel-kataskevi_options_panel > h3 {
+			background: linear-gradient(135deg, #3f75a1 0%, #2f597c 100%) !important;
+			color: #ffffff !important;
+			font-weight: 600 !important;
+			letter-spacing: 0.02em !important;
+			padding: 13px 15px !important;
+			border-radius: 4px;
+			margin: 8px 12px;
+			box-shadow: 0 2px 6px rgba(63, 117, 161, 0.25);
+		}
+		#accordion-panel-kataskevi_options_panel > h3:hover,
+		#accordion-panel-kataskevi_options_panel > h3:focus {
+			background: linear-gradient(135deg, #346389 0%, #254662 100%) !important;
+			color: #ffffff !important;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .accordion-section-title {
+			border-left: 3px solid transparent !important;
+			transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+			font-weight: 500;
+			color: #1e293b;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .accordion-section-title:hover {
+			border-left-color: #3f75a1 !important;
+			background-color: #f8fafc !important;
+			color: #0f172a !important;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .customize-section-description {
+			background: #f8fafc;
+			border-left: 3px solid #3f75a1;
+			border-radius: 4px;
+			padding: 10px 14px;
+			margin: 12px 0 16px 0;
+			font-size: 12px;
+			line-height: 1.5;
+			color: #475569;
+			font-style: normal;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .customize-control {
+			margin-bottom: 18px;
+			padding-bottom: 16px;
+			border-bottom: 1px solid #f1f5f9;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .customize-control:last-child {
+			border-bottom: none;
+			margin-bottom: 10px;
+			padding-bottom: 0;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .customize-control-title {
+			font-weight: 600;
+			color: #1e293b;
+			font-size: 13px;
+			margin-bottom: 4px;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .customize-control-description {
+			color: #64748b;
+			font-size: 11.5px;
+			line-height: 1.45;
+			font-style: normal;
+			margin-bottom: 8px;
+		}
+		#sub-accordion-panel-kataskevi_options_panel input[type="text"],
+		#sub-accordion-panel-kataskevi_options_panel input[type="email"],
+		#sub-accordion-panel-kataskevi_options_panel input[type="url"],
+		#sub-accordion-panel-kataskevi_options_panel textarea,
+		#sub-accordion-panel-kataskevi_options_panel select {
+			border-color: #cbd5e1;
+			border-radius: 6px;
+			padding: 7px 10px;
+			font-size: 13px;
+			transition: border-color 0.15s ease, box-shadow 0.15s ease;
+		}
+		#sub-accordion-panel-kataskevi_options_panel input[type="text"]:focus,
+		#sub-accordion-panel-kataskevi_options_panel input[type="email"]:focus,
+		#sub-accordion-panel-kataskevi_options_panel input[type="url"]:focus,
+		#sub-accordion-panel-kataskevi_options_panel textarea:focus,
+		#sub-accordion-panel-kataskevi_options_panel select:focus {
+			border-color: #3f75a1;
+			box-shadow: 0 0 0 2px rgba(63, 117, 161, 0.2);
+			outline: none;
+		}
+		#sub-accordion-panel-kataskevi_options_panel .button {
+			border-radius: 6px;
+			height: auto;
+			padding: 5px 12px;
+		}
+	</style>
+	<?php
+}
+add_action( 'customize_controls_print_styles', 'kataskevi_customizer_controls_styles' );
 
 /**
  * Safe helper to retrieve Theme Customizer options with fallback default.

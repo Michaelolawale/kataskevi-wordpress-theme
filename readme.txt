@@ -1,10 +1,10 @@
 === Kataskevi ===
-Contributors: unionolivia
+Contributors: kataskevi
 Tags: engineering, safety, telecommunications, corporate, responsive-layout, modern, grid-layout, accessibility-ready
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: v2.2.3
+Stable tag: v2.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,12 +24,23 @@ High-performance, bespoke WordPress theme for Kataskevi - Engineering, Safety, I
 == Frequently Asked Questions ==
 
 = How do theme updates work? =
-Updates are distributed through the integrated Plugin Update Checker (PUC) v6.0 connected directly to the Bitbucket repository (`https://bitbucket.org/unionolivia/kataskevi`). When a new release tag is published on Bitbucket, WordPress detects the update and allows one-click upgrading directly from Appearance > Themes or Dashboard > Updates.
+Updates are distributed through the integrated Plugin Update Checker (PUC) v6.0 connected directly to your private Bitbucket repository. When a new release tag is published on Bitbucket, WordPress detects the update and allows one-click upgrading directly from Appearance > Themes or Dashboard > Updates.
 
 = How do I configure private Bitbucket updates? =
-Navigate to Appearance > Theme Updates in your WordPress admin dashboard and input your Bitbucket Username (`unionolivia`) along with an App Password configured with `Repositories: Read` permissions.
+Navigate to Appearance > Theme Updates in your WordPress admin dashboard and input your Bitbucket Username (or registered email) along with an App Password configured with `Repositories: Read` permissions.
 
 == Changelog ==
+
+= 2.2.4 =
+* Theme Customizer & Updates UI Refinement: Clean, sequential section numbering (1-13) with dedicated "13. Inquiry & Form Settings" section.
+* Admin Updates & Settings Tabbed Organization: Rearranged into tabs (Form Settings & Leads, Google Maps Location, and Theme Updates placed last).
+* Private Credentials Sanitization: Replaced specific emails and usernames in placeholders with generic examples.
+* Lifecycle Banner Gradient Smooth Blend: Fixed harsh raster line transition where the banner image and gradient meet the 4-step lifecycle cards.
+* Full WordPress Coding Standards (WPCS) Compliance: Standardized Yoda conditions, string concatenation, sanitization, escaping, and secure DOM element creation.
+* Smooth Cross-Page & View Transitions: implemented native View Transitions API with cross-browser CSS fade-in entrance and seamless page exit animations on internal link clicks.
+* Scroll-Driven Reveal Animations: integrated lightweight `IntersectionObserver` across all cards, heroes, grids, and case blocks with staggered cascade delays.
+* Micro-Transition Refinements: enhanced hover transitions for `.btn-pill`, nav links, cards, accordion panels, and mobile drawer.
+* Full Accessibility: complete reduced-motion safeguards adhering to WCAG and `prefers-reduced-motion`.
 
 = 2.2.3 =
 * High-Performance Image Optimization: converted all theme assets to modern WebP format with automated fallback.

@@ -11,7 +11,7 @@
  * Adheres strictly to the WordPress PHP Coding Standards (WPCS).
  *
  * @package Kataskevi
- * @version 2.1.9
+ * @version 2.2.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -105,7 +105,7 @@ function kataskevi_init_update_checker() {
 		if ( preg_match( '@^/?(?P<username>[^/]+?)/(?P<repository>[^/#?&]+?)/?$@', $path, $matches ) ) {
 			$auth_creds['username'] = $matches['username'];
 		} else {
-			$auth_creds['username'] = 'unionolivia';
+			$auth_creds['username'] = '';
 		}
 	}
 
@@ -166,8 +166,8 @@ function kataskevi_test_bitbucket_connection() {
 		$owner = $matches['owner'];
 		$repo  = $matches['repo'];
 	} else {
-		$owner = 'unionolivia';
-		$repo  = 'kataskevi';
+		$owner = '';
+		$repo  = '';
 	}
 
 	if ( empty( $user ) && ! empty( $token ) ) {
@@ -284,8 +284,8 @@ function kataskevi_handle_updater_actions() {
 		return;
 	}
 
-	// 1. Handle Saving Credentials Form.
-	if ( 'POST' === ( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) && isset( $_POST['kataskevi_save_repo_settings'] ) ) {
+	// 1. Handle Saving Bitbucket Credentials Form.
+	if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['kataskevi_save_repo_settings'] ) ) {
 		check_admin_referer( 'kataskevi_repo_settings_nonce', 'kataskevi_repo_nonce' );
 
 		$repo_url = isset( $_POST['kataskevi_bitbucket_repo'] ) ? esc_url_raw( wp_unslash( $_POST['kataskevi_bitbucket_repo'] ) ) : '';
@@ -313,12 +313,12 @@ function kataskevi_handle_updater_actions() {
 		$diag = kataskevi_test_bitbucket_connection();
 		set_transient( 'kataskevi_diag_results', $diag, 300 );
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'updated' => '1', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'updates', 'updated' => '1', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 
-	// 1b. Handle Saving Contact Google Map Settings Form.
-	if ( 'POST' === ( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) && isset( $_POST['kataskevi_save_map_settings'] ) ) {
+	// 2. Handle Saving Contact Google Map Settings Form.
+	if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['kataskevi_save_map_settings'] ) ) {
 		check_admin_referer( 'kataskevi_map_settings_nonce', 'kataskevi_map_nonce' );
 
 		$show_map    = isset( $_POST['kataskevi_contact_show_map'] ) ? 1 : 0;
@@ -343,11 +343,60 @@ function kataskevi_handle_updater_actions() {
 		set_theme_mod( 'kataskevi_contact_map_desc', $map_desc );
 		set_theme_mod( 'kataskevi_contact_map_embed', $clean_embed );
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'map_updated' => '1' ), admin_url( 'themes.php' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'map', 'map_updated' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 
-	// 2. Handle Manual "Check for Updates" Button.
+	// 3. Handle Saving Consultation Form Settings.
+	if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['kataskevi_save_form_settings'] ) ) {
+		check_admin_referer( 'kataskevi_form_settings_nonce', 'kataskevi_form_nonce' );
+
+		$recipient_email = isset( $_POST['kataskevi_form_recipient_email'] ) ? sanitize_email( wp_unslash( $_POST['kataskevi_form_recipient_email'] ) ) : '';
+		$subject_prefix  = isset( $_POST['kataskevi_form_email_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_form_email_subject'] ) ) : '';
+		$submit_label    = isset( $_POST['kataskevi_form_submit_label'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_form_submit_label'] ) ) : '';
+		$success_msg     = isset( $_POST['kataskevi_form_success_msg'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kataskevi_form_success_msg'] ) ) : '';
+		$form_title      = isset( $_POST['kataskevi_form_title'] ) ? sanitize_text_field( wp_unslash( $_POST['kataskevi_form_title'] ) ) : '';
+		$form_desc       = isset( $_POST['kataskevi_form_desc'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kataskevi_form_desc'] ) ) : '';
+		$show_phone      = isset( $_POST['kataskevi_form_show_phone'] ) ? 1 : 0;
+		$show_org        = isset( $_POST['kataskevi_form_show_org'] ) ? 1 : 0;
+		$show_service    = isset( $_POST['kataskevi_form_show_service'] ) ? 1 : 0;
+
+		update_option( 'kataskevi_form_recipient_email', $recipient_email );
+		update_option( 'kataskevi_form_email_subject', $subject_prefix );
+		update_option( 'kataskevi_form_submit_label', $submit_label );
+		update_option( 'kataskevi_form_success_msg', $success_msg );
+		update_option( 'kataskevi_form_title', $form_title );
+		update_option( 'kataskevi_form_desc', $form_desc );
+		update_option( 'kataskevi_form_show_phone', $show_phone );
+		update_option( 'kataskevi_form_show_org', $show_org );
+		update_option( 'kataskevi_form_show_service', $show_service );
+
+		// Sync with theme mod
+		set_theme_mod( 'kataskevi_form_recipient_email', $recipient_email );
+		set_theme_mod( 'kataskevi_form_email_subject', $subject_prefix );
+		set_theme_mod( 'kataskevi_form_submit_label', $submit_label );
+		set_theme_mod( 'kataskevi_form_success_msg', $success_msg );
+		set_theme_mod( 'kataskevi_form_title', $form_title );
+		set_theme_mod( 'kataskevi_form_desc', $form_desc );
+		set_theme_mod( 'kataskevi_form_show_phone', (bool) $show_phone );
+		set_theme_mod( 'kataskevi_form_show_org', (bool) $show_org );
+		set_theme_mod( 'kataskevi_form_show_service', (bool) $show_service );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'forms', 'form_updated' => '1' ), admin_url( 'themes.php' ) ) );
+		exit;
+	}
+
+	// 4. Handle Clearing Recent Inquiries Log.
+	if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['kataskevi_clear_inquiries'] ) ) {
+		check_admin_referer( 'kataskevi_clear_inquiries_nonce', 'kataskevi_clear_nonce' );
+
+		delete_option( 'kataskevi_recent_inquiries' );
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'forms', 'inquiries_cleared' => '1' ), admin_url( 'themes.php' ) ) );
+		exit;
+	}
+
+	// 5. Handle Manual "Check for Updates" Button.
 	if ( isset( $_GET['action'] ) && 'check_now' === $_GET['action'] ) {
 		check_admin_referer( 'kataskevi_manual_check_nonce' );
 
@@ -381,25 +430,25 @@ function kataskevi_handle_updater_actions() {
 		$diag = kataskevi_test_bitbucket_connection();
 		set_transient( 'kataskevi_diag_results', $diag, 300 );
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'check_result' => $status, 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'updates', 'check_result' => $status, 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 
-	// 3. Handle Diagnostic "Test Connection" Button.
+	// 6. Handle Diagnostic "Test Connection" Button.
 	if ( isset( $_GET['action'] ) && 'test_connection' === $_GET['action'] ) {
 		check_admin_referer( 'kataskevi_test_connection_nonce' );
 
 		$diag = kataskevi_test_bitbucket_connection();
 		set_transient( 'kataskevi_diag_results', $diag, 300 );
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'page' => 'kataskevi-updates', 'tab' => 'updates', 'diag_run' => '1' ), admin_url( 'themes.php' ) ) );
 		exit;
 	}
 }
 add_action( 'admin_init', 'kataskevi_handle_updater_actions' );
 
 /**
- * Render the Theme Updates administrative page.
+ * Render the Theme Updates and Settings administrative page.
  *
  * @return void
  */
@@ -411,7 +460,7 @@ function kataskevi_render_updater_page() {
 	global $kataskevi_update_checker;
 
 	$theme         = wp_get_theme( 'kataskevi' );
-	$current_ver   = $theme->exists() ? $theme->get( 'Version' ) : '2.1.2';
+	$current_ver   = $theme->exists() ? $theme->get( 'Version' ) : KATASKEVI_VERSION;
 	$saved_repo    = get_option( 'kataskevi_bitbucket_repo', 'https://bitbucket.org/unionolivia/kataskevi' );
 	$saved_branch  = get_option( 'kataskevi_bitbucket_branch', 'main' );
 	$saved_user    = get_option( 'kataskevi_bitbucket_user', '' );
@@ -422,15 +471,33 @@ function kataskevi_render_updater_page() {
 	$has_const_user  = defined( 'KATASKEVI_BITBUCKET_USER' );
 	$has_const_token = defined( 'KATASKEVI_BITBUCKET_TOKEN' );
 
+	$active_tab   = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'forms';
 	$check_result = isset( $_GET['check_result'] ) ? sanitize_text_field( wp_unslash( $_GET['check_result'] ) ) : '';
 	$is_updated   = isset( $_GET['updated'] ) && '1' === $_GET['updated'];
+	$form_updated = isset( $_GET['form_updated'] ) && '1' === $_GET['form_updated'];
+	$inq_cleared  = isset( $_GET['inquiries_cleared'] ) && '1' === $_GET['inquiries_cleared'];
 	$map_updated  = isset( $_GET['map_updated'] ) && '1' === $_GET['map_updated'];
 	$diag_run     = isset( $_GET['diag_run'] ) && '1' === $_GET['diag_run'];
 	$diag_results = get_transient( 'kataskevi_diag_results' );
 	$error_notice = get_transient( 'kataskevi_update_error_notice' );
 
-	$default_map_embed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2844.38140054598!2d3.4053212!3d6.4476227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b248e126613%3A0x58cb7affcae5e3a7!2s48%20King%20George%20V%20Rd%2C%20Lagos%20Island%2C%20Lagos%20234001%2C%20Lagos!5e1!3m2!1sen!2sng!4v1794913471007!5m2!1sen!2sng';
+	// Form Settings Options.
+	$form_email     = get_option( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) ) ) );
+	$form_subject   = get_option( 'kataskevi_form_email_subject', get_theme_mod( 'kataskevi_form_email_subject', '[Kataskevi Inquiry] New Consultation Request' ) );
+	$form_submit    = get_option( 'kataskevi_form_submit_label', get_theme_mod( 'kataskevi_form_submit_label', 'Submit Consultation Request' ) );
+	$form_success   = get_option( 'kataskevi_form_success_msg', get_theme_mod( 'kataskevi_form_success_msg', 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.' ) );
+	$form_title     = get_option( 'kataskevi_form_title', get_theme_mod( 'kataskevi_form_title', '' ) );
+	$form_desc      = get_option( 'kataskevi_form_desc', get_theme_mod( 'kataskevi_form_desc', '' ) );
+	$form_phone     = (bool) get_option( 'kataskevi_form_show_phone', get_theme_mod( 'kataskevi_form_show_phone', 1 ) );
+	$form_org       = (bool) get_option( 'kataskevi_form_show_org', get_theme_mod( 'kataskevi_form_show_org', 1 ) );
+	$form_service   = (bool) get_option( 'kataskevi_form_show_service', get_theme_mod( 'kataskevi_form_show_service', 1 ) );
+	$inquiries_list = get_option( 'kataskevi_recent_inquiries', array() );
+	if ( ! is_array( $inquiries_list ) ) {
+		$inquiries_list = array();
+	}
 
+	// Map Options.
+	$default_map_embed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2844.38140054598!2d3.4053212!3d6.4476227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b248e126613%3A0x58cb7affcae5e3a7!2s48%20King%20George%20V%20Rd%2C%20Lagos%20Island%2C%20Lagos%20234001%2C%20Lagos!5e1!3m2!1sen!2sng!4v1794913471007!5m2!1sen!2sng';
 	$saved_show_map    = get_option( 'kataskevi_contact_show_map', get_theme_mod( 'kataskevi_contact_show_map', 1 ) );
 	$saved_map_eyebrow = get_option( 'kataskevi_contact_map_eyebrow', get_theme_mod( 'kataskevi_contact_map_eyebrow', 'Visit Our Office' ) );
 	$saved_map_title   = get_option( 'kataskevi_contact_map_title', get_theme_mod( 'kataskevi_contact_map_title', 'Engineering Headquarters & Consultation Hub' ) );
@@ -440,25 +507,186 @@ function kataskevi_render_updater_page() {
 		$saved_map_embed = $default_map_embed;
 	}
 	?>
-	<div class="wrap kataskevi-admin-wrap" style="max-width: 960px; margin-top: 2rem;">
+	<div class="wrap kataskevi-admin-wrap" style="max-width: 1040px; margin-top: 1.5rem;">
 		
-		<h1 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-			<span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #3f75a1; border-radius: 8px; color: #fff; font-weight: bold; font-size: 1.125rem;">K</span>
-			<span><?php esc_html_e( 'Kataskevi — Theme Updates & Repository Settings', 'kataskevi' ); ?></span>
-		</h1>
-		<p class="description" style="margin-bottom: 2rem; font-size: 0.95rem;">
-			<?php esc_html_e( 'Configure your Bitbucket repository details and private credentials to enable automated, one-click theme updates directly within WordPress.', 'kataskevi' ); ?>
+		<style type="text/css">
+			.kataskevi-admin-wrap {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+			}
+			.kataskevi-header-badge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 38px;
+				height: 38px;
+				background: linear-gradient(135deg, #3f75a1 0%, #2f597c 100%);
+				border-radius: 8px;
+				color: #fff;
+				font-weight: 700;
+				font-size: 1.2rem;
+				box-shadow: 0 2px 6px rgba(63, 117, 161, 0.25);
+			}
+			.kataskevi-nav-tabs {
+				margin: 1.25rem 0 1.5rem 0;
+				display: flex;
+				gap: 4px;
+				border-bottom: 2px solid #e2e8f0;
+			}
+			.kataskevi-tab-item {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 10px 18px;
+				font-size: 14px;
+				font-weight: 600;
+				color: #64748b;
+				text-decoration: none;
+				border-bottom: 2px solid transparent;
+				margin-bottom: -2px;
+				transition: all 0.2s ease;
+			}
+			.kataskevi-tab-item:hover {
+				color: #3f75a1;
+			}
+			.kataskevi-tab-item.active {
+				color: #3f75a1;
+				border-bottom-color: #3f75a1;
+				background: transparent;
+			}
+			.kataskevi-card {
+				background: #ffffff;
+				border: 1px solid #e2e8f0;
+				border-radius: 10px;
+				box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+				padding: 22px 26px;
+				margin-bottom: 24px;
+			}
+			.kataskevi-card-title {
+				margin-top: 0;
+				font-size: 1.15rem;
+				font-weight: 600;
+				color: #1e293b;
+				border-bottom: 1px solid #f1f5f9;
+				padding-bottom: 12px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.kataskevi-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 3px 10px;
+				border-radius: 999px;
+				font-size: 0.8rem;
+				font-weight: 600;
+			}
+			.kataskevi-badge-success { background: #dcfce7; color: #15803d; }
+			.kataskevi-badge-warning { background: #fef3c7; color: #b45309; }
+			.kataskevi-badge-info    { background: #e0f2fe; color: #0369a1; }
+			.kataskevi-badge-danger  { background: #fee2e2; color: #991b1b; }
+			.kataskevi-btn-primary {
+				background: #3f75a1 !important;
+				border-color: #3f75a1 !important;
+				color: #fff !important;
+				font-weight: 500 !important;
+				border-radius: 6px !important;
+				padding: 5px 16px !important;
+				height: auto !important;
+				transition: background 0.15s ease !important;
+			}
+			.kataskevi-btn-primary:hover,
+			.kataskevi-btn-primary:focus {
+				background: #346389 !important;
+				border-color: #346389 !important;
+				color: #fff !important;
+			}
+			.kataskevi-table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			.kataskevi-table th {
+				background: #f8fafc;
+				padding: 10px 14px;
+				font-size: 12px;
+				font-weight: 600;
+				color: #475569;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				border-bottom: 1px solid #e2e8f0;
+				text-align: left;
+			}
+			.kataskevi-table td {
+				padding: 12px 14px;
+				font-size: 13.5px;
+				color: #1e293b;
+				border-bottom: 1px solid #f1f5f9;
+				vertical-align: top;
+			}
+			.kataskevi-table tr:hover td {
+				background-color: #fafbfc;
+			}
+		</style>
+
+		<!-- HEADER -->
+		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 0.5rem;">
+			<h1 style="display: flex; align-items: center; gap: 0.75rem; margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a;">
+				<span class="kataskevi-header-badge">K</span>
+				<span><?php esc_html_e( 'Kataskevi — Theme Settings & Updates', 'kataskevi' ); ?></span>
+			</h1>
+			<div style="display: flex; align-items: center; gap: 8px;">
+				<span class="kataskevi-badge kataskevi-badge-info">
+					v<?php echo esc_html( $current_ver ); ?>
+				</span>
+				<a href="<?php echo esc_url( admin_url( 'customize.php' ) ); ?>" class="button">
+					🎨 <?php esc_html_e( 'Open Customizer', 'kataskevi' ); ?>
+				</a>
+			</div>
+		</div>
+		<p class="description" style="margin-bottom: 1.25rem; font-size: 0.95rem; color: #64748b;">
+			<?php esc_html_e( 'Configure automated Bitbucket theme updates, manage inquiry form routing and consultation leads, and customize your office Google Maps embed.', 'kataskevi' ); ?>
 		</p>
 
+		<!-- TAB NAVIGATION -->
+		<nav class="kataskevi-nav-tabs" aria-label="<?php esc_attr_e( 'Theme Settings Tabs', 'kataskevi' ); ?>">
+			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=forms' ) ); ?>" class="kataskevi-tab-item <?php echo 'forms' === $active_tab ? 'active' : ''; ?>">
+				📩 <span><?php esc_html_e( 'Form Settings & Leads', 'kataskevi' ); ?></span>
+				<?php if ( ! empty( $inquiries_list ) ) : ?>
+					<span class="kataskevi-badge kataskevi-badge-info" style="font-size: 11px; padding: 1px 7px;">
+						<?php echo count( $inquiries_list ); ?>
+					</span>
+				<?php endif; ?>
+			</a>
+			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=map' ) ); ?>" class="kataskevi-tab-item <?php echo 'map' === $active_tab ? 'active' : ''; ?>">
+				📍 <span><?php esc_html_e( 'Google Maps Location', 'kataskevi' ); ?></span>
+			</a>
+			<a href="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates' ) ); ?>" class="kataskevi-tab-item <?php echo 'updates' === $active_tab ? 'active' : ''; ?>">
+				🔄 <span><?php esc_html_e( 'Theme Updates & Git Repository', 'kataskevi' ); ?></span>
+			</a>
+		</nav>
+
+		<!-- NOTICES -->
 		<?php if ( $is_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #3f75a1;">
-				<p><strong><?php esc_html_e( 'Repository settings and credentials saved successfully.', 'kataskevi' ); ?></strong></p>
+				<p><strong>✅ <?php esc_html_e( 'Repository settings and credentials saved successfully.', 'kataskevi' ); ?></strong></p>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $form_updated ) : ?>
+			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
+				<p><strong>✅ <?php esc_html_e( 'Form settings updated! Client inquiries will now follow your configured notifications and messages.', 'kataskevi' ); ?></strong></p>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $inq_cleared ) : ?>
+			<div class="notice notice-warning is-dismissible" style="border-left-color: #f59e0b;">
+				<p><strong>🗑️ <?php esc_html_e( 'Inquiries log has been cleared successfully.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
 		<?php if ( $map_updated ) : ?>
 			<div class="notice notice-success is-dismissible" style="border-left-color: #10b981;">
-				<p><strong><?php esc_html_e( '✅ Contact Google Map settings saved successfully! The map is updated on your Contact page.', 'kataskevi' ); ?></strong></p>
+				<p><strong>✅ <?php esc_html_e( 'Google Maps settings saved! Your office location on the Contact page is updated.', 'kataskevi' ); ?></strong></p>
 			</div>
 		<?php endif; ?>
 
@@ -468,7 +696,7 @@ function kataskevi_render_updater_page() {
 					<strong>🎉 <?php esc_html_e( 'A new version of Kataskevi is available on Bitbucket!', 'kataskevi' ); ?></strong>
 				</p>
 				<p style="margin: 0;">
-					<a href="<?php echo esc_url( admin_url( 'update-core.php' ) ); ?>" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1;">
+					<a href="<?php echo esc_url( admin_url( 'update-core.php' ) ); ?>" class="button kataskevi-btn-primary">
 						<?php esc_html_e( 'Go to WordPress Updates & Install Now', 'kataskevi' ); ?> &rarr;
 					</a>
 				</p>
@@ -483,409 +711,592 @@ function kataskevi_render_updater_page() {
 				<?php if ( ! empty( $error_notice ) ) : ?>
 					<p style="margin: 0 0 8px 0; font-family: monospace; font-size: 0.88rem;"><?php echo esc_html( $error_notice ); ?></p>
 				<?php endif; ?>
-				<?php if ( ! empty( $error_notice ) && false !== strpos( $error_notice, '403' ) ) : ?>
-					<div style="background: #fff; border: 1px solid #fecaca; border-radius: 6px; padding: 12px 14px; margin-top: 8px; color: #1e293b; font-size: 0.9rem; line-height: 1.6;">
-						<strong style="color: #b91c1c;"><?php esc_html_e( 'Why did Bitbucket return HTTP 403 (Forbidden)?', 'kataskevi' ); ?></strong>
-						<ol style="margin: 8px 0 8px 18px; padding: 0;">
-							<li><strong><?php esc_html_e( 'Atlassian API Token vs Bitbucket App Password:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Tokens created at id.atlassian.com are Jira/Confluence tokens and cannot access Bitbucket code. You must create a Bitbucket App Password instead.', 'kataskevi' ); ?></li>
-							<li><strong><?php esc_html_e( 'Missing Permission Scope:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'When creating your Bitbucket App Password, the "Repositories: Read" checkbox must be selected.', 'kataskevi' ); ?></li>
-						</ol>
-						<p style="margin: 0;">
-							👉 <a href="https://bitbucket.org/account/settings/app-passwords/" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Open Bitbucket App Passwords &rarr;', 'kataskevi' ); ?></strong></a> <?php esc_html_e( 'Create a new password with "Repositories: Read", then enter your username "unionolivia" and the new password below.', 'kataskevi' ); ?>
-						</p>
-					</div>
-				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
-		<!-- System Status Card -->
-		<div class="card" style="max-width: 100%; padding: 20px 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">
-			<h2 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid #eee; padding-bottom: 12px;">
-				<?php esc_html_e( 'Current Installation & Status', 'kataskevi' ); ?>
-			</h2>
+		<!-- ================================================================= -->
+		<!-- TAB 1: CONSULTATION FORM SETTINGS & INQUIRIES LEADS -->
+		<!-- ================================================================= -->
+		<?php if ( 'forms' === $active_tab ) : ?>
 
-			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0;">
-				<div style="background: #f8fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #e2e8f0;">
-					<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Installed Version', 'kataskevi' ); ?></span>
-					<strong style="font-size: 1.25rem; color: #1e293b;">v<?php echo esc_html( $current_ver ); ?></strong>
-				</div>
+			<!-- Form Configuration Settings -->
+			<div class="kataskevi-card">
+				<h2 class="kataskevi-card-title">
+					<span>⚙️</span>
+					<span><?php esc_html_e( 'Consultation & Inquiry Form Routing', 'kataskevi' ); ?></span>
+				</h2>
+				<p class="description" style="margin-bottom: 20px;">
+					<?php esc_html_e( 'Configure where consultation requests and site survey inquiries are delivered, customize automated email notifications, and set form copy.', 'kataskevi' ); ?>
+				</p>
 
-				<div style="background: #f8fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #e2e8f0;">
-					<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Target Branch', 'kataskevi' ); ?></span>
-					<strong style="font-size: 1.1rem; color: #1e293b; font-family: monospace;"><?php echo esc_html( $saved_branch ); ?></strong>
-				</div>
+				<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=forms' ) ); ?>">
+					<?php wp_nonce_field( 'kataskevi_form_settings_nonce', 'kataskevi_form_nonce' ); ?>
 
-				<div style="background: #f8fafc; padding: 14px 16px; border-radius: 6px; border: 1px solid #e2e8f0;">
-					<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Authentication Status', 'kataskevi' ); ?></span>
-					<?php if ( $is_configured || $has_const_token ) : ?>
-						<span style="display: inline-flex; align-items: center; gap: 4px; background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
-							● <?php esc_html_e( 'Configured (Private Repo Ready)', 'kataskevi' ); ?>
-						</span>
-					<?php else : ?>
-						<span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
-							○ <?php esc_html_e( 'Unauthenticated (Requires App Password for Private Repo)', 'kataskevi' ); ?>
-						</span>
-					<?php endif; ?>
-				</div>
-			</div>
-
-			<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-				<div style="font-size: 0.875rem; color: #64748b;">
-					<span><?php esc_html_e( 'Remote Repository:', 'kataskevi' ); ?></span>
-					<a href="<?php echo esc_url( $saved_repo ); ?>" target="_blank" rel="noopener noreferrer" style="font-family: monospace; color: #3f75a1;">
-						<?php echo esc_html( $saved_repo ); ?>
-					</a>
-				</div>
-				<div style="display: flex; gap: 8px;">
-					<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&action=test_connection' ), 'kataskevi_test_connection_nonce' ) ); ?>" class="button button-secondary">
-						🔍 <?php esc_html_e( 'Test Connection & Diagnostics', 'kataskevi' ); ?>
-					</a>
-					<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1;">
-						🔄 <?php esc_html_e( 'Check for Updates Now', 'kataskevi' ); ?>
-					</a>
-				</div>
-			</div>
-		</div>
-
-		<?php if ( $diag_run && is_array( $diag_results ) ) : ?>
-			<!-- Live Diagnostic Report Card -->
-			<div class="card" style="max-width: 100%; padding: 20px 24px; border-radius: 8px; border: 1px solid #bbf7d0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #f0fdf4;">
-				<h3 style="margin-top: 0; font-size: 1.1rem; color: #166534; display: flex; align-items: center; gap: 8px;">
-					<span>🩺</span>
-					<span><?php esc_html_e( 'Bitbucket API Live Diagnostics Report', 'kataskevi' ); ?></span>
-					<span style="font-size: 0.8rem; font-weight: normal; color: #15803d; margin-left: auto;">
-						<?php echo esc_html( $diag_results['timestamp'] ); ?>
-					</span>
-				</h3>
-
-				<div style="background: #fff; border: 1px solid #dcfce7; border-radius: 6px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;">
-					<table style="width: 100%; border-collapse: collapse; text-align: left;">
+					<table class="form-table" role="presentation">
 						<tbody>
-							<tr style="border-bottom: 1px solid #f1f5f9;">
-								<td style="padding: 6px 0; color: #64748b; width: 220px; font-weight: 600;"><?php esc_html_e( 'API Connection Status', 'kataskevi' ); ?></td>
-								<td style="padding: 6px 0;">
-									<?php if ( $diag_results['api_accessible'] ) : ?>
-										<strong style="color: #15803d;">HTTP 200 OK — Repository Accessible</strong>
-									<?php else : ?>
-										<strong style="color: #dc2626;">HTTP <?php echo esc_html( $diag_results['http_code'] ); ?> — <?php echo esc_html( $diag_results['error_message'] ); ?></strong>
-									<?php endif; ?>
-								</td>
-							</tr>
-							<tr style="border-bottom: 1px solid #f1f5f9;">
-								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'readme.txt Stable Tag', 'kataskevi' ); ?></td>
-								<td style="padding: 6px 0;">
-									<?php if ( $diag_results['readme_found'] && ! empty( $diag_results['stable_tag'] ) ) : ?>
-										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['stable_tag'] ); ?></code>
-										<span style="color: #15803d; font-size: 0.85rem; margin-left: 6px;">(Primary PUC Strategy)</span>
-									<?php elseif ( $diag_results['readme_found'] ) : ?>
-										<span style="color: #b45309;">readme.txt present but missing 'Stable tag:' header</span>
-									<?php else : ?>
-										<span style="color: #dc2626;">readme.txt not found on branch <?php echo esc_html( $diag_results['branch'] ); ?></span>
-									<?php endif; ?>
-								</td>
-							</tr>
-							<tr style="border-bottom: 1px solid #f1f5f9;">
-								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'Latest Git Tag on Remote', 'kataskevi' ); ?></td>
-								<td style="padding: 6px 0;">
-									<?php if ( ! empty( $diag_results['latest_git_tag'] ) ) : ?>
-										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['latest_git_tag'] ); ?></code>
-										<?php if ( count( $diag_results['all_tags'] ) > 1 ) : ?>
-											<span style="color: #64748b; font-size: 0.85rem; margin-left: 6px;">(All tags: <?php echo esc_html( implode( ', ', $diag_results['all_tags'] ) ); ?>)</span>
-										<?php endif; ?>
-									<?php else : ?>
-										<span style="color: #64748b;">No tags found or authentication required</span>
-									<?php endif; ?>
-								</td>
-							</tr>
 							<tr>
-								<td style="padding: 6px 0; color: #64748b; font-weight: 600;"><?php esc_html_e( 'Remote style.css Version', 'kataskevi' ); ?></td>
-								<td style="padding: 6px 0;">
-									<?php if ( ! empty( $diag_results['remote_style_ver'] ) ) : ?>
-										<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;"><?php echo esc_html( $diag_results['remote_style_ver'] ); ?></code>
-									<?php else : ?>
-										<span style="color: #64748b;">Not readable or authentication required</span>
-									<?php endif; ?>
+								<th scope="row">
+									<label for="kataskevi_form_recipient_email"><?php esc_html_e( 'Notification Recipient Email', 'kataskevi' ); ?> <span style="color: #dc2626;">*</span></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_form_recipient_email" 
+										type="email" 
+										id="kataskevi_form_recipient_email" 
+										value="<?php echo esc_attr( $form_email ); ?>" 
+										class="regular-text" 
+										required
+										style="width: 100%; max-width: 480px;"
+									>
+									<p class="description"><?php esc_html_e( 'All completed website consultation requests will be dispatched to this email address.', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_form_email_subject"><?php esc_html_e( 'Email Subject Prefix', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_form_email_subject" 
+										type="text" 
+										id="kataskevi_form_email_subject" 
+										value="<?php echo esc_attr( $form_subject ); ?>" 
+										class="regular-text" 
+										style="width: 100%; max-width: 480px;"
+									>
+									<p class="description"><?php esc_html_e( 'Subject line prefix in emails, e.g. [Kataskevi Inquiry] New Consultation Request', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_form_submit_label"><?php esc_html_e( 'Submit Button Label', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_form_submit_label" 
+										type="text" 
+										id="kataskevi_form_submit_label" 
+										value="<?php echo esc_attr( $form_submit ); ?>" 
+										class="regular-text" 
+										style="width: 100%; max-width: 480px;"
+									>
+									<p class="description"><?php esc_html_e( 'Button call to action text (defaults to "Submit Consultation Request").', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_form_success_msg"><?php esc_html_e( 'Success Confirmation Message', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<textarea 
+										name="kataskevi_form_success_msg" 
+										id="kataskevi_form_success_msg" 
+										rows="3" 
+										class="large-text" 
+										style="width: 100%; max-width: 600px;"
+									><?php echo esc_textarea( $form_success ); ?></textarea>
+									<p class="description"><?php esc_html_e( 'Displayed in the alert banner right after the user submits the form.', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_form_title"><?php esc_html_e( 'Form Heading (Optional)', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_form_title" 
+										type="text" 
+										id="kataskevi_form_title" 
+										value="<?php echo esc_attr( $form_title ); ?>" 
+										class="regular-text" 
+										placeholder="<?php esc_attr_e( 'e.g. Request a Technical Consultation', 'kataskevi' ); ?>"
+										style="width: 100%; max-width: 480px;"
+									>
+									<p class="description"><?php esc_html_e( 'Optional header displayed directly inside the form card.', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_form_desc"><?php esc_html_e( 'Form Subheading (Optional)', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<textarea 
+										name="kataskevi_form_desc" 
+										id="kataskevi_form_desc" 
+										rows="2" 
+										class="large-text" 
+										style="width: 100%; max-width: 600px;"
+										placeholder="<?php esc_attr_e( 'e.g. Complete the specifications below and our engineering team will follow up within 24 hours.', 'kataskevi' ); ?>"
+									><?php echo esc_textarea( $form_desc ); ?></textarea>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row"><?php esc_html_e( 'Optional Field Toggles', 'kataskevi' ); ?></th>
+								<td>
+									<fieldset style="display: flex; flex-direction: column; gap: 8px;">
+										<label style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" name="kataskevi_form_show_phone" value="1" <?php checked( $form_phone ); ?>>
+											<span><?php esc_html_e( 'Display Phone Number field', 'kataskevi' ); ?></span>
+										</label>
+										<label style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" name="kataskevi_form_show_org" value="1" <?php checked( $form_org ); ?>>
+											<span><?php esc_html_e( 'Display Company / Organization field', 'kataskevi' ); ?></span>
+										</label>
+										<label style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" name="kataskevi_form_show_service" value="1" <?php checked( $form_service ); ?>>
+											<span><?php esc_html_e( 'Display Primary System of Interest dropdown', 'kataskevi' ); ?></span>
+										</label>
+									</fieldset>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
+					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+						<button type="submit" name="kataskevi_save_form_settings" class="button kataskevi-btn-primary">
+							💾 <?php esc_html_e( 'Save Form Settings', 'kataskevi' ); ?>
+						</button>
+					</p>
+				</form>
+			</div>
+
+			<!-- Recent Inquiries & Leads Manager -->
+			<div class="kataskevi-card">
+				<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+					<h2 style="margin: 0; font-size: 1.15rem; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+						<span>📋</span>
+						<span><?php esc_html_e( 'Recent Consultation Inquiries Log', 'kataskevi' ); ?></span>
+						<span class="kataskevi-badge kataskevi-badge-info"><?php echo count( $inquiries_list ); ?> <?php esc_html_e( 'Saved Leads', 'kataskevi' ); ?></span>
+					</h2>
+
+					<?php if ( ! empty( $inquiries_list ) ) : ?>
+						<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=forms' ) ); ?>" onsubmit="return confirm('<?php esc_attr_e( 'Are you sure you want to clear all logged inquiries? This cannot be undone.', 'kataskevi' ); ?>');">
+							<?php wp_nonce_field( 'kataskevi_clear_inquiries_nonce', 'kataskevi_clear_nonce' ); ?>
+							<button type="submit" name="kataskevi_clear_inquiries" class="button button-link-delete" style="font-size: 13px; color: #b91c1c;">
+								🗑️ <?php esc_html_e( 'Clear All Inquiries', 'kataskevi' ); ?>
+							</button>
+						</form>
+					<?php endif; ?>
 				</div>
 
-				<?php if ( ! $diag_results['api_accessible'] ) : ?>
-					<?php if ( 401 === (int) $diag_results['http_code'] && false !== stripos( $diag_results['error_message'], 'registered email' ) ) : ?>
-						<div style="margin-top: 14px; padding: 16px 20px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; color: #92400e; font-size: 0.92rem; line-height: 1.6;">
-							<strong style="display: block; margin-bottom: 6px; font-size: 1.05rem; color: #b45309;">⚠️ Atlassian API Token Detected (HTTP 401)</strong>
-							<p style="margin: 0 0 10px 0;">
-								<?php esc_html_e( 'Bitbucket detected that this is an Atlassian API Token. Atlassian API Tokens must be paired with your Atlassian registered email address in the Username field.', 'kataskevi' ); ?>
-							</p>
-							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fef3c7; border-radius: 6px; margin-bottom: 10px;">
-								<strong style="color: #0f766e; display: block; margin-bottom: 4px;">👉 To resolve this:</strong>
-								<ol style="margin: 0 0 0 18px; padding: 0; font-size: 0.88rem; color: #334155;">
-									<li>In the <strong>Atlassian Email or Bitbucket Username</strong> field below, enter your registered email (e.g. <code>olawalemichael335@gmail.com</code>).</li>
-									<li><strong>Important:</strong> If saving with your email then gives a <em>"403 — credentials lack required privilege scopes"</em> error, your token was created without Bitbucket scopes. You must generate a new scoped token at <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer"><strong>Atlassian Security &rarr;</strong></a> by clicking <strong>Create API token with scopes</strong> &rarr; Select <strong>Bitbucket</strong> &rarr; check <strong>Repositories: Read</strong>.</li>
-								</ol>
-							</div>
-						</div>
-					<?php elseif ( 403 === (int) $diag_results['http_code'] || false !== stripos( $diag_results['error_message'], 'privilege scopes' ) || false !== stripos( $diag_results['error_message'], 'forbidden' ) ) : ?>
-						<div style="margin-top: 14px; padding: 16px 20px; background: #fff5f5; border: 1px solid #fca5a5; border-radius: 8px; color: #7f1d1d; font-size: 0.92rem; line-height: 1.6;">
-							<strong style="display: block; margin-bottom: 8px; font-size: 1.05rem; color: #991b1b;">🚫 Missing Privilege Scopes (HTTP 403)</strong>
-							<p style="margin: 0 0 10px 0;">
-								<?php esc_html_e( 'Bitbucket recognized your email and token, but rejected access because the token was not granted the "Repositories: Read" scope.', 'kataskevi' ); ?>
-							</p>
-							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fed7d7; border-radius: 6px; margin-bottom: 12px;">
-								<strong style="color: #0369a1; display: block; margin-bottom: 4px;">🏆 Fix: Create a Scoped Atlassian Token (2 minutes)</strong>
-								<ol style="margin: 0 0 0 18px; padding: 0; font-size: 0.88rem; color: #334155;">
-									<li>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer"><strong>Atlassian Account Security &rarr; API Tokens</strong></a>.</li>
-									<li>Click <strong>Create API token with scopes</strong> (do not click the standard unscoped button).</li>
-									<li>Select <strong>Bitbucket</strong> as the application.</li>
-									<li>Check <strong>Repositories: Read</strong> (<code>read:repository:bitbucket</code>) and <strong>Account: Read</strong> (<code>read:user:bitbucket</code>).</li>
-									<li>Copy the new token, paste it below, ensure your registered email is in the Username field, and save.</li>
-								</ol>
-							</div>
-							<div style="background: #fff; padding: 14px 16px; border: 1px solid #fed7d7; border-radius: 6px;">
-								<strong style="color: #0369a1; display: block; margin-bottom: 4px;">⚡ Alternative (Repository Access Token):</strong>
-								<p style="margin: 0; font-size: 0.88rem; color: #334155;">
-									If the repo owner (<code>unionolivia</code>) generates a <a href="https://bitbucket.org/unionolivia/kataskevi/admin/access-tokens" target="_blank" rel="noopener noreferrer"><strong>Repository Access Token</strong></a> with <strong>Repositories: Read</strong>, you can simply enter Username: <code>x-token-auth</code> and paste that token.
-								</p>
-							</div>
-						</div>
-					<?php else : ?>
-						<div style="margin-top: 12px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #991b1b; font-size: 0.88rem;">
-							<strong><?php esc_html_e( 'Attention:', 'kataskevi' ); ?></strong>
-							<?php esc_html_e( 'Bitbucket returned HTTP ' . intval( $diag_results['http_code'] ) . '. Because the repository is private, you must provide valid Bitbucket credentials with "Repositories: Read" permission below to allow WordPress to check for updates.', 'kataskevi' ); ?>
-						</div>
-					<?php endif; ?>
-				<?php endif; ?>
-			</div>
-		<?php endif; ?>
-
-		<!-- Contact Page Google Maps Settings Card -->
-		<div class="card" style="max-width: 100%; padding: 24px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">
-			<h2 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid #eee; padding-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #0f172a;">
-				<span style="font-size: 1.25rem;">📍</span>
-				<span><?php esc_html_e( 'Contact Page — Google Maps Location & Embed Settings', 'kataskevi' ); ?></span>
-			</h2>
-			<p class="description" style="margin-bottom: 20px;">
-				<?php esc_html_e( 'Manage the interactive Google Map on your Contact Us page without Customizer limitations. Paste your full Google Maps <iframe> embed code or just the embed URL below.', 'kataskevi' ); ?>
-			</p>
-
-			<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates' ) ); ?>">
-				<?php wp_nonce_field( 'kataskevi_map_settings_nonce', 'kataskevi_map_nonce' ); ?>
-
-				<table class="form-table" role="presentation">
-					<tbody>
-						<!-- Display Map Toggle -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_contact_show_map"><?php esc_html_e( 'Display Map', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
-									<input 
-										name="kataskevi_contact_show_map" 
-										type="checkbox" 
-										id="kataskevi_contact_show_map" 
-										value="1" 
-										<?php checked( 1, (int) $saved_show_map ); ?>
-									>
-									<?php esc_html_e( 'Show office location map section on the Contact Us page', 'kataskevi' ); ?>
-								</label>
-							</td>
-						</tr>
-
-						<!-- Map Eyebrow -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_contact_map_eyebrow"><?php esc_html_e( 'Section Eyebrow', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<input 
-									name="kataskevi_contact_map_eyebrow" 
-									type="text" 
-									id="kataskevi_contact_map_eyebrow" 
-									value="<?php echo esc_attr( $saved_map_eyebrow ); ?>" 
-									class="regular-text" 
-									style="width: 100%; max-width: 480px;"
-								>
-							</td>
-						</tr>
-
-						<!-- Map Title -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_contact_map_title"><?php esc_html_e( 'Section Headline', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<input 
-									name="kataskevi_contact_map_title" 
-									type="text" 
-									id="kataskevi_contact_map_title" 
-									value="<?php echo esc_attr( $saved_map_title ); ?>" 
-									class="regular-text" 
-									style="width: 100%; max-width: 480px;"
-								>
-							</td>
-						</tr>
-
-						<!-- Map Description -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_contact_map_desc"><?php esc_html_e( 'Lead Description', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<textarea 
-									name="kataskevi_contact_map_desc" 
-									id="kataskevi_contact_map_desc" 
-									rows="3" 
-									class="large-text" 
-									style="width: 100%; max-width: 600px;"
-								><?php echo esc_textarea( $saved_map_desc ); ?></textarea>
-							</td>
-						</tr>
-
-						<!-- Google Map Embed Code or URL -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_contact_map_embed"><?php esc_html_e( 'Google Map Embed Code or URL', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<textarea 
-									name="kataskevi_contact_map_embed" 
-									id="kataskevi_contact_map_embed" 
-									rows="4" 
-									class="large-text code" 
-									style="width: 100%; max-width: 700px; font-size: 12px; line-height: 1.5;"
-									placeholder="https://www.google.com/maps/embed?pb=... or <iframe src=...>"
-								><?php echo esc_textarea( $saved_map_embed ); ?></textarea>
-								<p class="description" style="margin-top: 6px;">
-									<?php esc_html_e( 'Paste your Google Maps embed code or URL here. It will automatically be cleaned, secured, and rendered responsively.', 'kataskevi' ); ?>
-								</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<!-- Live Preview Box -->
-				<?php
-				$preview_url = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $saved_map_embed ) : $saved_map_embed;
-				if ( ! empty( $preview_url ) ) :
-				?>
-					<div style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; padding: 14px;">
-						<p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #475569;">
-							🖥️ <?php esc_html_e( 'Live Map Preview (Your Saved Configuration):', 'kataskevi' ); ?>
+				<?php if ( empty( $inquiries_list ) ) : ?>
+					<div style="text-align: center; padding: 3rem 1rem; color: #64748b; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
+						<p style="font-size: 2rem; margin: 0 0 0.5rem 0;">📭</p>
+						<p style="font-size: 1rem; font-weight: 600; color: #334155; margin: 0 0 4px 0;"><?php esc_html_e( 'No inquiries logged yet', 'kataskevi' ); ?></p>
+						<p style="font-size: 0.88rem; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto;">
+							<?php esc_html_e( 'When visitors submit consultation or site survey requests through your website form, their details will automatically be backed up and listed here.', 'kataskevi' ); ?>
 						</p>
-						<div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1;">
-							<iframe 
-								src="<?php echo esc_url( $preview_url ); ?>" 
-								width="100%" 
-								height="100%" 
-								style="border:0;" 
-								allowfullscreen="" 
-								loading="lazy" 
-								referrerpolicy="no-referrer-when-downgrade"
-								title="<?php esc_attr_e( 'Google Map Preview', 'kataskevi' ); ?>"
-							></iframe>
-						</div>
+					</div>
+				<?php else : ?>
+					<div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+						<table class="kataskevi-table">
+							<thead>
+								<tr>
+									<th><?php esc_html_e( 'Date & Time', 'kataskevi' ); ?></th>
+									<th><?php esc_html_e( 'Contact Name & Email', 'kataskevi' ); ?></th>
+									<th><?php esc_html_e( 'Phone & Org', 'kataskevi' ); ?></th>
+									<th><?php esc_html_e( 'Service Requested', 'kataskevi' ); ?></th>
+									<th><?php esc_html_e( 'Project Scope / Message', 'kataskevi' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+								foreach ( $inquiries_list as $inquiry ) :
+									$inq_date    = ! empty( $inquiry['date'] ) ? $inquiry['date'] : esc_html__( 'N/A', 'kataskevi' );
+									$inq_name    = ! empty( $inquiry['name'] ) ? $inquiry['name'] : esc_html__( 'Anonymous', 'kataskevi' );
+									$inq_email   = ! empty( $inquiry['email'] ) ? $inquiry['email'] : '';
+									$inq_phone   = ! empty( $inquiry['phone'] ) ? $inquiry['phone'] : '';
+									$inq_org     = ! empty( $inquiry['organization'] ) ? $inquiry['organization'] : esc_html__( 'Direct Client', 'kataskevi' );
+									$inq_service = ! empty( $inquiry['service'] ) ? $inquiry['service'] : esc_html__( 'General Inquiry', 'kataskevi' );
+									$inq_message = ! empty( $inquiry['message'] ) ? $inquiry['message'] : '';
+									?>
+									<tr>
+										<td style="white-space: nowrap; font-size: 12px; color: #64748b;">
+											<?php echo esc_html( $inq_date ); ?>
+										</td>
+										<td>
+											<strong><?php echo esc_html( $inq_name ); ?></strong><br>
+											<?php if ( ! empty( $inq_email ) ) : ?>
+												<a href="mailto:<?php echo esc_attr( $inq_email ); ?>" style="color: #3f75a1; font-size: 12.5px;">
+													<?php echo esc_html( $inq_email ); ?>
+												</a>
+											<?php endif; ?>
+										</td>
+										<td>
+											<?php if ( ! empty( $inq_phone ) ) : ?>
+												<a href="tel:<?php echo esc_attr( preg_replace( '/\s+/', '', $inq_phone ) ); ?>" style="color: #1e293b; font-size: 12.5px;">
+													📞 <?php echo esc_html( $inq_phone ); ?>
+												</a><br>
+											<?php endif; ?>
+											<span style="color: #64748b; font-size: 12px;">
+												🏢 <?php echo esc_html( $inq_org ); ?>
+											</span>
+										</td>
+										<td>
+											<span class="kataskevi-badge kataskevi-badge-info">
+												<?php echo esc_html( $inq_service ); ?>
+											</span>
+										</td>
+										<td style="max-width: 320px; font-size: 12.5px; line-height: 1.5; color: #334155;">
+											<?php echo esc_html( $inq_message ); ?>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
 					</div>
 				<?php endif; ?>
+			</div>
 
-				<p class="submit" style="margin-top: 20px; padding-top: 14px; border-top: 1px solid #f1f5f9;">
-					<button type="submit" name="kataskevi_save_map_settings" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1; padding: 4px 18px; height: 36px; font-size: 14px;">
-						💾 <?php esc_html_e( 'Save Map Settings', 'kataskevi' ); ?>
-					</button>
+		<!-- ================================================================= -->
+		<!-- TAB 2: CONTACT GOOGLE MAPS LOCATION & EMBED -->
+		<!-- ================================================================= -->
+		<?php elseif ( 'map' === $active_tab ) : ?>
+
+			<div class="kataskevi-card">
+				<h2 class="kataskevi-card-title">
+					<span>📍</span>
+					<span><?php esc_html_e( 'Contact Page — Google Maps Location & Embed Settings', 'kataskevi' ); ?></span>
+				</h2>
+				<p class="description" style="margin-bottom: 20px;">
+					<?php esc_html_e( 'Configure the interactive Google Map section displayed on your Contact page. Paste your full Google Maps <iframe> embed code or just the embed URL below.', 'kataskevi' ); ?>
 				</p>
-			</form>
-		</div>
 
-		<!-- Main Settings Form -->
-		<div class="card" style="max-width: 100%; padding: 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px; background: #fff;">
-			<h2 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid #eee; padding-bottom: 12px;">
-				<?php esc_html_e( 'Bitbucket Repository Credentials', 'kataskevi' ); ?>
-			</h2>
-			<p class="description" style="margin-bottom: 20px;">
-				<?php esc_html_e( 'Fill in the details below if your repository is private on Bitbucket. If your repository is public, credentials are not required.', 'kataskevi' ); ?>
-			</p>
+				<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=map' ) ); ?>">
+					<?php wp_nonce_field( 'kataskevi_map_settings_nonce', 'kataskevi_map_nonce' ); ?>
 
-			<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates' ) ); ?>">
-				<?php wp_nonce_field( 'kataskevi_repo_settings_nonce', 'kataskevi_repo_nonce' ); ?>
+					<table class="form-table" role="presentation">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_contact_show_map"><?php esc_html_e( 'Display Map', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+										<input 
+											name="kataskevi_contact_show_map" 
+											type="checkbox" 
+											id="kataskevi_contact_show_map" 
+											value="1" 
+											<?php checked( 1, (int) $saved_show_map ); ?>
+										>
+										<?php esc_html_e( 'Show office location map section on the Contact Us page', 'kataskevi' ); ?>
+									</label>
+								</td>
+							</tr>
 
-				<table class="form-table" role="presentation">
-					<tbody>
-						<!-- Repository URL -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_bitbucket_repo"><?php esc_html_e( 'Bitbucket Repository URL', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
-							</th>
-							<td>
-								<input 
-									name="kataskevi_bitbucket_repo" 
-									type="url" 
-									id="kataskevi_bitbucket_repo" 
-									value="<?php echo esc_attr( $saved_repo ); ?>" 
-									class="regular-text code" 
-									required
-									style="width: 100%; max-width: 480px;"
-								>
-								<p class="description"><?php esc_html_e( 'The full HTTPS web address of your Bitbucket repository, e.g. https://bitbucket.org/unionolivia/kataskevi', 'kataskevi' ); ?></p>
-							</td>
-						</tr>
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_contact_map_eyebrow"><?php esc_html_e( 'Section Eyebrow', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_contact_map_eyebrow" 
+										type="text" 
+										id="kataskevi_contact_map_eyebrow" 
+										value="<?php echo esc_attr( $saved_map_eyebrow ); ?>" 
+										class="regular-text" 
+										style="width: 100%; max-width: 480px;"
+									>
+								</td>
+							</tr>
 
-						<!-- Release Branch -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_bitbucket_branch"><?php esc_html_e( 'Branch to Track', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<input 
-									name="kataskevi_bitbucket_branch" 
-									type="text" 
-									id="kataskevi_bitbucket_branch" 
-									value="<?php echo esc_attr( $saved_branch ); ?>" 
-									class="regular-text code"
-									style="width: 100%; max-width: 240px;"
-								>
-								<p class="description"><?php esc_html_e( 'The git branch that holds your release code (typically "main" or "master").', 'kataskevi' ); ?></p>
-							</td>
-						</tr>
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_contact_map_title"><?php esc_html_e( 'Section Headline', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_contact_map_title" 
+										type="text" 
+										id="kataskevi_contact_map_title" 
+										value="<?php echo esc_attr( $saved_map_title ); ?>" 
+										class="regular-text" 
+										style="width: 100%; max-width: 480px;"
+									>
+								</td>
+							</tr>
 
-						<!-- Bitbucket Username or Atlassian Email -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Atlassian Email or Bitbucket Username', 'kataskevi' ); ?> <span class="required" style="color: #dc2626;">*</span></label>
-							</th>
-							<td>
-								<input 
-									name="kataskevi_bitbucket_user" 
-									type="text" 
-									id="kataskevi_bitbucket_user" 
-									value="<?php echo esc_attr( $saved_user ); ?>" 
-									class="regular-text" 
-									autocomplete="off"
-									placeholder="<?php esc_attr_e( 'e.g. olawalemichael335@gmail.com or x-token-auth', 'kataskevi' ); ?>"
-									style="width: 100%; max-width: 480px;"
-									<?php echo $has_const_user ? 'disabled' : ''; ?>
-								>
-								<?php if ( $has_const_user ) : ?>
-									<p class="description" style="color: #0284c7;">
-										<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_USER constant in wp-config.php.', 'kataskevi' ); ?></em>
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_contact_map_desc"><?php esc_html_e( 'Lead Description', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<textarea 
+										name="kataskevi_contact_map_desc" 
+										id="kataskevi_contact_map_desc" 
+										rows="3" 
+										class="large-text" 
+										style="width: 100%; max-width: 600px;"
+									><?php echo esc_textarea( $saved_map_desc ); ?></textarea>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_contact_map_embed"><?php esc_html_e( 'Google Map Embed Code or URL', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<textarea 
+										name="kataskevi_contact_map_embed" 
+										id="kataskevi_contact_map_embed" 
+										rows="4" 
+										class="large-text code" 
+										style="width: 100%; max-width: 700px; font-size: 12px; line-height: 1.5;"
+										placeholder="https://www.google.com/maps/embed?pb=... or <iframe src=...>"
+									><?php echo esc_textarea( $saved_map_embed ); ?></textarea>
+									<p class="description" style="margin-top: 6px;">
+										<?php esc_html_e( 'Paste your Google Maps embed code or URL here. It will automatically be parsed, secured, and rendered responsively.', 'kataskevi' ); ?>
 									</p>
-								<?php else : ?>
-									<p class="description">
-										&bull; <strong><?php esc_html_e( 'Atlassian API Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter your registered email address (e.g. olawalemichael335@gmail.com).', 'kataskevi' ); ?><br>
-										&bull; <strong><?php esc_html_e( 'Repository Access Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter "x-token-auth".', 'kataskevi' ); ?><br>
-										&bull; <strong><?php esc_html_e( 'Bitbucket App Password:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Enter your Bitbucket account username.', 'kataskevi' ); ?>
-									</p>
-								<?php endif; ?>
-							</td>
-						</tr>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 
-						<!-- Bitbucket App Password / Access Token -->
-						<tr>
-							<th scope="row">
-								<label for="kataskevi_bitbucket_token"><?php esc_html_e( 'Bitbucket App Password', 'kataskevi' ); ?></label>
-							</th>
-							<td>
-								<div style="position: relative; max-width: 480px;">
+					<!-- Live Preview Box -->
+					<?php
+					$preview_url = function_exists( 'kataskevi_parse_map_url' ) ? kataskevi_parse_map_url( $saved_map_embed ) : $saved_map_embed;
+					if ( ! empty( $preview_url ) ) :
+					?>
+						<div style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; padding: 14px;">
+							<p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #475569;">
+								🖥️ <?php esc_html_e( 'Live Map Preview (Your Saved Location):', 'kataskevi' ); ?>
+							</p>
+							<div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1;">
+								<iframe 
+									src="<?php echo esc_url( $preview_url ); ?>" 
+									width="100%" 
+									height="100%" 
+									style="border:0;" 
+									allowfullscreen="" 
+									loading="lazy" 
+									referrerpolicy="no-referrer-when-downgrade"
+									title="<?php esc_attr_e( 'Google Map Preview', 'kataskevi' ); ?>"
+								></iframe>
+							</div>
+						</div>
+					<?php endif; ?>
+
+					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+						<button type="submit" name="kataskevi_save_map_settings" class="button kataskevi-btn-primary">
+							💾 <?php esc_html_e( 'Save Map Settings', 'kataskevi' ); ?>
+						</button>
+					</p>
+				</form>
+			</div>
+
+		<!-- ================================================================= -->
+		<!-- TAB 3: THEME UPDATES & BITBUCKET REPOSITORY -->
+		<!-- ================================================================= -->
+		<?php elseif ( 'updates' === $active_tab ) : ?>
+			
+			<!-- System Status Card -->
+			<div class="kataskevi-card">
+				<h2 class="kataskevi-card-title">
+					<span>📊</span>
+					<span><?php esc_html_e( 'Current Installation & Git Status', 'kataskevi' ); ?></span>
+				</h2>
+
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0;">
+					<div style="background: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+						<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Installed Version', 'kataskevi' ); ?></span>
+						<strong style="font-size: 1.25rem; color: #1e293b;">v<?php echo esc_html( $current_ver ); ?></strong>
+					</div>
+
+					<div style="background: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+						<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Tracked Branch', 'kataskevi' ); ?></span>
+						<strong style="font-size: 1.1rem; color: #1e293b; font-family: monospace;"><?php echo esc_html( $saved_branch ); ?></strong>
+					</div>
+
+					<div style="background: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+						<span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;"><?php esc_html_e( 'Authentication Status', 'kataskevi' ); ?></span>
+						<?php if ( $is_configured || $has_const_token ) : ?>
+							<span class="kataskevi-badge kataskevi-badge-success">
+								● <?php esc_html_e( 'Configured (Private Repo Ready)', 'kataskevi' ); ?>
+							</span>
+						<?php else : ?>
+							<span class="kataskevi-badge kataskevi-badge-warning">
+								○ <?php esc_html_e( 'Credentials Required for Private Repo', 'kataskevi' ); ?>
+							</span>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+					<div style="font-size: 0.875rem; color: #64748b;">
+						<span><?php esc_html_e( 'Remote Repository:', 'kataskevi' ); ?></span>
+						<a href="<?php echo esc_url( $saved_repo ); ?>" target="_blank" rel="noopener noreferrer" style="font-family: monospace; color: #3f75a1; font-weight: 500;">
+							<?php echo esc_html( $saved_repo ); ?> &rarr;
+						</a>
+					</div>
+					<div style="display: flex; gap: 8px;">
+						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=test_connection' ), 'kataskevi_test_connection_nonce' ) ); ?>" class="button button-secondary">
+							🔍 <?php esc_html_e( 'Test Connection & Diagnostics', 'kataskevi' ); ?>
+						</a>
+						<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates&action=check_now' ), 'kataskevi_manual_check_nonce' ) ); ?>" class="button kataskevi-btn-primary">
+							🔄 <?php esc_html_e( 'Check for Updates Now', 'kataskevi' ); ?>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<?php if ( $diag_run && is_array( $diag_results ) ) : ?>
+				<!-- Live Diagnostic Report Card -->
+				<div class="kataskevi-card" style="border-color: #bbf7d0; background: #f0fdf4;">
+					<h3 style="margin-top: 0; font-size: 1.1rem; color: #166534; display: flex; align-items: center; gap: 8px;">
+						<span>🩺</span>
+						<span><?php esc_html_e( 'Bitbucket API Live Diagnostics Report', 'kataskevi' ); ?></span>
+						<span style="font-size: 0.8rem; font-weight: normal; color: #15803d; margin-left: auto;">
+							<?php echo esc_html( $diag_results['timestamp'] ); ?>
+						</span>
+					</h3>
+
+					<div style="background: #fff; border: 1px solid #dcfce7; border-radius: 8px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;">
+						<table class="kataskevi-table">
+							<tbody>
+								<tr>
+									<td style="color: #64748b; width: 220px; font-weight: 600;"><?php esc_html_e( 'API Connection Status', 'kataskevi' ); ?></td>
+									<td>
+										<?php if ( $diag_results['api_accessible'] ) : ?>
+											<span class="kataskevi-badge kataskevi-badge-success">HTTP 200 OK — Repository Accessible</span>
+										<?php else : ?>
+											<span class="kataskevi-badge kataskevi-badge-danger">HTTP <?php echo esc_html( $diag_results['http_code'] ); ?> — <?php echo esc_html( $diag_results['error_message'] ); ?></span>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<tr>
+									<td style="color: #64748b; font-weight: 600;"><?php esc_html_e( 'readme.txt Stable Tag', 'kataskevi' ); ?></td>
+									<td>
+										<?php if ( $diag_results['readme_found'] && ! empty( $diag_results['stable_tag'] ) ) : ?>
+											<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;"><?php echo esc_html( $diag_results['stable_tag'] ); ?></code>
+											<span style="color: #15803d; font-size: 0.85rem; margin-left: 6px;">(Primary PUC Strategy)</span>
+										<?php elseif ( $diag_results['readme_found'] ) : ?>
+											<span style="color: #b45309;">readme.txt present but missing 'Stable tag:' header</span>
+										<?php else : ?>
+											<span style="color: #dc2626;">readme.txt not found on branch <?php echo esc_html( $diag_results['branch'] ); ?></span>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<tr>
+									<td style="color: #64748b; font-weight: 600;"><?php esc_html_e( 'Latest Git Tag on Remote', 'kataskevi' ); ?></td>
+									<td>
+										<?php if ( ! empty( $diag_results['latest_git_tag'] ) ) : ?>
+											<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;"><?php echo esc_html( $diag_results['latest_git_tag'] ); ?></code>
+											<?php if ( count( $diag_results['all_tags'] ) > 1 ) : ?>
+												<span style="color: #64748b; font-size: 0.85rem; margin-left: 6px;">(All tags: <?php echo esc_html( implode( ', ', $diag_results['all_tags'] ) ); ?>)</span>
+											<?php endif; ?>
+										<?php else : ?>
+											<span style="color: #64748b;">No tags found or authentication required</span>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<tr>
+									<td style="color: #64748b; font-weight: 600;"><?php esc_html_e( 'Remote style.css Version', 'kataskevi' ); ?></td>
+									<td>
+										<?php if ( ! empty( $diag_results['remote_style_ver'] ) ) : ?>
+											<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;"><?php echo esc_html( $diag_results['remote_style_ver'] ); ?></code>
+										<?php else : ?>
+											<span style="color: #64748b;">Not readable or authentication required</span>
+										<?php endif; ?>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<?php endif; ?>
+
+			<!-- Repository Credentials Settings Card -->
+			<div class="kataskevi-card">
+				<h2 class="kataskevi-card-title">
+					<span>🔑</span>
+					<span><?php esc_html_e( 'Bitbucket Repository Credentials', 'kataskevi' ); ?></span>
+				</h2>
+				<p class="description" style="margin-bottom: 20px;">
+					<?php esc_html_e( 'Enter your Bitbucket repository details and private credentials below to enable automatic update checking and installation within WordPress.', 'kataskevi' ); ?>
+				</p>
+
+				<form method="post" action="<?php echo esc_url( admin_url( 'themes.php?page=kataskevi-updates&tab=updates' ) ); ?>">
+					<?php wp_nonce_field( 'kataskevi_repo_settings_nonce', 'kataskevi_repo_nonce' ); ?>
+
+					<table class="form-table" role="presentation">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_bitbucket_repo"><?php esc_html_e( 'Repository URL', 'kataskevi' ); ?> <span style="color: #dc2626;">*</span></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_bitbucket_repo" 
+										type="url" 
+										id="kataskevi_bitbucket_repo" 
+										value="<?php echo esc_attr( $saved_repo ); ?>" 
+										class="regular-text code" 
+										required
+										style="width: 100%; max-width: 480px;"
+									>
+									<p class="description"><?php esc_html_e( 'Full HTTPS repository URL, e.g. https://bitbucket.org/workspace/repository', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_bitbucket_branch"><?php esc_html_e( 'Branch to Track', 'kataskevi' ); ?></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_bitbucket_branch" 
+										type="text" 
+										id="kataskevi_bitbucket_branch" 
+										value="<?php echo esc_attr( $saved_branch ); ?>" 
+										class="regular-text code"
+										style="width: 100%; max-width: 240px;"
+									>
+									<p class="description"><?php esc_html_e( 'Git branch holding release tags and code (typically "main" or "master").', 'kataskevi' ); ?></p>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_bitbucket_user"><?php esc_html_e( 'Username or Registered Email', 'kataskevi' ); ?> <span style="color: #dc2626;">*</span></label>
+								</th>
+								<td>
+									<input 
+										name="kataskevi_bitbucket_user" 
+										type="text" 
+										id="kataskevi_bitbucket_user" 
+										value="<?php echo esc_attr( $saved_user ); ?>" 
+										class="regular-text" 
+										autocomplete="off"
+										placeholder="<?php esc_attr_e( 'e.g. user@example.com, username, or x-token-auth', 'kataskevi' ); ?>"
+										style="width: 100%; max-width: 480px;"
+										<?php echo $has_const_user ? 'disabled' : ''; ?>
+									>
+									<?php if ( $has_const_user ) : ?>
+										<p class="description" style="color: #0284c7;">
+											<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_USER in wp-config.php.', 'kataskevi' ); ?></em>
+										</p>
+									<?php else : ?>
+										<p class="description">
+											&bull; <strong><?php esc_html_e( 'Atlassian Scoped Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Use your registered Atlassian email address.', 'kataskevi' ); ?><br>
+											&bull; <strong><?php esc_html_e( 'Repository Access Token:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Use username: x-token-auth', 'kataskevi' ); ?><br>
+											&bull; <strong><?php esc_html_e( 'Bitbucket App Password:', 'kataskevi' ); ?></strong> <?php esc_html_e( 'Use your Bitbucket account username.', 'kataskevi' ); ?>
+										</p>
+									<?php endif; ?>
+								</td>
+							</tr>
+
+							<tr>
+								<th scope="row">
+									<label for="kataskevi_bitbucket_token"><?php esc_html_e( 'App Password / API Token', 'kataskevi' ); ?></label>
+								</th>
+								<td>
 									<input 
 										name="kataskevi_bitbucket_token" 
 										type="password" 
@@ -893,78 +1304,69 @@ function kataskevi_render_updater_page() {
 										value="<?php echo ! empty( $saved_token ) ? '********' : ''; ?>" 
 										class="regular-text code" 
 										autocomplete="new-password"
-										placeholder="<?php esc_attr_e( 'Enter your App Password / API Token', 'kataskevi' ); ?>"
-										style="width: 100%; padding-right: 40px;"
+										placeholder="<?php esc_attr_e( 'Enter your App Password or API Token', 'kataskevi' ); ?>"
+										style="width: 100%; max-width: 480px;"
 										<?php echo $has_const_token ? 'disabled' : ''; ?>
 									>
-								</div>
-								<?php if ( $has_const_token ) : ?>
-									<p class="description" style="color: #0284c7;">
-										<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_TOKEN constant in wp-config.php.', 'kataskevi' ); ?></em>
-									</p>
-								<?php else : ?>
-									<p class="description">
-										<?php esc_html_e( 'Generate a Bitbucket App Password with "Repositories: Read" permission. Leave unchanged to keep the currently stored token.', 'kataskevi' ); ?>
-									</p>
-								<?php endif; ?>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+									<?php if ( $has_const_token ) : ?>
+										<p class="description" style="color: #0284c7;">
+											<em><?php esc_html_e( 'Configured via KATASKEVI_BITBUCKET_TOKEN in wp-config.php.', 'kataskevi' ); ?></em>
+										</p>
+									<?php else : ?>
+										<p class="description">
+											<?php esc_html_e( 'Requires "Repositories: Read" permission scope. Leave unchanged to keep the currently stored token.', 'kataskevi' ); ?>
+										</p>
+									<?php endif; ?>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 
-				<p class="submit" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-					<button type="submit" name="kataskevi_save_repo_settings" class="button button-primary" style="background: #3f75a1; border-color: #3f75a1; padding: 6px 18px; height: auto; font-size: 0.95rem;">
-						<?php esc_html_e( 'Save Repository Settings', 'kataskevi' ); ?>
-					</button>
-				</p>
-			</form>
-		</div>
+					<p class="submit" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+						<button type="submit" name="kataskevi_save_repo_settings" class="button kataskevi-btn-primary">
+							💾 <?php esc_html_e( 'Save Repository Settings', 'kataskevi' ); ?>
+						</button>
+					</p>
+				</form>
+			</div>
 
-		<!-- Step-by-step Guide Card -->
-		<div class="card" style="max-width: 100%; padding: 20px 24px; border-radius: 8px; border: 1px solid #ccd0d4; box-shadow: 0 1px 3px rgba(0,0,0,0.04); background: #fbfcfe;">
-			<h3 style="margin-top: 0; font-size: 1.05rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-				<span>🔑</span>
-				<span><?php esc_html_e( 'How to generate your Bitbucket Credentials (2 Easy Options)', 'kataskevi' ); ?></span>
-			</h3>
+			<!-- Quick Step-by-Step Guide -->
+			<div class="kataskevi-card" style="background: #fbfcfe;">
+				<h3 style="margin-top: 0; font-size: 1.05rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+					<span>💡</span>
+					<span><?php esc_html_e( 'Credential Setup Instructions', 'kataskevi' ); ?></span>
+				</h3>
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
+					<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
+						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
+							🏆 <?php esc_html_e( 'Option A (Recommended): Repository Access Token', 'kataskevi' ); ?>
+						</h4>
+						<ol style="margin-left: 18px; line-height: 1.6; color: #475569; font-size: 0.88rem; padding: 0;">
+							<?php
+							$tokens_link = ! empty( $saved_repo ) ? esc_url( rtrim( $saved_repo, '/' ) . '/admin/access-tokens' ) : 'https://bitbucket.org';
+							?>
+							<li>Open: <a href="<?php echo $tokens_link; ?>" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Repository Access Tokens', 'kataskevi' ); ?> &rarr;</strong></a></li>
+							<li>Click <strong>Create repository access token</strong>.</li>
+							<li>Under <strong>Repositories</strong> check: <strong>Read</strong>.</li>
+							<li>Username: <code>x-token-auth</code>, Token: paste your generated token.</li>
+						</ol>
+					</div>
 
-			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
-				<!-- Option 1: Repository Access Token -->
-				<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px;">
-					<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
-						🏆 <?php esc_html_e( 'Option A (Fastest): Repository Access Token', 'kataskevi' ); ?>
-					</h4>
-					<ol style="margin-left: 18px; line-height: 1.7; color: #475569; font-size: 0.88rem; padding: 0;">
-						<li>Open your repo: <a href="https://bitbucket.org/unionolivia/kataskevi/admin/access-tokens" target="_blank" rel="noopener noreferrer"><strong><?php esc_html_e( 'Repository Access Tokens', 'kataskevi' ); ?></strong></a>.</li>
-						<li>Click <strong><?php esc_html_e( 'Create repository access token', 'kataskevi' ); ?></strong>.</li>
-						<li>Name it <code>Kataskevi Updater</code>.</li>
-						<li>Under <strong>Repositories</strong>, check: <strong>Read</strong>.</li>
-						<li>Click <strong>Create</strong> and copy the token.</li>
-						<li>In the form above:
-							<br>&bull; <strong>Username:</strong> <code>x-token-auth</code>
-							<br>&bull; <strong>Token:</strong> paste your token.
-						</li>
-					</ol>
-				</div>
-
-				<!-- Option 2: Personal Bitbucket App Password -->
-				<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px;">
-					<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
-						⚙️ <?php esc_html_e( 'Option B: Personal App Password', 'kataskevi' ); ?>
-					</h4>
-					<ol style="margin-left: 18px; line-height: 1.7; color: #475569; font-size: 0.88rem; padding: 0;">
-						<li>In Bitbucket, click your <strong>Profile avatar</strong> (or the gear icon ⚙️) in the top-right corner.</li>
-						<li>Click <strong>Personal Bitbucket settings</strong>.</li>
-						<li>Under <strong>Access Management</strong> on the left, click <strong>App passwords</strong>.</li>
-						<li>Click <strong>Create app password</strong>.</li>
-						<li>Under <strong>Repositories</strong>, check: <strong>Read</strong>.</li>
-						<li>In the form above:
-							<br>&bull; <strong>Username:</strong> <code>unionolivia</code>
-							<br>&bull; <strong>Token:</strong> paste your app password.
-						</li>
-					</ol>
+					<div style="background: #fff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px;">
+						<h4 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">
+							⚙️ <?php esc_html_e( 'Option B: Personal Bitbucket App Password', 'kataskevi' ); ?>
+						</h4>
+						<ol style="margin-left: 18px; line-height: 1.6; color: #475569; font-size: 0.88rem; padding: 0;">
+							<li>Open: <a href="https://bitbucket.org/account/settings/app-passwords/" target="_blank" rel="noopener noreferrer"><strong>Personal App Passwords &rarr;</strong></a></li>
+							<li>Click <strong>Create app password</strong>.</li>
+							<li>Under <strong>Repositories</strong> check: <strong>Read</strong>.</li>
+							<li>Username: your Bitbucket username, Token: paste app password.</li>
+						</ol>
+					</div>
 				</div>
 			</div>
-		</div>
+
+		<?php endif; ?>
 
 	</div>
 	<?php

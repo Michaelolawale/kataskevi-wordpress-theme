@@ -108,7 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (currentSubmitBtn) {
         currentSubmitBtn.disabled = true;
         originalBtnHtml = currentSubmitBtn.innerHTML;
-        currentSubmitBtn.innerHTML = '<span>Sending Request...</span>';
+        const submittingText = (typeof kataskeviData !== 'undefined' && kataskeviData.submitting) ? kataskeviData.submitting : 'Submitting Request...';
+        currentSubmitBtn.innerHTML = `<span>${submittingText}</span>`;
       }
       if (statusBox) {
         statusBox.style.display = 'none';
@@ -175,9 +176,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showStatus(msg, type) {
       if (!statusBox) return;
-      statusBox.textContent = msg;
+      const icon = type === 'success' ? '✅' : '⚠️';
+      statusBox.innerHTML = '';
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'status-alert-icon';
+      iconSpan.setAttribute('aria-hidden', 'true');
+      iconSpan.textContent = icon;
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'status-alert-text';
+      textSpan.textContent = msg;
+
+      statusBox.appendChild(iconSpan);
+      statusBox.appendChild(textSpan);
       statusBox.className = 'form-status-alert ' + type;
-      statusBox.style.display = 'block';
+      statusBox.style.display = 'flex';
       statusBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
@@ -477,4 +491,136 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
+
+  // 7. Scroll-Driven Element Reveal Transitions
+  const initScrollReveals = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const revealSelectors = [
+      '.service-grid-card',
+      '.work-card',
+      '.featured-work-card',
+      '.section-hero-media',
+      '.case-media-frame',
+      '.case-block',
+      '.contact-editorial-card',
+      '.section-contact-map',
+      '.about-accordion-card',
+      '.pillars-editorial-grid',
+      '.contact-meta-card',
+      '.stat-card',
+      '.stat-counter-item',
+      '.deliverable-item',
+      '.reveal-on-scroll'
+    ];
+
+    const elementsToReveal = document.querySelectorAll(revealSelectors.join(', '));
+    if (elementsToReveal.length === 0) return;
+
+    if (!('IntersectionObserver' in window)) {
+      elementsToReveal.forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '0px 0px -40px 0px',
+      threshold: 0.08,
+    });
+
+    elementsToReveal.forEach((el) => {
+      if (!el.classList.contains('reveal-on-scroll')) {
+        el.classList.add('reveal-on-scroll');
+      }
+
+      // Check if element is already within viewport on initial load
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('is-revealed');
+      } else {
+        observer.observe(el);
+      }
+    });
+  };
+
+  initScrollReveals();
+
+  // 8. Smooth Page Navigation Transition
+  const initPageTransitions = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    // Reset exit transition when page is restored from bfcache
+    window.addEventListener('pageshow', () => {
+      document.body.classList.remove('page-is-exiting');
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      if (!href) return;
+
+      // Ignore hash links, mailto, tel, javascript, new tabs, modifier keys, downloads
+      if (
+        href.startsWith('#') ||
+        href.startsWith('mailto:') ||
+        href.startsWith('tel:') ||
+        href.startsWith('javascript:') ||
+        link.target === '_blank' ||
+        link.hasAttribute('download') ||
+        e.ctrlKey ||
+        e.metaKey ||
+        e.shiftKey ||
+        e.altKey ||
+        e.defaultPrevented
+      ) {
+        return;
+      }
+
+      let targetUrl;
+      try {
+        targetUrl = new URL(link.href, window.location.href);
+      } catch (err) {
+        return;
+      }
+
+      // Only transition internal same-origin links
+      if (targetUrl.origin !== window.location.origin) {
+        return;
+      }
+
+      // Ignore wp-admin, login, or clicking same page anchor
+      if (
+        targetUrl.pathname.includes('/wp-admin') ||
+        targetUrl.pathname.includes('/wp-login.php') ||
+        (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search && targetUrl.hash)
+      ) {
+        return;
+      }
+
+      // If browser doesn't have cross-document view transitions natively, handle smoothly with CSS
+      const supportsNavTransitions = ('startViewTransition' in document) && ('navigation' in window);
+      if (!supportsNavTransitions) {
+        e.preventDefault();
+        document.body.classList.add('page-is-exiting');
+        setTimeout(() => {
+          window.location.href = targetUrl.href;
+        }, 180);
+      }
+    });
+  };
+
+  initPageTransitions();
 });

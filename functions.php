@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'KATASKEVI_VERSION', '2.2.3' );
+define( 'KATASKEVI_VERSION', '2.2.4' );
 define( 'KATASKEVI_DIR', get_template_directory() );
 define( 'KATASKEVI_URI', get_template_directory_uri() );
 
@@ -425,13 +425,18 @@ function kataskevi_scripts_styles() {
 	);
 
 	// Localize script for AJAX quotes and forms
+	$default_success_msg = esc_html__( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' );
+	$configured_success  = get_option( 'kataskevi_form_success_msg', get_theme_mod( 'kataskevi_form_success_msg', $default_success_msg ) );
+
 	wp_localize_script(
 		'kataskevi-main-js',
 		'kataskeviData',
 		array(
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'kataskevi_inquiry_nonce' ),
-			'siteUrl' => esc_url( home_url( '/' ) ),
+			'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+			'nonce'      => wp_create_nonce( 'kataskevi_inquiry_nonce' ),
+			'siteUrl'    => esc_url( home_url( '/' ) ),
+			'successMsg' => ! empty( $configured_success ) ? esc_html( $configured_success ) : $default_success_msg,
+			'submitting' => esc_html__( 'Submitting Request...', 'kataskevi' ),
 		)
 	);
 
@@ -2384,22 +2389,33 @@ function kataskevi_handle_inquiry_submission() {
 		wp_send_json_error( array( 'message' => esc_html__( 'Please provide a valid work email address.', 'kataskevi' ) ) );
 	}
 
-	$admin_email = get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) );
-	$brand_name  = kataskevi_get_brand_name();
-	/* translators: 1: Brand name, 2: Customer name */
-	$subject     = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
-	$body        = "You have received a new consultation / site survey request:\n\n";
-	$body       .= "Full Name: $name\n";
-	$body       .= "Email: $email\n";
-	$body       .= "Phone: " . ( ! empty( $phone ) ? $phone : 'Not provided' ) . "\n";
-	$body       .= "Company / Organization: " . ( ! empty( $organization ) ? $organization : 'Not provided' ) . "\n";
-	$body       .= "Service Required: " . ( ! empty( $service ) ? $service : 'General Audit / Inquiries' ) . "\n\n";
-	$body       .= "Project Scope / Notes:\n$message\n\n";
-	$body       .= "---\nSent from: " . home_url() . "\n";
+	// Recipient email from Form Settings, fallback to company email or admin email.
+	$admin_email = get_option( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_form_recipient_email', get_theme_mod( 'kataskevi_email', get_option( 'admin_email' ) ) ) );
+	if ( empty( $admin_email ) || ! is_email( $admin_email ) ) {
+		$admin_email = get_option( 'admin_email' );
+	}
+
+	$brand_name     = kataskevi_get_brand_name();
+	$subject_prefix = get_option( 'kataskevi_form_email_subject', get_theme_mod( 'kataskevi_form_email_subject', '' ) );
+	if ( empty( $subject_prefix ) ) {
+		/* translators: 1: Brand name, 2: Customer name */
+		$subject = sprintf( '[%1$s Inquiry] New Consultation Request from %2$s', $brand_name, $name );
+	} else {
+		$subject = sprintf( '%1$s from %2$s', $subject_prefix, $name );
+	}
+
+	$body  = "You have received a new consultation / site survey request:\n\n";
+	$body .= 'Full Name: ' . $name . "\n";
+	$body .= 'Email: ' . $email . "\n";
+	$body .= 'Phone: ' . ( ! empty( $phone ) ? $phone : esc_html__( 'Not provided', 'kataskevi' ) ) . "\n";
+	$body .= 'Company / Organization: ' . ( ! empty( $organization ) ? $organization : esc_html__( 'Not provided', 'kataskevi' ) ) . "\n";
+	$body .= 'Service Required: ' . ( ! empty( $service ) ? $service : esc_html__( 'General Audit / Inquiries', 'kataskevi' ) ) . "\n\n";
+	$body .= "Project Scope / Notes:\n" . $message . "\n\n";
+	$body .= "---\nSent from: " . esc_url( home_url( '/' ) ) . "\n";
 
 	$headers = array(
 		'Content-Type: text/plain; charset=UTF-8',
-		"Reply-To: $name <$email>",
+		'Reply-To: ' . $name . ' <' . $email . '>',
 	);
 
 	// Send email (falls back gracefully in local dev).
@@ -2425,8 +2441,14 @@ function kataskevi_handle_inquiry_submission() {
 	$inquiries = array_slice( $inquiries, 0, 50 );
 	update_option( 'kataskevi_recent_inquiries', $inquiries, false );
 
+	$default_success_msg = esc_html__( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' );
+	$success_msg         = get_option( 'kataskevi_form_success_msg', get_theme_mod( 'kataskevi_form_success_msg', $default_success_msg ) );
+	if ( empty( $success_msg ) ) {
+		$success_msg = $default_success_msg;
+	}
+
 	wp_send_json_success( array(
-		'message' => esc_html__( 'Thank you! Your inquiry has been received. A Kataskevi technical specialist will contact you within 24 hours.', 'kataskevi' ),
+		'message' => esc_html( $success_msg ),
 	) );
 }
 add_action( 'wp_ajax_kataskevi_submit_inquiry', 'kataskevi_handle_inquiry_submission' );
