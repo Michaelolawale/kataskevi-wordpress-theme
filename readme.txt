@@ -4,7 +4,7 @@ Tags: engineering, safety, telecommunications, corporate, responsive-layout, mod
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: v2.2.4
+Stable tag: v2.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,12 @@ Updates are distributed through the integrated Plugin Update Checker (PUC) v6.0 
 Navigate to Appearance > Theme Updates in your WordPress admin dashboard and input your Bitbucket Username (or registered email) along with an App Password configured with `Repositories: Read` permissions.
 
 == Changelog ==
+
+= 2.2.5 =
+* Button Highlights & Interaction: Added `user-select: none` across pill buttons and action buttons to prevent accidental text highlight on click. Enhanced focus-visible outlines and active press transitions.
+* Global Selection Styling: Added theme primary text highlight (`::selection` and `::-moz-selection`) with Customizer color synchronization across all page sections, cards, and dark footer zones.
+* Success & Error Alerts Refinement: Replaced consumer emojis with crisp, stroke-based SVG icons matching the theme's architectural aesthetic, and redesigned confirmation alerts with white card styling and primary accent borders.
+* Admin UI Polish: Replaced all emojis in Appearance > Theme Updates tabs, cards, and buttons with native WordPress Dashicons.
 
 = 2.2.4 =
 * Theme Customizer & Updates UI Refinement: Clean, sequential section numbering (1-13) with dedicated "13. Inquiry & Form Settings" section.
